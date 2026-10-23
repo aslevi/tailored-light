@@ -57,6 +57,12 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px}
 
 .stage{position:relative;min-width:0;display:grid;place-items:center;background:#0d1210;border-radius:22px;overflow:hidden;min-height:300px}
 .view{position:relative;max-width:100%}
+@media (max-width:899px){
+  .stage{position:sticky;top:0;z-index:4;display:block;min-height:0;border-radius:0 0 22px 22px;margin:0 -16px;box-shadow:0 12px 24px -18px rgba(0,0,0,.5)}
+  .stage .view{max-width:none}
+  .stickycta .fine,.stickycta .price .x{display:none}
+  .stickycta{gap:6px;padding-top:8px}
+}
 #gl{display:block;width:100%;height:100%;touch-action:none;cursor:ns-resize}
 .handles{position:absolute;inset:0;pointer-events:none}
 .handles svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -160,7 +166,7 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 .receipt{align-self:flex-end;font-size:11px;color:var(--muted);margin:-2px 4px 4px}
-.clipcard{align-self:flex-start;width:260px;max-width:82%;border-radius:18px;overflow:hidden;background:var(--panel);border:1px solid var(--line);box-shadow:0 8px 22px -14px rgba(0,0,0,.4);text-align:left;padding:0;animation:pop .25s ease-out}
+.clipcard{flex:none;align-self:flex-start;width:260px;max-width:82%;border-radius:18px;overflow:hidden;background:var(--panel);border:1px solid var(--line);box-shadow:0 8px 22px -14px rgba(0,0,0,.4);text-align:left;padding:0;animation:pop .25s ease-out}
 .clipcard img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
 .clipcard .cc{display:flex;align-items:center;gap:10px;padding:10px 12px}
 .clipcard .ic{width:34px;height:34px;border-radius:9px;background:var(--pine);display:grid;place-items:center;color:var(--pine-ink);font-family:var(--display);font-style:italic;font-size:16px;flex:none}
@@ -277,7 +283,7 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
         <button class="btn ghost" id="mine">Try it on my window</button>
       </div>
       <div class="stickycta">
-        <div class="price"><div><b id="price"></b></div><span>per window, made to measure<br>measurements checked by Dana</span></div>
+        <div class="price"><div><b id="price"></b></div><span>per window, made to measure<span class="x"><br>measurements checked by Dana</span></span></div>
         <button class="btn primary" id="send"><span class="av" style="width:26px;height:26px;font-size:12px">D</span> Text Dana, your designer</button>
         <p class="fine">Free design help. She'll mock up every room and answer anything.</p>
       </div>
@@ -729,9 +735,17 @@ function layout(){
   const stage = $("#stage"), view = $("#view");
   const wide = matchMedia("(min-width:900px)").matches;
   const maxW = stage.clientWidth, maxH = wide ? Math.min(innerHeight - 90, 820) : Math.min(innerHeight * .62, 640);
-  const k = Math.min(maxW / imgW, maxH / imgH);
+  const live = !!document.querySelector(".live");
+  const k = (wide || live) ? Math.min(maxW / imgW, maxH / imgH) : maxW / imgW;
   const w = Math.round(imgW * k), h = Math.round(imgH * k);
-  view.style.width = w + "px"; view.style.height = h + "px"; stage.style.height = h + "px";
+  view.style.width = w + "px"; view.style.height = h + "px";
+  if(wide){ stage.style.height = h + "px"; view.style.top = ""; }
+  else {
+    // phones: full-width room, kept on screen while choosing; crop around the window
+    const sh = Math.min(h, Math.round(innerHeight * .44)); stage.style.height = sh + "px";
+    let cy = .45; if(corners){ const n = corners[0][1] > 1.5 ? imgH : 1; cy = corners.reduce((a,c)=>a+c[1],0)/4/n; }
+    view.style.top = Math.round(Math.min(0, Math.max(sh - h, sh/2 - cy*h))) + "px";
+  }
   renderer.setSize(w, h, false); canvas.style.width = w + "px"; canvas.style.height = h + "px";
   drawHandles(); draw();
 }
@@ -810,10 +824,10 @@ function startPlay(){
 }
 function stopPlay(){ playDay = null; $("#playBtn").textContent = "▶ Play my day"; setTimeout(()=>{ if(!playDay) $("#cap").hidden = true; }, 1800); }
 function stepPlay(now){
-  const k = Math.min(1, (now - playDay.t0) / playDay.dur);
+  const k = Math.max(0, Math.min(1, (now - playDay.t0) / playDay.dur));
   S.night = uniforms.night.value = k < .45 ? 0 : k < .62 ? (k - .45) / .17 * .55 : .55 + (k - .62) / .38 * .45;
   if(!playDay.lowered && k > .6){ playDay.lowered = true; tween("drop", 1, 2600); }
-  const c = CAPS.filter(x => k >= x[0]).pop(); $("#cap").textContent = c[1];
+  const c = CAPS.filter(x => k >= x[0]).pop() || CAPS[0]; $("#cap").textContent = c[1];
   document.querySelectorAll(".tod button").forEach(x=>x.setAttribute("aria-pressed", +x.dataset.tod === (S.night > .8 ? 1 : S.night > .2 ? .55 : 0)));
   if(k >= 1) stopPlay();
 }
@@ -1143,17 +1157,21 @@ function openLive(){
   // move the live canvas into the full-screen view, then put it back
   const home = canvas.parentElement, next = canvas.nextSibling;
   $("#lvStage").prepend(canvas);
-  const fit = () => { const W = innerWidth, H = innerHeight; const k = Math.min(W / imgW, H / imgH) * 1.0; renderer.setSize(Math.round(imgW*k), Math.round(imgH*k), false); canvas.style.width = Math.round(imgW*k)+"px"; canvas.style.height = Math.round(imgH*k)+"px"; };
+  const fit = () => { const W = innerWidth, H = innerHeight; const k = Math.max(W / imgW, H / imgH); const cw = Math.round(imgW*k), ch = Math.round(imgH*k);
+    renderer.setSize(cw, ch, false); Object.assign(canvas.style, {width:cw+"px", height:ch+"px", position:"absolute", maxWidth:"none", maxHeight:"none"});
+    let cx = .5, cy = .5; if(corners){ const n = corners[0][0] > 1.5 ? [imgW, imgH] : [1, 1]; cx = corners.reduce((a,c)=>a+c[0],0)/4/n[0]; cy = corners.reduce((a,c)=>a+c[1],0)/4/n[1]; }
+    const left = Math.min(0, Math.max(W - cw, W/2 - cx*cw)), top = Math.min(0, Math.max(H - ch, H*0.42 - cy*ch));
+    canvas.style.left = left+"px"; canvas.style.top = top+"px"; };
   fit(); addEventListener("resize", fit);
   const strip = $("#lvStrip");
   const stt = CATALOG[S.style];
-  stt.groups.filter(g => fits(S.style, g)).forEach(g => g.colors.forEach(([n,h,uri]) => {
+  (stt.groups.some(g => fits(S.style, g)) ? stt.groups.filter(g => fits(S.style, g)) : stt.groups).forEach(g => g.colors.forEach(([n,h,uri]) => {
     const b = document.createElement("button"); b.setAttribute("aria-label", `${g.family} ${n}`); b.setAttribute("aria-pressed", S.family===g.family && S.color===n);
     if(uri){ const i = document.createElement("img"); i.src = uri; i.alt = ""; b.append(i); } else b.style.background = h;
     b.onclick = () => { S.family = g.family; S.color = n; strip.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); applyShade(); renderStrip(); };
     strip.append(b);
   }));
-  const close = () => { removeEventListener("resize", fit); home.insertBefore(canvas, next); lv.remove(); layout(); };
+  const close = () => { removeEventListener("resize", fit); ["position","left","top","maxWidth","maxHeight"].forEach(k=>canvas.style[k]=""); home.insertBefore(canvas, next); lv.remove(); layout(); };
   $("#lvClose").onclick = close;
   $("#lvText").onclick = () => { close(); openChat(); const {grp,col} = current(); me(`Love ${grp.family} in ${col[0]}. What's next?`); say(["Great choice! Let's lock in your measurements and I'll send your quote."]); };
 }
