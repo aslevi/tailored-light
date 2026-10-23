@@ -64,12 +64,29 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .stickycta{gap:6px;padding-top:8px}
 }
 #gl{display:block;width:100%;height:100%;touch-action:none;cursor:ns-resize}
+.view{touch-action:none}
 .handles{position:absolute;inset:0;pointer-events:none}
 .handles svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .hdl{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;pointer-events:auto;touch-action:none;cursor:grab;display:grid;place-items:center;background:transparent;border:0}
 .hdl span{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--sun);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .overlay{position:absolute;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none}
 .overlay.topo{top:12px}
+.zoomctl{display:flex;gap:6px;pointer-events:none}
+.zoomctl .pill{min-width:32px}
+#gl,#handles{transform-origin:0 0}
+/* note mode */
+.nbtn{position:fixed;left:12px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:40;border:0;border-radius:999px;padding:10px 14px;font:600 14px/1 var(--sans, system-ui);background:#E59A2F;color:#1B1B1B;box-shadow:0 8px 20px -8px rgba(0,0,0,.5);cursor:pointer}
+@media (min-width:900px){ .nbtn{bottom:20px} }
+.nbanner{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:60;background:#1B2A26;color:#fff;border-radius:999px;padding:9px 16px;font:600 14px/1.2 system-ui;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
+body.placing, body.placing *{cursor:crosshair!important}
+.npin{position:absolute;z-index:45;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:#E59A2F;color:#111;font:700 12px/24px system-ui;text-align:center;box-shadow:0 0 0 3px #fff,0 4px 10px rgba(0,0,0,.4);pointer-events:none}
+.npanel{position:fixed;inset:auto 12px calc(12px + env(safe-area-inset-bottom,0px)) 12px;max-width:460px;margin:0 auto;max-height:70dvh;overflow:auto;z-index:70;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px;display:grid;gap:10px}
+.npanel textarea{width:100%;min-height:90px;font:16px/1.4 system-ui;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink);box-sizing:border-box}
+.npanel .row{display:flex;gap:8px;flex-wrap:wrap}
+.npanel .row button{flex:1;min-width:110px}
+.npanel ol{margin:0;padding-left:20px;display:grid;gap:8px;font-size:14px}
+.npanel li small{display:block;color:var(--muted)}
+.npanel .x{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
 .overlay.boto{bottom:12px}
 .pill{pointer-events:auto;background:var(--scrim);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:0;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .tod{pointer-events:auto;display:flex;background:var(--scrim);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:999px;padding:3px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
@@ -245,7 +262,7 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
         </div>
         <div class="overlay topo">
           <span class="pill roomtag" id="roomTag">Sample room</span>
-          <button class="pill" id="adjust">Adjust window</button>
+          <span class="zoomctl"><button class="pill" id="zOut" aria-label="Zoom out">−</button><button class="pill" id="zIn" aria-label="Zoom in">+</button><button class="pill" id="adjust">Adjust window</button></span>
         </div>
         <div class="cap" id="cap" hidden aria-live="polite"></div>
         <div class="overlay boto">
@@ -791,7 +808,7 @@ function loadRoom(id){
   uniforms.roomLum.value = R.lum ?? estimateLum(R.src);
   $("#roomTag").textContent = R.label;
   $("#credit").textContent = R.credit ? `Photo: ${R.credit} on Unsplash` : "";
-  updateGeometry(); layout(); renderRooms(); draw();
+  updateGeometry(); layout(); renderRooms(); draw(); if(typeof resetZoom === "function") resetZoom();
 }
 function estimateLum(src){
   const c = document.createElement("canvas"); c.width = 32; c.height = 32; const g = c.getContext("2d");
@@ -1030,7 +1047,7 @@ let dragging = false;
 function evToImg(e){ const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left)/r.width, (e.clientY - r.top)/r.height]; }
 let looking = null;
 canvas.addEventListener("pointerdown", e => {
-  if(S.adjusting) return;
+  if(S.adjusting || ptrs.size >= 2) return;
   if(playDay) stopPlay();
   const [x,y] = evToImg(e); const [u,v,z] = toWindow(x,y);
   canvas.setPointerCapture(e.pointerId);
@@ -1039,6 +1056,7 @@ canvas.addEventListener("pointerdown", e => {
 });
 canvas.addEventListener("pointermove", e => {
   const [x,y] = evToImg(e);
+  if(pinch) return;
   if(dragging){ const [,v] = toWindow(x,y); setDrop(v); return; }
   if(looking){ parSpring.tx = Math.max(-1, Math.min(1, (x - looking.x) * 4)); parSpring.ty = Math.max(-1, Math.min(1, (y - looking.y) * 4)); }
   else if(e.pointerType === "mouse"){ parSpring.tx = (x - .5) * 1.2; parSpring.ty = (y - .5) * .8; }
@@ -1046,6 +1064,42 @@ canvas.addEventListener("pointermove", e => {
 const endPtr = () => { dragging = false; if(looking){ looking = null; parSpring.tx = 0; parSpring.ty = 0; } };
 canvas.addEventListener("pointerup", endPtr); canvas.addEventListener("pointercancel", endPtr);
 canvas.addEventListener("pointerleave", () => { if(!looking && !dragging){ parSpring.tx = 0; parSpring.ty = 0; } });
+/* zoom: pinch, trackpad pinch (ctrl+wheel), or the +/− buttons */
+const Z = {s:1, tx:0, ty:0};
+function applyZoom(){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  Z.s = Math.max(1, Math.min(4, Z.s));
+  Z.tx = Math.min(0, Math.max(w * (1 - Z.s), Z.tx)); Z.ty = Math.min(0, Math.max(h * (1 - Z.s), Z.ty));
+  const t = Z.s === 1 ? "" : `translate(${Z.tx}px,${Z.ty}px) scale(${Z.s})`;
+  canvas.style.transform = t; $("#handles").style.transform = t;
+  $("#zOut").hidden = Z.s <= 1.001;
+}
+function zoomAt(f, cx, cy){ // cx, cy: point in the canvas's unzoomed css box that should stay put
+  const s0 = Z.s, s1 = Math.max(1, Math.min(4, s0 * f));
+  Z.tx = cx - (cx - Z.tx) * (s1 / s0); Z.ty = cy - (cy - Z.ty) * (s1 / s0); Z.s = s1; applyZoom();
+}
+function resetZoom(){ Z.s = 1; Z.tx = 0; Z.ty = 0; applyZoom(); }
+const viewEl = $("#view"), ptrs = new Map(); let pinch = null;
+const localPt = e => { const r = viewEl.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+viewEl.addEventListener("pointerdown", e => {
+  ptrs.set(e.pointerId, localPt(e));
+  if(ptrs.size === 2){ dragging = false; looking = null; const [a,b] = [...ptrs.values()];
+    pinch = {d: Math.hypot(a[0]-b[0], a[1]-b[1]), mx:(a[0]+b[0])/2, my:(a[1]+b[1])/2, s:Z.s, tx:Z.tx, ty:Z.ty}; }
+}, true);
+viewEl.addEventListener("pointermove", e => {
+  if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, localPt(e));
+  if(pinch && ptrs.size >= 2){ const [a,b] = [...ptrs.values()];
+    const d = Math.hypot(a[0]-b[0], a[1]-b[1]), mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+    const s1 = Math.max(1, Math.min(4, pinch.s * d / Math.max(1, pinch.d)));
+    Z.tx = mx - (pinch.mx - pinch.tx) * (s1 / pinch.s); Z.ty = my - (pinch.my - pinch.ty) * (s1 / pinch.s); Z.s = s1; applyZoom(); }
+}, true);
+const ptrEnd = e => { ptrs.delete(e.pointerId); if(ptrs.size < 2) pinch = null; };
+viewEl.addEventListener("pointerup", ptrEnd, true); viewEl.addEventListener("pointercancel", ptrEnd, true);
+viewEl.addEventListener("wheel", e => { if(!e.ctrlKey) return; e.preventDefault(); const [x,y] = localPt(e); zoomAt(Math.exp(-e.deltaY * .01), x, y); }, {passive:false});
+$("#zIn").onclick = () => { const w = canvas.clientWidth, h = canvas.clientHeight; let cx = w/2, cy = h/2;
+  if(Z.s === 1 && corners){ cx = corners.reduce((a,c)=>a+c[0],0)/4*w; cy = corners.reduce((a,c)=>a+c[1],0)/4*h; }
+  zoomAt(1.6, cx, cy); };
+$("#zOut").onclick = () => { if(Z.s / 1.6 <= 1.05) resetZoom(); else zoomAt(1/1.6, canvas.clientWidth/2, canvas.clientHeight/2); };
 function setDrop(v){ delete tweens.drop; if(playDay) stopPlay(); S.drop = Math.max(.08, Math.min(1, v)); if(S.drop > .985) S.drop = 1; $("#drop").value = Math.round(S.drop*100); applyShade(); }
 
 /* corner handles */
@@ -1391,6 +1445,108 @@ $("#kitForm").addEventListener("submit", async e => {
 let toastT;
 function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), 3200); }
 
+/* ---------- Note mode (for reviewing the site): ?notes=1 turns it on ---------- */
+const NOTES = { list: [] };
+try { if(new URLSearchParams(location.search).get("notes") === "1") store.set("tl.notesOn", "1"); if(new URLSearchParams(location.search).get("notes") === "0") store.set("tl.notesOn", ""); } catch(e){}
+try { NOTES.list = JSON.parse(store.get("tl.notesList") || "[]"); } catch(e){ NOTES.list = []; }
+function saveNotes(){ store.set("tl.notesList", JSON.stringify(NOTES.list.map(n => ({...n, shot: n.shot && n.shot.length < 400000 ? n.shot : null})))); }
+function describeEl(el){
+  if(!el) return "page";
+  if(el.closest && el.closest("#gl")) return "the room / shade";
+  const t = el.closest("button,a,label,input,select,textarea,[role],h1,h2,h3,p,li,span,div") || el;
+  const txt = (t.getAttribute("aria-label") || t.textContent || t.placeholder || "").replace(/\s+/g," ").trim().slice(0, 70);
+  const sec = t.closest("section,dialog,.sms,.live,.stickycta,header");
+  return `${t.tagName.toLowerCase()}${t.id ? "#" + t.id : ""}${txt ? ` "${txt}"` : ""}${sec && sec.id ? ` in #${sec.id}` : ""}`;
+}
+function noteState(){ return {style:S.style, fabric:S.family, color:S.color, room:USES[S.use].label, need:NEEDS[S.need].label, photo:S.room, mount:S.mount, lining:S.style==="roman"?LININGS[S.lining].k:"", drop:Math.round(S.drop*100)+"%", time:["Day","Evening","Night"][S.night>.8?2:S.night>.2?1:0], zoom:Z.s.toFixed(1), screen:`${innerWidth}x${innerHeight}`}; }
+function pinShot(rx, ry){
+  try { const src = snapshot(); return new Promise(res => { const im = new Image(); im.onload = () => {
+    const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const g = c.getContext("2d"); g.drawImage(im, 0, 0);
+    if(rx != null){ g.fillStyle = "#E59A2F"; g.strokeStyle = "#fff"; g.lineWidth = 4; g.beginPath(); g.arc(rx*c.width, ry*c.height, 14, 0, 7); g.fill(); g.stroke(); }
+    res(c.toDataURL("image/jpeg", .7)); }; im.src = src; }); } catch(e){ return Promise.resolve(null); }
+}
+function renderNoteUI(){
+  if(store.get("tl.notesOn") !== "1") return;
+  let b = $("#nbtn"); if(!b){ b = document.createElement("button"); b.id = "nbtn"; b.className = "nbtn"; document.body.append(b); b.onclick = openNotePanel; }
+  b.textContent = `✎ Notes${NOTES.list.length ? " (" + NOTES.list.length + ")" : ""}`;
+  document.querySelectorAll(".npin").forEach(p => p.remove());
+  NOTES.list.forEach((n, i) => { if(n.page !== location.pathname || n.px == null) return; const p = document.createElement("div"); p.className = "npin"; p.textContent = i + 1; p.style.left = n.px + "px"; p.style.top = n.py + "px"; document.body.append(p); });
+}
+function closePanel(){ document.querySelectorAll(".npanel").forEach(p => p.remove()); }
+function openNotePanel(){
+  closePanel();
+  const p = document.createElement("div"); p.className = "npanel"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","Notes");
+  p.innerHTML = `<b>Notes for Claude</b><small style="color:var(--muted)">Tap "Add a note", then tap the spot you mean. Use the mic on your keyboard to dictate.</small>
+    <ol></ol><div class="row"><button class="btn primary" id="nAdd">Add a note</button><button class="btn" id="nSend">Send to Claude</button></div>
+    <div class="row"><button class="x" id="nClear">Clear all</button><button class="x" id="nClose">Close</button></div>`;
+  const ol = p.querySelector("ol");
+  NOTES.list.forEach((n, i) => { const li = document.createElement("li"); li.innerHTML = `<span></span><small></small> <button class="x">Delete</button>`;
+    li.querySelector("span").textContent = n.text; li.querySelector("small").textContent = `On ${n.on} · ${n.state.style}, ${n.state.fabric} ${n.state.color}, ${n.state.room}`;
+    li.querySelector("button").onclick = () => { NOTES.list.splice(i, 1); saveNotes(); renderNoteUI(); openNotePanel(); }; ol.append(li); });
+  if(!NOTES.list.length) ol.outerHTML = `<small style="color:var(--muted)">No notes yet.</small>`;
+  document.body.append(p);
+  p.querySelector("#nClose").onclick = closePanel;
+  p.querySelector("#nClear").onclick = () => { NOTES.list = []; saveNotes(); renderNoteUI(); openNotePanel(); };
+  p.querySelector("#nAdd").onclick = startPlacing;
+  p.querySelector("#nSend").onclick = sendNotes;
+}
+function startPlacing(){
+  closePanel(); document.body.classList.add("placing");
+  const ban = document.createElement("div"); ban.className = "nbanner"; ban.textContent = "Tap the spot your note is about"; document.body.append(ban);
+  const grab = e => {
+    if(e.target.closest && e.target.closest(".nbtn")) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    document.removeEventListener("click", grab, true); document.removeEventListener("pointerdown", stop, true);
+    document.body.classList.remove("placing"); ban.remove();
+    const on = describeEl(e.target); const onCanvas = e.target === canvas;
+    let rx = null, ry = null; if(onCanvas){ [rx, ry] = evToImg(e); }
+    const px = e.pageX, py = e.pageY;
+    const pnl = document.createElement("div"); pnl.className = "npanel";
+    pnl.innerHTML = `<b>Note</b><small style="color:var(--muted)"></small><textarea placeholder="What should change here?"></textarea><div class="row"><button class="btn primary">Save note</button><button class="btn">Cancel</button></div>`;
+    pnl.querySelector("small").textContent = `On ${on}`;
+    document.body.append(pnl); const ta = pnl.querySelector("textarea"); setTimeout(() => ta.focus(), 50);
+    const tmp = document.createElement("div"); tmp.className = "npin"; tmp.textContent = NOTES.list.length + 1; tmp.style.left = px + "px"; tmp.style.top = py + "px"; document.body.append(tmp);
+    pnl.querySelectorAll("button")[1].onclick = () => { pnl.remove(); tmp.remove(); };
+    pnl.querySelectorAll("button")[0].onclick = async () => {
+      const text = ta.value.trim(); if(!text){ ta.focus(); return; }
+      const shot = await pinShot(rx, ry);
+      NOTES.list.push({text, on, px, py, page: location.pathname, state: noteState(), shot, at: new Date().toISOString()});
+      saveNotes(); pnl.remove(); tmp.remove(); renderNoteUI(); toast("Note saved");
+    };
+  };
+  const stop = e => { if(e.target.closest && e.target.closest(".nbtn")) return; e.stopPropagation(); };
+  document.addEventListener("pointerdown", stop, true);
+  document.addEventListener("click", grab, true);
+}
+async function sendNotes(){
+  if(!NOTES.list.length){ toast("Add a note first"); return; }
+  const W = 1080, pad = 40, imgs = await Promise.all(NOTES.list.map(n => n.shot ? new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = n.shot; }) : null));
+  const c = document.createElement("canvas"); const g = c.getContext("2d");
+  const wrap = (t, max) => { g.font = "28px system-ui"; const words = t.split(/\s+/), lines = []; let line = ""; words.forEach(w => { const tryL = line ? line + " " + w : w; if(g.measureText(tryL).width > max && line){ lines.push(line); line = w; } else line = tryL; }); if(line) lines.push(line); return lines; };
+  // measure
+  let H = pad + 60;
+  const blocks = NOTES.list.map((n, i) => { const lines = wrap(n.text, W - pad*2 - 50); const ih = imgs[i] ? Math.round((W - pad*2) * imgs[i].height / imgs[i].width) : 0; const h = 40 + lines.length * 36 + 70 + ih + 30; H += h; return {lines, ih, h}; });
+  c.width = W; c.height = H + pad; g.fillStyle = "#F7F8F6"; g.fillRect(0, 0, W, c.height);
+  g.fillStyle = "#1B2A26"; g.font = "600 36px Georgia, serif"; g.fillText(`Tailored Light · ${NOTES.list.length} note${NOTES.list.length>1?"s":""}`, pad, pad + 30);
+  let y = pad + 80;
+  NOTES.list.forEach((n, i) => { const b = blocks[i];
+    g.fillStyle = "#E59A2F"; g.beginPath(); g.arc(pad + 16, y + 6, 18, 0, 7); g.fill(); g.fillStyle = "#111"; g.font = "700 20px system-ui"; g.fillText(String(i+1), pad + (i+1 > 9 ? 5 : 10), y + 13);
+    g.fillStyle = "#1B2A26"; g.font = "28px system-ui"; b.lines.forEach((l, k) => g.fillText(l, pad + 50, y + 16 + k * 36));
+    let yy = y + 16 + b.lines.length * 36; g.fillStyle = "#5B6863"; g.font = "20px system-ui";
+    g.fillText(`On ${n.on}`.slice(0, 95), pad + 50, yy + 8);
+    g.fillText(Object.entries(n.state).map(([k,v]) => `${k}: ${v}`).join(" · ").slice(0, 110), pad + 50, yy + 36);
+    yy += 60; if(imgs[i]){ g.drawImage(imgs[i], pad, yy, W - pad*2, b.ih); yy += b.ih; }
+    y = yy + 40; });
+  const text = NOTES.list.map((n, i) => `${i+1}. ${n.text}\n   On ${n.on}\n   ${Object.entries(n.state).map(([k,v]) => `${k}: ${v}`).join(", ")}`).join("\n\n");
+  const blob = await new Promise(r => c.toBlob(r, "image/png"));
+  const file = new File([blob], `tailored-light-notes-${Date.now()}.png`, {type:"image/png"});
+  try { if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], text:`Tailored Light notes:\n\n${text}`}); return; } } catch(e){ if(e && e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(`Tailored Light notes:\n\n${text}`); } catch(e){}
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
+  toast("Saved the notes image and copied the text. Paste both to Claude.");
+}
+addEventListener("resize", () => renderNoteUI());
+
 /* ---------- Start ---------- */
 renderUses(); renderStyles(); renderStrip();
 addStaged().then(() => {
@@ -1405,7 +1561,7 @@ addStaged().then(() => {
     const g = CATALOG[S.style].groups.find(g => g.family === q.get("f"));
     if(g){ S.family = g.family; S.color = (g.colors.find(c => c[0] === q.get("c")) || g.colors[0])[0]; renderStrip(); applyShade(); }
   }
-  paintDesigner();
+  paintDesigner(); renderNoteUI();
 });
 </script>
 
