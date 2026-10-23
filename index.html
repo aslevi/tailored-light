@@ -1047,7 +1047,11 @@ function renderRooms(){
   $("#rooms").innerHTML = Object.entries(ROOMS).map(([k,r])=>`<button data-room="${k}" aria-pressed="${S.room===k}">${r.label}</button>`).join("");
 }
 $("#styles").onclick = e => { const b=e.target.closest("[data-style]"); if(!b) return; S.style=b.dataset.style; applyRules(); };
-$("#uses").onclick = e => { const b=e.target.closest("[data-use]"); if(!b) return; S.use=b.dataset.use; S.need=USES[S.use].need; S.style=USES[S.use].style; S.showAll=false; applyRules(true); };
+// which staged photo goes with each room type (falls back to whatever is showing)
+const PHOTO_FOR_USE = {nursery:"nursery", bedroom:"bedroom", bathroom:"bathroom", kitchen:"kitchen", living:"living", basement:"basement"};
+$("#uses").onclick = e => { const b=e.target.closest("[data-use]"); if(!b) return; S.use=b.dataset.use; S.need=USES[S.use].need; S.style=USES[S.use].style; S.showAll=false;
+  const ph = PHOTO_FOR_USE[S.use]; if(ph && ROOMS[ph] && S.room !== ph && S.room !== "mine"){ setAdjust(false); loadRoom(ph); }
+  applyRules(true); };
 $("#needs").onclick = e => { const b=e.target.closest("[data-need]"); if(!b) return; S.need=b.dataset.need; S.showAll=false; applyRules(true); };
 $("#mounts").onclick = e => { const b=e.target.closest("[data-mount]"); if(!b) return; S.mount=b.dataset.mount; updateGeometry(); applyShade(); };
 $("#folds").onclick = e => { const b=e.target.closest("[data-fold]"); if(!b) return; S.fold=b.dataset.fold; applyShade(); };
