@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tailored Light Inbox</title><meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Petrona:wght@600&family=Figtree:wght@400;600&display=swap">
+<style>
+:root{--bg:#F2F5F2;--panel:#FBFCFA;--ink:#1B2A26;--muted:#5B6863;--line:#D6DED9;--pine:#24463D;--sun-soft:#FBEBD2}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1513;--panel:#171F1C;--ink:#E7EEEA;--muted:#9BA9A3;--line:#2E3935;--pine:#86BFAC;--sun-soft:#3A2D19}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 Figtree,system-ui,sans-serif;padding:20px max(16px,env(safe-area-inset-left))}
+h1{font-family:Petrona,Georgia,serif;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));max-width:1100px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--line)}
+.b{padding:12px 14px;display:grid;gap:4px}.row{display:flex;justify-content:space-between;gap:8px}
+small{color:var(--muted)}.chip{font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;background:var(--sun-soft)}
+select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:4px;background:var(--panel);color:var(--ink)}
+.key{display:flex;gap:8px;margin-bottom:16px}.key input{flex:1;max-width:320px;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:var(--pine);color:#fff;cursor:pointer}
+</style><script src="config.js"></script></head>
+<body>
+<h1>Designer inbox</h1><p class="sub" id="sub">Texts to Dana and swatch orders, newest first.</p>
+<form class="key" id="keyForm"><input id="key" type="password" placeholder="Inbox key" autocomplete="current-password"><button>Open</button></form>
+<div class="cards" id="cards"></div>
+<script>
+const C = window.TL_CONFIG||{}, $ = s=>document.querySelector(s);
+let key = ""; try{ key = localStorage.getItem("tl.inbox")||""; }catch(e){}
+async function load(){
+  if(!C.inboxFunction){ $("#sub").textContent = "Connect Supabase in config.js to see leads."; return; }
+  const r = await fetch(C.inboxFunction, {headers:{"x-inbox-key":key}});
+  if(!r.ok){ $("#sub").textContent = "Enter the inbox key to see leads."; return; }
+  $("#keyForm").hidden = true; const rows = await r.json();
+  $("#sub").textContent = `${rows.length} lead${rows.length===1?"":"s"}, newest first.`;
+  $("#cards").innerHTML = "";
+  rows.forEach(v => { const L = v.look||{}; const el = document.createElement("article"); el.className = "card";
+    el.innerHTML = `<img alt=""><div class="b"><div class="row"><b class="n"></b><span class="chip"></span></div><div class="w"></div><small class="c"></small><small class="a"></small><div class="row"><small class="t"></small><select><option>new</option><option>contacted</option><option>ordered</option><option>lost</option></select></div></div>`;
+    if(L.image && String(L.image).startsWith("data:image/")) el.querySelector("img").src = L.image; else el.querySelector("img").remove();
+    el.querySelector(".n").textContent = v.name || "New customer";
+    el.querySelector(".chip").textContent = v.kind === "swatches" ? "Swatch kit · $9" : "Texted Dana";
+    el.querySelector(".w").textContent = [L.family, L.color, (L.style||"").toLowerCase(), L.room, L.need].filter(Boolean).join(" · ");
+    el.querySelector(".c").textContent = [v.phone, v.email].filter(Boolean).join(" · ");
+    el.querySelector(".a").textContent = v.address || ""; el.querySelector(".t").textContent = new Date(v.created_at).toLocaleString();
+    const sel = el.querySelector("select"); sel.value = v.status;
+    sel.onchange = () => fetch(C.inboxFunction, {method:"POST", headers:{"x-inbox-key":key,"Content-Type":"application/json"}, body:JSON.stringify({id:v.id, status:sel.value})});
+    $("#cards").append(el); });
+}
+$("#keyForm").onsubmit = e => { e.preventDefault(); key = $("#key").value; try{ localStorage.setItem("tl.inbox", key); }catch(e){} load(); };
+load();
+</script></body></html>
