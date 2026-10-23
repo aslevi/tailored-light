@@ -326,6 +326,7 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
       <div class="ctas">
         <button class="btn ghost" id="kitBtn">Get swatches · $9, credited to your order</button>
         <button class="btn ghost" id="mine">Try it on my window</button>
+        <a class="btn ghost" id="to3d" href="rooms.html" style="text-decoration:none;text-align:center">See it in a 3D room, sunrise to night</a>
       </div>
       <div class="stickycta">
         <div class="price"><div><b id="price"></b></div><span>per window, made to measure<span class="x"><br>measurements checked by Dana</span></span></div>
@@ -948,6 +949,8 @@ function applyShade(){
   $("#linings").innerHTML = LININGS.map((l,i)=>`<button data-lin="${i}" aria-pressed="${S.lining===i}">${l.k.replace(" lining","")}</button>`).join("");
   $("#mountNote").textContent = USES[S.use].note;
   $("#price").textContent = "$" + unitPrice();
+  { const r3 = {nursery:"nursery", bedroom:"bedroom", bathroom:"bathroom", kitchen:"kitchen", living:"living", basement:"living"}[S.use] || "living";
+    const a = document.getElementById("to3d"); if(a) a.href = `rooms.html?${new URLSearchParams({room:r3, s:S.style, f:grp.family, c:col[0]})}`; }
   $("#dropV").textContent = S.drop >= .995 ? "Fully down" : Math.round(S.drop*100) + "% down";
   draw();
 }
@@ -1599,6 +1602,7 @@ addStaged().then(() => {
     if(g){ S.family = g.family; S.color = (g.colors.find(c => c[0] === q.get("c")) || g.colors[0])[0]; renderStrip(); applyShade(); }
   }
   paintDesigner(); renderNoteUI();
+  if(q.get("text") === "1") setTimeout(startText, 600);
 });
 </script>
 

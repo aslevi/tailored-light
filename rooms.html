@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tailored Light Rooms</title>
+<meta name="description" content="Play with custom shades in five cozy 3D rooms, from sunrise to lamplight.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Petrona:ital,wght@0,600;1,500&family=Figtree:wght@400;500;600;700&display=swap">
+<script src="config.js"></script>
+<style>
+:root{--bg:#F4EFE6;--panel:#FFFBF4;--panel-2:#F1EADF;--ink:#2A211B;--muted:#76685C;--line:#E4D9CA;--pine:#24463D;--pine-ink:#fff;--sun:#E59A2F;--sun-soft:#FBE7C6;--good:#3F7D5A;
+  --display:"Petrona",Georgia,serif;--sans:"Figtree",system-ui,-apple-system,sans-serif;--shadow:0 18px 40px -24px rgba(60,40,20,.45)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17130F;--panel:#211B16;--panel-2:#2A231C;--ink:#F3ECE2;--muted:#B5A797;--line:#3A3027;--pine:#7FBFA8;--pine-ink:#10201B;--sun-soft:#3A2B16}}
+:root[data-theme="dark"]{--bg:#17130F;--panel:#211B16;--panel-2:#2A231C;--ink:#F3ECE2;--muted:#B5A797;--line:#3A3027;--pine:#7FBFA8;--pine-ink:#10201B;--sun-soft:#3A2B16}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans)}
+button{font:inherit;color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;max-width:1280px;margin:0 auto}
+.mark{font:italic 500 22px var(--display);display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none}
+.mark i{width:10px;height:10px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 4px var(--sun-soft)}
+.back{font-size:13.5px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 12px;background:var(--panel)}
+.main{display:grid;gap:14px;max-width:1280px;margin:0 auto;padding:0 16px 24px}
+.main > *, .panel > *, .panel > * > *{min-width:0}
+html,body{overflow-x:hidden}
+@media (min-width:960px){.main{grid-template-columns:minmax(0,1fr) 360px;align-items:start}}
+.stage{position:relative;border-radius:24px;overflow:hidden;background:#cfe3f3;aspect-ratio:4/3;box-shadow:var(--shadow);touch-action:none}
+@media (max-width:959px){.stage{aspect-ratio:auto;height:min(58vh,520px);margin:0 -16px;border-radius:0 0 24px 24px;position:sticky;top:0;z-index:3}}
+#c{display:block;width:100%;height:100%}
+.ov{position:absolute;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none}
+.ov.t{top:12px}.ov.b{bottom:12px}
+.pill{pointer-events:auto;border:0;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;background:rgba(255,251,244,.86);color:#2A211B;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px -6px rgba(0,0,0,.35);white-space:nowrap}
+.clock{font:600 13px var(--sans);display:flex;align-items:center;gap:6px}
+.clock .dot{width:10px;height:10px;border-radius:50%;background:#F2B544;box-shadow:0 0 0 3px rgba(242,181,68,.3)}
+.cap{position:absolute;left:50%;top:54px;transform:translateX(-50%);max-width:min(92%,520px);text-align:center;font:500 15px/1.3 var(--sans);color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.55);pointer-events:none;transition:opacity .4s}
+.hint{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);font-size:12.5px;color:#fff;background:rgba(0,0,0,.35);padding:5px 10px;border-radius:999px;pointer-events:none;transition:opacity .6s}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:16px;display:grid;gap:14px;box-shadow:var(--shadow)}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lbl .v{font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink);font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1.5px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 13px;font-weight:600;font-size:14px;cursor:pointer}
+.chips button[aria-pressed="true"]{border-color:var(--pine);background:var(--pine);color:var(--pine-ink)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--panel-2);border-radius:14px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:10px;padding:9px 6px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.3)}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.sw{flex:none;width:64px;border:0;background:none;padding:0;cursor:pointer;text-align:center;font-size:11.5px;color:var(--muted)}
+.sw img,.sw span.c{display:block;width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid transparent;box-shadow:0 2px 8px -4px rgba(0,0,0,.35)}
+.sw[aria-pressed="true"] img,.sw[aria-pressed="true"] span.c{border-color:var(--pine)}
+.sw[aria-pressed="true"]{color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--pine)}
+.time{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+.play{border:0;background:var(--pine);color:var(--pine-ink);border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.read{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.read div{background:var(--panel-2);border-radius:12px;padding:8px 10px}
+.read small{display:block;font-size:11.5px;color:var(--muted)}
+.read b{font-size:13.5px}
+.cta{position:sticky;bottom:0;background:var(--panel);margin:0 -16px -16px;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-radius:0 0 22px 22px;display:grid;gap:6px}
+.btn{border:0;border-radius:16px;padding:14px 16px;font-weight:700;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn.primary{background:var(--pine);color:var(--pine-ink)}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;background:linear-gradient(135deg,#C9774A,#E59A2F)}
+.price{display:flex;justify-content:space-between;align-items:baseline}
+.price b{font:600 24px var(--display)}
+.price span{color:var(--muted);font-size:12.5px}
+.fine{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.load{position:absolute;inset:0;display:grid;place-items:center;color:#3b3127;font-weight:600;background:#EFE6D8;transition:opacity .5s}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="./"><i></i>Tailored Light</a>
+  <a class="back" href="./">Try it on a photo</a>
+</header>
+<main class="main">
+  <section class="stage" id="stage" aria-label="3D room with shades">
+    <canvas id="c" aria-label="Drag to look around the room. Use the time slider to move the sun."></canvas>
+    <div class="load" id="load">Building your room…</div>
+    <div class="ov t"><span class="pill" id="roomTag">Nursery</span><span class="pill clock"><span class="dot" id="sunDot"></span><span id="clock">9:00 am</span></span></div>
+    <div class="cap" id="cap"></div>
+    <div class="hint" id="hint">Drag to look around · pinch to zoom</div>
+    <div class="ov b"><button class="pill" id="playBtn">▶ Play my day</button><button class="pill" id="upDown">Lower shades</button></div>
+  </section>
+
+  <section class="panel" aria-label="Choose your room and shade">
+    <div><div class="lbl">Room</div><div class="chips" id="rooms"></div></div>
+    <div>
+      <div class="lbl">Time of day <span class="v" id="timeV">9:00 am</span></div>
+      <div class="time"><button class="play" id="play2">▶ Day</button><input type="range" id="time" min="6" max="22.5" step="0.05" value="9" aria-label="Time of day"></div>
+    </div>
+    <div><div class="lbl">Style</div><div class="seg" id="styles"></div></div>
+    <div><div class="lbl">Fabric <span class="v" id="fabName"></span></div><div class="strip" id="strip"></div></div>
+    <div><div class="lbl">Raise or lower <span class="v" id="dropV"></span></div><input type="range" id="drop" min="0" max="100" value="70" aria-label="Shade height"></div>
+    <div class="read" id="read"></div>
+    <div class="cta">
+      <div class="price"><b id="price">$199</b><span>per window, made to measure</span></div>
+      <button class="btn primary" id="text"><span class="av">D</span> Text Dana about this room</button>
+      <p class="fine">She'll send it live on your own window next.</p>
+    </div>
+  </section>
+</main>
+
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="catalog.js"></script>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const CAT = window.TL_CATALOG, CFG = window.TL_CONFIG || {};
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+const q = new URLSearchParams(location.search);
+
+/* ---------- state ---------- */
+const S = { room: q.get("room") || "nursery", style: q.get("s") || "roller", family: q.get("f") || "", color: q.get("c") || "", time: +q.get("t") || 9, drop: .7, bands: .35 };
+const ROOM_DEFAULTS = { living:["zebra","Twin Light"], bedroom:["roman","Raw Linen"], nursery:["roller","Deep Sleep"], kitchen:["roman","Natural Reed"], office:["roller","Clear View"], bathroom:["roller","Daylight Weave"] };
+
+/* ---------- renderer ---------- */
+const canvas = $("#c");
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 4/3, .1, 200);
+camera.position.set(0, 2.5, 7.4);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.target.set(0, 1.35, -.4); controls.enableDamping = true; controls.dampingFactor = .08; controls.enablePan = false;
+controls.minDistance = 4.2; controls.maxDistance = 10; controls.minPolarAngle = .95; controls.maxPolarAngle = 1.62;
+controls.minAzimuthAngle = -.85; controls.maxAzimuthAngle = .85; controls.rotateSpeed = .6;
+controls.addEventListener("start", () => { $("#hint").style.opacity = 0; });
+
+/* toon shading: four soft bands for a warm, storybook look */
+const gradMap = (() => { const d = new Uint8Array([70,70,70, 135,135,135, 200,200,200, 255,255,255]); const t = new THREE.DataTexture(d, 4, 1, THREE.RGBFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t; })();
+const matCache = {};
+const toon = (hex, opts={}) => { const k = hex + JSON.stringify(opts); if(!matCache[k]) matCache[k] = new THREE.MeshToonMaterial(Object.assign({color:new THREE.Color(hex), gradientMap:gradMap}, opts)); return matCache[k]; };
+function rbox(w, h, d, r, mat){
+  r = Math.min(r, w/2-.001, h/2-.001, d/2-.001);
+  const s = new THREE.Shape(); const x = -w/2 + r, y = -h/2 + r, ww = w - 2*r, hh = h - 2*r;
+  s.moveTo(x, y); s.lineTo(x+ww, y); s.lineTo(x+ww, y+hh); s.lineTo(x, y+hh); s.lineTo(x, y);
+  const g = new THREE.ExtrudeGeometry(s, {depth: Math.max(.001, d - 2*r), bevelEnabled:true, bevelSize:r, bevelThickness:r, bevelSegments:3, curveSegments:4});
+  g.translate(0, 0, -(d - 2*r)/2);
+  const m = new THREE.Mesh(g, typeof mat === "string" ? toon(mat) : mat); m.castShadow = m.receiveShadow = true; return m;
+}
+function put(parent, mesh, x, y, z, ry){ mesh.position.set(x, y, z); if(ry) mesh.rotation.y = ry; parent.add(mesh); return mesh; }
+const cyl = (rt, rb, h, mat, seg=16) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), typeof mat === "string" ? toon(mat) : mat); m.castShadow = m.receiveShadow = true; return m; };
+const ball = (r, mat, sx=1, sy=1, sz=1) => { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 20, 14), typeof mat === "string" ? toon(mat) : mat); m.scale.set(sx, sy, sz); m.castShadow = m.receiveShadow = true; return m; };
+
+/* ---------- outdoors: sky, sun, trees ---------- */
+const skyU = { top:{value:new THREE.Color()}, bot:{value:new THREE.Color()}, sunDir:{value:new THREE.Vector3()}, sunCol:{value:new THREE.Color()}, sunK:{value:1}, night:{value:0} };
+const sky = new THREE.Mesh(new THREE.SphereGeometry(90, 32, 16), new THREE.ShaderMaterial({uniforms:skyU, side:THREE.BackSide, depthWrite:false,
+  vertexShader:`varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+  fragmentShader:`uniform vec3 top, bot, sunDir, sunCol; uniform float sunK, night; varying vec3 vP;
+    float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,45.164))) * 43758.5453); }
+    void main(){ float y = clamp(vP.y*1.4+.15, 0.0, 1.0); vec3 c = mix(bot, top, y);
+      float d = max(dot(vP, normalize(sunDir)), 0.0); c += sunCol * (pow(d, 400.0) * 3.0 + pow(d, 12.0) * .45) * sunK;
+      vec3 g = floor(vP * 160.0); float st = step(.996, h(g)) * night * smoothstep(.05, .4, vP.y); c += vec3(st);
+      gl_FragColor = vec4(c, 1.0); }`}));
+scene.add(sky);
+const outside = new THREE.Group(); scene.add(outside);
+put(outside, new THREE.Mesh(new THREE.CircleGeometry(60, 32), toon("#9CC27A")), 0, -.02, -20).rotation.x = -Math.PI/2;
+outside.children[0].receiveShadow = true;
+const trees = [];
+[[-6,-9,1.2],[-2.5,-12,1.6],[1.8,-8.5,1.1],[5.5,-11,1.5],[9,-14,1.8],[-10,-15,2],[3.5,-17,2.1],[-5,-19,2.2]].forEach(([x,z,s], i) => {
+  const t = new THREE.Group(); put(t, cyl(.12*s, .16*s, 1.2*s, "#8A5A3B"), 0, .6*s, 0);
+  const crown = ball(1*s, i % 2 ? "#6FA35A" : "#5E9450", 1, 1.15, 1); put(t, crown, 0, 1.75*s, 0); crown.userData.sway = Math.random()*6;
+  if(i % 3 === 0){ const c2 = ball(.7*s, "#7DB066"); put(t, c2, .5*s, 2.3*s, .2*s); }
+  put(outside, t, x, 0, z); trees.push(crown);
+});
+const sunBall = new THREE.Mesh(new THREE.SphereGeometry(2.2, 24, 16), new THREE.MeshBasicMaterial({color:"#FFE7A8"})); scene.add(sunBall);
+const moon = new THREE.Mesh(new THREE.SphereGeometry(1.2, 20, 14), new THREE.MeshBasicMaterial({color:"#EEF2FF"})); scene.add(moon);
+
+/* ---------- lights ---------- */
+const hemi = new THREE.HemisphereLight("#fff4e0", "#8a7360", .55); scene.add(hemi);
+const amb = new THREE.AmbientLight("#ffffff", .12); scene.add(amb);
+const sun = new THREE.DirectionalLight("#fff1d6", 2.4); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0015; sun.shadow.normalBias = .06;
+Object.assign(sun.shadow.camera, {left:-7, right:7, top:7, bottom:-7, near:1, far:80}); scene.add(sun); scene.add(sun.target); sun.target.position.set(0, .8, .5);
+
+/* ---------- room building ---------- */
+const room = new THREE.Group(); scene.add(room);
+const W = 6.4, H = 3.1, D = 5.2, BZ = -D/2;
+function planks(base, dark){
+  const c = document.createElement("canvas"); c.width = c.height = 512; const g = c.getContext("2d");
+  g.fillStyle = base; g.fillRect(0,0,512,512);
+  for(let i=0;i<8;i++){ g.fillStyle = i % 2 ? dark : base; g.globalAlpha = .35; g.fillRect(0, i*64, 512, 64); g.globalAlpha = .5; g.fillStyle = dark; g.fillRect(0, i*64, 512, 3);
+    for(let k=0;k<3;k++){ g.fillRect(((i*173 + k*190) % 512), i*64, 3, 64); } }
+  g.globalAlpha = 1; const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2.2, 2.2); t.encoding = THREE.sRGBEncoding; return t;
+}
+function wallWithWindows(wins, color){
+  const s = new THREE.Shape(); s.moveTo(-W/2, 0); s.lineTo(W/2, 0); s.lineTo(W/2, H); s.lineTo(-W/2, H); s.lineTo(-W/2, 0);
+  wins.forEach(w => { const h = new THREE.Path(); h.moveTo(w.x - w.w/2, w.y); h.lineTo(w.x - w.w/2, w.y + w.h); h.lineTo(w.x + w.w/2, w.y + w.h); h.lineTo(w.x + w.w/2, w.y); h.lineTo(w.x - w.w/2, w.y); s.holes.push(h); });
+  const g = new THREE.ExtrudeGeometry(s, {depth:.22, bevelEnabled:false}); g.translate(0, 0, -.22);
+  const m = new THREE.Mesh(g, toon(color)); m.castShadow = m.receiveShadow = true; m.position.z = BZ; return m;
+}
+function windowFrame(w, trim){
+  const g = new THREE.Group(), t = .08, depth = .3;
+  put(g, rbox(w.w + .22, .12, depth, .03, trim), 0, w.h + .06, 0);
+  put(g, rbox(w.w + .36, .1, .42, .03, trim), 0, -.05, .08);            // sill
+  put(g, rbox(.12, w.h + .12, depth, .03, trim), -w.w/2 - .05, w.h/2, 0);
+  put(g, rbox(.12, w.h + .12, depth, .03, trim), w.w/2 + .05, w.h/2, 0);
+  put(g, rbox(t*.6, w.h, .06, .01, trim), 0, w.h/2, -.08);             // mullion
+  if(w.h > 1.2) put(g, rbox(w.w, t*.6, .06, .01, trim), 0, w.h*.55, -.08);
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(w.w, w.h), new THREE.MeshBasicMaterial({color:"#dff0ff", transparent:true, opacity:.08, depthWrite:false}));
+  put(g, glass, 0, w.h/2, -.1);
+  g.position.set(w.x, w.y, BZ - .11); return g;
+}
+/* furniture kits */
+const F = {
+  rug(p, x, z, w, d, c1, c2){ const r = rbox(w, .03, d, .012, c1); r.castShadow = false; put(p, r, x, .016, z); const r2 = rbox(w*.8, .032, d*.75, .012, c2); r2.castShadow = false; put(p, r2, x, .018, z); },
+  plant(p, x, z, s=1){ put(p, cyl(.2*s, .15*s, .35*s, "#C9744B"), x, .175*s, z); [[0,.7,0,.32],[.15,.85,.05,.24],[-.14,.9,-.04,.22],[.02,1.05,.02,.2]].forEach(([a,b,c,r]) => put(p, ball(r*s, "#5E9A57", 1, 1.25, 1), x+a*s, b*s, z+c*s)); },
+  lamp(p, x, y, z, shade="#F6E3C1"){ put(p, cyl(.1, .14, .05, "#B98D62"), x, y+.025, z); put(p, cyl(.025, .025, .4, "#B98D62"), x, y+.25, z);
+    const sh = cyl(.14, .22, .26, new THREE.MeshToonMaterial({color:shade, gradientMap:gradMap, emissive:new THREE.Color("#ffcf86"), emissiveIntensity:0})); put(p, sh, x, y+.52, z); lampShades.push(sh); return [x, y+.5, z]; },
+  floorLamp(p, x, z){ put(p, cyl(.18, .2, .05, "#4E4036"), x, .025, z); put(p, cyl(.025, .025, 1.5, "#4E4036"), x, .78, z);
+    const sh = cyl(.2, .3, .34, new THREE.MeshToonMaterial({color:"#F6E3C1", gradientMap:gradMap, emissive:new THREE.Color("#ffcf86"), emissiveIntensity:0})); put(p, sh, x, 1.6, z); lampShades.push(sh); return [x, 1.55, z]; },
+  frame(p, x, y, w, h, c){ put(p, rbox(w, h, .05, .015, "#F5EEE2"), x, y, BZ + .03); put(p, rbox(w*.78, h*.78, .055, .01, c), x, y, BZ + .035); }
+};
+const lampShades = [];
+const ROOMS = {
+  nursery:{label:"Nursery", wall:"#F1D3C2", floor:["#E4C9A6","#C9A27C"], trim:"#FFF8EE", wins:[{x:0, y:.95, w:1.6, h:1.55}], build(p){
+    F.rug(p, 0, .8, 3.2, 2.2, "#F2D1C4", "#FBE9DF");
+    const crib = new THREE.Group(); put(crib, rbox(1.5, .14, .8, .04, "#FFFFFF"), 0, .45, 0); put(crib, rbox(1.3, .14, .62, .05, "#F7D9D2"), 0, .56, 0);
+    for(let i=0;i<10;i++){ put(crib, cyl(.025, .025, .55, "#FFFFFF", 8), -.68 + i*.151, .8, .39); put(crib, cyl(.025, .025, .55, "#FFFFFF", 8), -.68 + i*.151, .8, -.39); }
+    [[-.75,.39],[.75,.39],[-.75,-.39],[.75,-.39]].forEach(([a,b]) => put(crib, cyl(.04, .04, 1.1, "#FFFFFF", 10), a, .55, b));
+    put(crib, rbox(1.56, .06, .06, .02, "#FFFFFF"), 0, 1.08, .39); put(crib, rbox(1.56, .06, .06, .02, "#FFFFFF"), 0, 1.08, -.39);
+    put(crib, ball(.16, "#C9B6E4"), -.3, .72, 0); put(crib, ball(.12, "#F2C88A"), .2, .7, .1);
+    put(p, crib, -1.55, 0, -1.6);
+    const mob = new THREE.Group(); put(mob, cyl(.01, .01, .6, "#B98D62", 6), 0, .3, 0); ["#F2C88A","#9DC7E8","#F4A9A8"].forEach((c,i) => put(mob, ball(.07, c), Math.cos(i*2.1)*.22, 0, Math.sin(i*2.1)*.22)); put(p, mob, -1.55, 1.75, -1.6);
+    const rock = new THREE.Group(); put(rock, rbox(.8, .16, .8, .07, "#E8B98F"), 0, .45, 0); put(rock, rbox(.8, .8, .16, .07, "#E8B98F"), 0, .85, -.32); put(rock, rbox(.62, .12, .62, .06, "#FFF3E2"), 0, .56, .03);
+    const runner = new THREE.Mesh(new THREE.TorusGeometry(.6, .03, 6, 24, 1.1), toon("#B98D62")); runner.rotation.set(0, Math.PI/2, Math.PI*1.5 - .55); put(rock, runner, -.36, .6, 0);
+    const r2 = runner.clone(); r2.position.x = .36; rock.add(r2); put(p, rock, 1.7, 0, .2, -.6);
+    put(p, rbox(1.1, .9, .5, .05, "#FFFFFF"), 1.9, .45, -2.25); put(p, rbox(1.12, .06, .52, .02, "#E8C9A8"), 1.9, .93, -2.25);
+    lamps.push(F.lamp(p, 2.2, .96, -2.25, "#FBE1D3"));
+    put(p, ball(.18, "#F2C88A", 1, .8, .8), 1.65, 1.08, -2.22);
+    F.frame(p, -2.3, 2.05, .55, .7, "#9DC7E8"); F.frame(p, 2.2, 2.0, .7, .55, "#F4A9A8");
+    F.plant(p, -2.7, .2, .9);
+  }},
+  bedroom:{label:"Bedroom", wall:"#E3CDB5", floor:["#D9B88E","#B8936A"], trim:"#FBF6EE", wins:[{x:-1.35, y:.9, w:1.25, h:1.6},{x:1.35, y:.9, w:1.25, h:1.6}], build(p){
+    F.rug(p, 0, .3, 3.6, 2.6, "#C9B49A", "#E6D6C0");
+    const bed = new THREE.Group(); put(bed, rbox(2.1, .35, 2.4, .08, "#A9805C"), 0, .25, 0); put(bed, rbox(2.0, .3, 2.25, .12, "#FFFBF2"), 0, .55, 0);
+    put(bed, rbox(2.06, .18, 1.5, .1, "#8FA8C2"), 0, .7, .35); put(bed, rbox(2.2, 1.1, .16, .08, "#A9805C"), 0, .75, -1.18);
+    put(bed, rbox(.75, .2, .45, .1, "#FFFFFF"), -.48, .78, -.85); put(bed, rbox(.75, .2, .45, .1, "#FFFFFF"), .48, .78, -.85); put(bed, rbox(.5, .18, .3, .09, "#E7B98A"), 0, .8, -.62);
+    put(p, bed, 0, 0, -1.1);
+    [-1.55, 1.55].forEach(x => { put(p, rbox(.55, .55, .45, .05, "#C49A72"), x, .28, -2.15); lamps.push(F.lamp(p, x, .56, -2.15)); });
+    F.plant(p, 2.6, .9, 1.1); F.frame(p, 0, 2.6, 1.2, .38, "#B9CBD8");
+    const bench = rbox(1.6, .4, .45, .08, "#7C93AE"); put(p, bench, 0, .2, .6);
+  }},
+  living:{label:"Living room", wall:"#EBD6B8", floor:["#D6B387","#B48D63"], trim:"#FFF9EF", wins:[{x:0, y:.75, w:2.6, h:1.85}], build(p){
+    F.rug(p, 0, .5, 3.8, 2.6, "#D9A27C", "#F1D6BE");
+    const sofa = new THREE.Group(); put(sofa, rbox(2.6, .45, .95, .12, "#7E9C8A"), 0, .32, 0); put(sofa, rbox(2.6, .6, .28, .12, "#7E9C8A"), 0, .75, -.36);
+    put(sofa, rbox(.28, .55, .95, .12, "#738F7E"), -1.3, .55, 0); put(sofa, rbox(.28, .55, .95, .12, "#738F7E"), 1.3, .55, 0);
+    [-.65, .65].forEach(x => put(sofa, rbox(1.15, .16, .78, .08, "#8EAE9A"), x, .62, .05)); put(sofa, rbox(.5, .42, .16, .08, "#F2C88A"), -.85, .85, -.15); put(sofa, rbox(.45, .4, .16, .08, "#E8A68A"), .9, .85, -.15);
+    put(p, sofa, 0, 0, -1.55);
+    const tbl = new THREE.Group(); put(tbl, cyl(.55, .55, .08, "#B98D62", 24), 0, .42, 0); put(tbl, cyl(.06, .1, .38, "#8A6446"), 0, .2, 0); put(tbl, ball(.12, "#F2E6D4"), .18, .52, .05); put(tbl, rbox(.3, .06, .22, .02, "#C9744B"), -.15, .49, -.05);
+    put(p, tbl, 0, 0, .25);
+    const arm = new THREE.Group(); put(arm, rbox(.9, .4, .9, .14, "#E3B47E"), 0, .3, 0); put(arm, rbox(.9, .55, .22, .1, "#E3B47E"), 0, .72, -.34); put(p, arm, 2.1, 0, .6, -.7);
+    lamps.push(F.floorLamp(p, -2.4, -1.4)); F.plant(p, 2.6, -1.9, 1.2);
+    const shelf = new THREE.Group(); put(shelf, rbox(.9, 1.8, .35, .03, "#C49A72"), 0, .9, 0); ["#E8A68A","#7E9C8A","#F2C88A","#9DB6CF"].forEach((c,i) => put(shelf, rbox(.12, .3, .25, .01, c), -.3 + i*.17, 1.2, .02)); put(p, shelf, -2.7, 0, .7, Math.PI/2);
+  }},
+  kitchen:{label:"Kitchen", wall:"#EEDDC3", floor:["#E6D2B4","#CDB38E"], trim:"#FFFFFF", wins:[{x:0, y:1.2, w:1.9, h:1.25}], build(p){
+    const run = new THREE.Group(); put(run, rbox(5.6, .88, .65, .04, "#8FB0A3"), 0, .44, 0); put(run, rbox(5.7, .06, .7, .02, "#E9DCC6"), 0, .91, .02);
+    put(run, rbox(.9, .05, .45, .02, "#D8DEE2"), 0, .945, .02); put(run, cyl(.025, .025, .35, "#C9CDD1", 10), 0, 1.12, -.2); put(run, rbox(.04, .04, .22, .01, "#C9CDD1"), 0, 1.28, -.1);
+    for(let i=-2;i<=2;i++) if(i) put(run, rbox(.06, .2, .03, .01, "#E9DCC6"), i*1.1, .62, .34);
+    put(p, run, 0, 0, BZ + .35);
+    [[-2.3, 1.5],[2.3, 1.5]].forEach(([x,y]) => { put(p, rbox(1.2, .05, .3, .015, "#C49A72"), x, y, BZ + .17); ["#F4A9A8","#F2C88A","#9DC7E8"].forEach((c,i) => put(p, cyl(.07, .07, .16, c, 12), x - .35 + i*.33, y + .11, BZ + .17)); });
+    const isl = new THREE.Group(); put(isl, rbox(2.2, .9, .9, .04, "#E3B47E"), 0, .45, 0); put(isl, rbox(2.3, .07, 1.0, .02, "#FFF7EA"), 0, .93, 0);
+    put(isl, ball(.16, "#E8A04A"), -.4, 1.05, .1); put(isl, ball(.13, "#9CC27A"), -.15, 1.03, .05); put(isl, ball(.12, "#E2574C"), .55, 1.02, -.05);
+    put(p, isl, 0, 0, .6);
+    [-.7, 0, .7].forEach(x => { put(p, cyl(.2, .2, .07, "#7E9C8A", 18), x, .72, 1.35); put(p, cyl(.025, .025, .7, "#4E4036", 8), x, .35, 1.35); });
+    [-.6, .6].forEach(x => { put(p, cyl(.005, .005, .9, "#4E4036", 4), x, 2.65, .6); const sh = cyl(.08, .22, .22, new THREE.MeshToonMaterial({color:"#F6E3C1", gradientMap:gradMap, emissive:new THREE.Color("#ffcf86"), emissiveIntensity:0})); put(p, sh, x, 2.12, .6); lampShades.push(sh); lamps.push([x, 2.0, .6]); });
+    F.plant(p, -1.75, BZ + .35, .55);
+  }},
+  office:{label:"Home office", wall:"#D9DFCB", floor:["#CFAE86","#AE8C66"], trim:"#FBFAF4", wins:[{x:.2, y:.9, w:2.0, h:1.6}], build(p){
+    F.rug(p, .2, .2, 2.8, 2.0, "#B9C4B0", "#DCE3D3");
+    const desk = new THREE.Group(); put(desk, rbox(2.0, .07, .8, .02, "#C49A72"), 0, .76, 0); [[-.92,-.34],[.92,-.34],[-.92,.34],[.92,.34]].forEach(([a,b]) => put(desk, cyl(.03, .03, .74, "#4E4036", 8), a, .37, b));
+    put(desk, rbox(.8, .5, .04, .02, "#2F3438"), 0, 1.12, -.2); put(desk, rbox(.74, .44, .045, .015, "#9FC3E6"), 0, 1.12, -.18); put(desk, cyl(.03, .05, .3, "#2F3438", 8), 0, .9, -.22);
+    put(desk, rbox(.45, .02, .15, .01, "#E9E4DA"), 0, .8, .15); put(desk, ball(.06, "#E8A04A"), .7, .84, .1); put(desk, cyl(.05, .05, .12, "#F4F0E8", 10), -.65, .86, .05);
+    put(p, desk, .2, 0, -1.25);
+    const chair = new THREE.Group(); put(chair, rbox(.55, .1, .55, .04, "#3F4A52"), 0, .5, 0); put(chair, rbox(.52, .6, .08, .05, "#3F4A52"), 0, .85, .27); put(chair, cyl(.035, .035, .4, "#2A2A2A", 8), 0, .28, 0); put(chair, cyl(.28, .28, .03, "#2A2A2A", 5), 0, .06, 0);
+    put(p, chair, .2, 0, -.35, Math.PI);
+    const shelf = new THREE.Group(); put(shelf, rbox(1.0, 2.0, .35, .03, "#C49A72"), 0, 1.0, 0); [.5, 1.0, 1.5].forEach(y => ["#E8A68A","#7E9C8A","#F2C88A","#9DB6CF","#C9B6E4"].forEach((c,i) => put(shelf, rbox(.12, .28, .24, .01, c), -.36 + i*.17, y + .16, .02)));
+    put(p, shelf, -2.75, 0, -1.3, Math.PI/2);
+    lamps.push(F.lamp(p, 1.0, .8, -1.45)); F.plant(p, 2.6, -1.9, 1.1); F.frame(p, 2.3, 1.9, .6, .8, "#E8A68A");
+  }},
+  bathroom:{label:"Bathroom", wall:"#CFE3DC", floor:["#F1ECE4","#D9D2C6"], trim:"#FFFFFF", wins:[{x:-.4, y:1.25, w:1.4, h:1.2}], build(p){
+    const tub = new THREE.Group(); put(tub, rbox(2.2, .62, 1.0, .3, "#FFFFFF"), 0, .31, 0); put(tub, rbox(1.9, .1, .72, .2, "#CFE6F2"), 0, .58, 0);
+    [-.85, .85].forEach(x => [-.35, .35].forEach(z => put(tub, ball(.07, "#D9B56A"), x, .04, z))); put(tub, cyl(.03, .03, .4, "#D9B56A", 8), .95, .82, -.38);
+    put(p, tub, -.4, 0, BZ + .75);
+    put(p, rbox(1.3, .85, .55, .05, "#C49A72"), 2.2, .43, -.6, -Math.PI/2); put(p, rbox(1.36, .05, .6, .02, "#FFFFFF"), 2.2, .87, -.6, -Math.PI/2);
+    const mir = rbox(.06, 1.0, .75, .05, "#D9B56A"); put(p, mir, W/2 - .05, 1.6, -.6); const glass = rbox(.07, .86, .62, .04, "#DCEBF3"); put(p, glass, W/2 - .06, 1.6, -.6);
+    lamps.push([2.4, 2.3, -.6]); const sconce = cyl(.09, .09, .2, new THREE.MeshToonMaterial({color:"#F6E3C1", gradientMap:gradMap, emissive:new THREE.Color("#ffcf86"), emissiveIntensity:0})); put(p, sconce, W/2 - .15, 2.25, -.6); lampShades.push(sconce);
+    put(p, rbox(.5, .05, .3, .02, "#FFFFFF"), -2.4, 1.2, BZ + .12); put(p, rbox(.42, .7, .06, .03, "#F2C88A"), -2.4, .85, BZ + .14);
+    F.rug(p, -.4, .3, 1.8, .9, "#9DC7E8", "#CFE3F0"); F.plant(p, 1.3, BZ + .5, .7);
+  }},
+};
+const lamps = []; let lampLights = [];
+
+/* ---------- shades ---------- */
+const texCache = {};
+function fabricTex(uri, hex){
+  const key = (uri || hex);
+  if(texCache[key]) return texCache[key];
+  let t;
+  if(uri){ t = new THREE.TextureLoader().load(uri); }
+  else { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"); g.fillStyle = hex; g.fillRect(0,0,128,128);
+    g.globalAlpha = .25; for(let i=0;i<128;i+=4){ g.fillStyle = i % 8 ? "#000" : "#fff"; g.fillRect(0, i, 128, 2); g.fillRect(i, 0, 1, 128); } t = new THREE.CanvasTexture(c); }
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; texCache[key] = t; return t;
+}
+const zebraAlpha = (() => { const c = document.createElement("canvas"); c.width = 4; c.height = 64; const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0,0,4,64); g.fillStyle = "#3a3a3a"; g.fillRect(0, 36, 4, 28);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.magFilter = THREE.NearestFilter; return t; })();
+const shadeMat = new THREE.MeshStandardMaterial({side:THREE.DoubleSide, roughness:.92, metalness:0, emissive:new THREE.Color("#ffffff"), emissiveIntensity:0});
+const shadeDepth = new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking, alphaTest:.5});
+const hardware = toon("#F3EEE6");
+let shades = [], beams = [], spills = [];
+const beamMat = new THREE.MeshBasicMaterial({color:"#ffe3a6", transparent:true, opacity:.0, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide});
+
+function current(){
+  const st = CAT[S.style]; const grp = st.groups.find(g => g.family === S.family) || st.groups[0];
+  const col = grp.colors.find(c => c[0] === S.color) || grp.colors[0]; return {st, grp, col};
+}
+function buildShade(w){
+  const g = new THREE.Group(); g.position.set(w.x, w.y + w.h + .02, BZ + .12);
+  const head = S.style === "roman" ? rbox(w.w + .1, .12, .12, .03, hardware) : cyl(.07, .07, w.w + .1, hardware, 18);
+  if(S.style !== "roman") head.rotation.z = Math.PI/2;
+  put(g, head, 0, .02, 0);
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 24), shadeMat); cloth.castShadow = true; cloth.customDepthMaterial = shadeDepth; g.add(cloth);
+  const cloth2 = S.style === "zebra" ? new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1), shadeMat2) : null;
+  if(cloth2){ cloth2.castShadow = true; cloth2.customDepthMaterial = shadeDepth2; g.add(cloth2); }
+  const bar = S.style === "roman" ? null : rbox(w.w, .05, .05, .02, hardware); if(bar) g.add(bar);
+  const folds = new THREE.Group(); g.add(folds);
+  room.add(g); return {g, cloth, cloth2, bar, folds, w};
+}
+const shadeMat2 = shadeMat.clone(); const shadeDepth2 = shadeDepth.clone();
+function layoutShade(s){
+  const {w} = s; const len = w.h + .06; const down = Math.max(.06, S.drop * len);
+  const isRoman = S.style === "roman";
+  const flat = isRoman ? Math.max(.02, down - (1 - S.drop) * .35 - .05) : down;
+  s.cloth.scale.set(w.w, flat, 1); s.cloth.position.set(0, -flat/2 - .04, .01);
+  const {grp} = current(); const rep = grp.weave ? 3 : 1.6;
+  if(s.cloth2){ s.cloth2.scale.set(w.w, flat, 1); s.cloth2.position.set(0, -flat/2 - .04, .035); }
+  if(s.bar) s.bar.position.set(0, -flat - .06, .02);
+  s.folds.clear();
+  if(isRoman){
+    const n = Math.max(1, Math.round((1 - S.drop) * 6) + 1), fh = Math.min(.09, ((1 - S.drop) * .35 + .05) / n);
+    for(let i=0;i<n;i++){ const f = new THREE.Mesh(new THREE.CylinderGeometry(fh*.75, fh*.75, w.w, 14, 1, false, 0, Math.PI), shadeMat); f.rotation.set(0, 0, Math.PI/2); f.rotation.x = Math.PI/2; f.rotation.order = "YXZ";
+      f.rotation.set(-Math.PI/2, 0, Math.PI/2); f.position.set(0, -flat - .04 - fh*(i+.5)*1.4, .02 + fh*.2); f.castShadow = true; s.folds.add(f); }
+  }
+  if(shadeMat.map) shadeMat.map.repeat.set(w.w * rep, Math.max(.3, flat) * rep);
+}
+function rebuildShades(){
+  shades.forEach(s => room.remove(s.g)); shades = [];
+  const {grp, col} = current();
+  const tex = fabricTex(col[2], col[1]);
+  shadeMat.map = tex; shadeMat.emissiveMap = tex; shadeMat.color.set("#ffffff");
+  shadeMat.transparent = !!grp.screen; shadeMat.opacity = grp.screen ? .82 : 1; shadeMat.alphaMap = null; shadeMat.alphaTest = 0;
+  shadeDepth.alphaMap = null; shadeDepth.alphaTest = 0;
+  if(S.style === "zebra"){
+    const a1 = zebraAlpha.clone(); a1.needsUpdate = true; a1.repeat.set(1, 6); const a2 = zebraAlpha.clone(); a2.needsUpdate = true; a2.repeat.set(1, 6);
+    shadeMat.alphaMap = a1; shadeMat.alphaTest = .5; shadeMat.transparent = false; shadeDepth.alphaMap = a1; shadeDepth.alphaTest = .5; shadeDepth.map = null;
+    shadeMat2.copy(shadeMat); shadeMat2.alphaMap = a2; shadeDepth2.alphaMap = a2; shadeDepth2.alphaTest = .5;
+  }
+  shadeMat.needsUpdate = true; shadeDepth.needsUpdate = true;
+  ROOMS[S.room].wins.forEach(w => shades.push(buildShade(w)));
+  shades.forEach(layoutShade); applyBands();
+}
+function applyBands(){ if(S.style !== "zebra" || !shadeMat.alphaMap) return; shadeMat2.alphaMap.offset.y = S.bands * .5; }
+
+/* light shafts: a soft additive volume from each window to the floor, along the sun */
+function buildBeams(){
+  beams.forEach(b => scene.remove(b)); spills.forEach(s => scene.remove(s)); beams = []; spills = [];
+  ROOMS[S.room].wins.forEach(w => {
+    const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(8*3), 3));
+    geo.setIndex([0,1,5, 0,5,4, 1,2,6, 1,6,5, 2,3,7, 2,7,6, 3,0,4, 3,4,7]);
+    const m = new THREE.Mesh(geo, beamMat); m.frustumCulled = false; m.renderOrder = 5; m.userData.w = w; scene.add(m); beams.push(m);
+    const sp = new THREE.SpotLight("#ffe7c2", 0, 9, .9, .9, 1.4); sp.position.set(w.x, w.y + w.h*.6, BZ + .1); sp.target.position.set(w.x, 0, 1.2); scene.add(sp); scene.add(sp.target); spills.push(sp);
+  });
+}
+function updateBeams(dir, strength){
+  beams.forEach(b => {
+    const w = b.userData.w, pos = b.geometry.attributes.position.array;
+    const open = Math.max(0, 1 - S.drop), topY = w.y + w.h * open, corners = [[w.x - w.w/2, topY],[w.x + w.w/2, topY],[w.x + w.w/2, w.y],[w.x - w.w/2, w.y]];
+    const d = dir.clone(); if(d.y > -.05) d.y = -.05;
+    corners.forEach(([x,y], i) => { pos[i*3] = x; pos[i*3+1] = y; pos[i*3+2] = BZ;
+      const k = (y - .01) / -d.y; pos[(i+4)*3] = x + d.x * k; pos[(i+4)*3+1] = .01; pos[(i+4)*3+2] = Math.min(D/2, BZ + d.z * k); });
+    b.geometry.attributes.position.needsUpdate = true; b.geometry.computeBoundingSphere();
+    b.visible = strength > .01 && open > .02;
+  });
+  beamMat.opacity = .045 * strength;
+}
+
+function loadRoom(id){
+  S.room = id; while(room.children.length) room.remove(room.children[0]);
+  lampShades.length = 0; lamps.length = 0; lampLights.forEach(l => scene.remove(l)); lampLights = [];
+  const R = ROOMS[id];
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshToonMaterial({map:planks(R.floor[0], R.floor[1]), gradientMap:gradMap})); fl.rotation.x = -Math.PI/2; fl.position.set(0, 0, 0); fl.receiveShadow = true; room.add(fl);
+  room.add(wallWithWindows(R.wins, R.wall));
+  [-1, 1].forEach(sx => { const sw = rbox(.22, H, D*.62, .02, R.wall); put(room, sw, sx*(W/2 + .11), H/2, BZ + D*.31); });
+  put(room, rbox(W + .44, .3, D + .2, .06, "#8C6B4E"), 0, -.15, .1);
+  put(room, rbox(W, .1, .04, .01, R.trim), 0, .05, BZ + .02); put(room, rbox(W, .08, .06, .01, R.trim), 0, H - .04, BZ + .03);
+  R.wins.forEach(w => room.add(windowFrame(w, R.trim)));
+  R.build(room);
+  lamps.forEach(([x,y,z]) => { const l = new THREE.PointLight("#ffbf73", 0, 7, 1.6); l.position.set(x, y, z); scene.add(l); lampLights.push(l); });
+  $("#roomTag").textContent = R.label;
+  document.querySelectorAll("#rooms button").forEach(b => b.setAttribute("aria-pressed", b.dataset.room === id));
+  rebuildShades(); buildBeams(); updateUI();
+}
+
+/* ---------- time of day ---------- */
+const C = h => new THREE.Color(h);
+const KEYS = [ // hour, sky top, sky bottom, hemi sky, hemi ground, ambient
+  [5.5,"#0b1530","#1d2b4c","#30406a","#1a1410",.05],[6.6,"#5d6fa8","#f3a77c","#c9a7a0","#6d5545",.2],[8,"#7fb2e8","#f6d9b3","#fff0d8","#8a7360",.42],
+  [12,"#6fb0ef","#d9edfb","#fff8ec","#8f7a66",.6],[16.5,"#79aee6","#f7dcb6","#fff0da","#8a7360",.5],[18.6,"#6a5aa6","#ff9e66","#e7a98a","#6d5545",.3],
+  [19.6,"#28305e","#a35f6e","#7a6a8f","#3a2c26",.14],[21,"#0b1530","#1d2b4c","#2f3c64","#1a1410",.06],[23,"#070e22","#141f3a","#26304f","#120e0b",.05]];
+function keyAt(t){ for(let i=0;i<KEYS.length-1;i++){ const a = KEYS[i], b = KEYS[i+1]; if(t >= a[0] && t <= b[0]){ const k = (t - a[0]) / (b[0] - a[0]); return [1,2,3,4].map(j => C(a[j]).lerp(C(b[j]), k)).concat([a[5] + (b[5] - a[5]) * k]); } } const L = KEYS[t < KEYS[0][0] ? 0 : KEYS.length-1]; return [C(L[1]),C(L[2]),C(L[3]),C(L[4]),L[5]]; }
+const sunDir = new THREE.Vector3();
+function applyTime(){
+  const t = S.time, rise = 6.4, set = 19.4, day = (t - rise) / (set - rise);
+  const up = day > 0 && day < 1; const elev = up ? Math.sin(Math.PI * day) * .95 : -.2;
+  const az = (day - .5) * 2.0; // left in the morning, right in the evening, always behind the window
+  const p = new THREE.Vector3(Math.sin(az) * Math.cos(elev), Math.sin(elev), -Math.cos(az) * Math.cos(elev));
+  sunBall.position.copy(p).multiplyScalar(70); sunBall.visible = elev > -.05;
+  moon.position.set(-Math.sin(az) * 50, 26, -55); moon.visible = !up || t > 19;
+  const lowK = up ? Math.min(1, Math.sin(Math.PI*day) * 2.2) : 0;   // 0 at the horizon, 1 by mid-morning
+  const warm = C("#ff9a52").lerp(C("#fff2d8"), Math.min(1, Math.sin(Math.PI*Math.max(0,Math.min(1,day))) * 1.8));
+  sun.position.copy(p).multiplyScalar(30); sun.color.copy(warm); sun.intensity = 2.3 * lowK;
+  sunDir.copy(p).negate();
+  const [top, bot, hs, hg, am] = keyAt(t);
+  skyU.top.value.copy(top); skyU.bot.value.copy(bot); skyU.sunDir.value.copy(p); skyU.sunCol.value.copy(warm); skyU.sunK.value = lowK; skyU.night.value = Math.max(0, 1 - am * 6);
+  hemi.color.copy(hs); hemi.groundColor.copy(hg); hemi.intensity = .14 + am * .45; amb.intensity = .03 + am * .06;
+  const lampsOn = Math.max(0, Math.min(1, (t - 17.8) / 1.2)) + Math.max(0, Math.min(1, (7 - t) / .6));
+  lampLights.forEach(l => l.intensity = 1.6 * lampsOn); lampShades.forEach(m => m.material.emissiveIntensity = .9 * lampsOn);
+  // fabric physics: light through the cloth, glow from behind, warm spill into the room
+  const {grp} = current(); const trans = 1 - grp.block;
+  shadeMat.emissive.copy(warm); shadeMat.emissiveIntensity = lowK * trans * 1.35 + lampsOn * .04;
+  shadeMat2.emissive.copy(warm); shadeMat2.emissiveIntensity = shadeMat.emissiveIntensity;
+  spills.forEach(sp => { sp.color.copy(warm).lerp(new THREE.Color(current().col[1]), .35); sp.intensity = lowK * trans * S.drop * 2.6; sp.target.position.set(sp.position.x + sunDir.x * 3, 0, BZ + 3); });
+  updateBeams(sunDir, lowK);
+  renderer.toneMappingExposure = .7 + am * .22 + lampsOn * .22;
+  $("#clock").textContent = $("#timeV").textContent = fmt(t);
+  $("#sunDot").style.background = up ? "#F2B544" : "#C9D3F2";
+  $("#cap").textContent = caption(t, trans, lampsOn);
+}
+const fmt = t => { const h = Math.floor(t), m = Math.round((t - h) * 60 / 15) * 15; const hh = ((h + (m === 60 ? 1 : 0)) % 24); const ap = hh >= 12 ? "pm" : "am"; return `${((hh + 11) % 12) + 1}:${String(m % 60).padStart(2,"0")} ${ap}`; };
+function caption(t, trans, lampsOn){
+  const {grp} = current(); const down = S.drop > .55;
+  if(lampsOn > .5) return grp.t[2] >= 2 ? "Lamps on. From outside, nobody sees in." : grp.t[2] >= 1 ? "Lamps on. Neighbors see soft shadows, nothing more." : "Lamps on. This fabric lets people see in at night.";
+  if(t < 8) return down ? (trans < .1 ? "Sunrise outside. Still dark in here." : "Sunrise glowing through the fabric.") : "Morning sun pouring in.";
+  if(t < 11) return down ? (trans < .1 ? "Morning outside, still calm and dim in here." : "Morning sun, softened through the fabric.") : "Morning sun pouring in.";
+  if(t < 16.5) return down ? (trans < .1 ? "Bright noon, but the room stays dim." : "The sun's behind the shade. Soft light, no glare.") : "Full sun. Lower the shade to soften it.";
+  return down ? "Golden hour, warmed through the fabric." : "Golden hour streaming across the floor.";
+}
+
+/* ---------- UI ---------- */
+function updateUI(){
+  const {st, grp, col} = current();
+  $("#styles").innerHTML = Object.entries(CAT).map(([k,v]) => `<button data-style="${k}" aria-pressed="${S.style===k}">${v.label}</button>`).join("");
+  const strip = $("#strip"); strip.innerHTML = "";
+  st.groups.forEach(g => g.colors.forEach(([n,h,uri]) => {
+    const b = document.createElement("button"); b.className = "sw"; b.dataset.fam = g.family; b.dataset.col = n; b.setAttribute("aria-pressed", g.family === grp.family && n === col[0]); b.setAttribute("aria-label", `${g.family} ${n}`);
+    if(uri){ const i = document.createElement("img"); i.src = uri; i.alt = ""; b.append(i); } else { const c = document.createElement("span"); c.className = "c"; c.style.background = h; b.append(c); }
+    const l = document.createElement("span"); l.textContent = n; b.append(l); strip.append(b);
+  }));
+  $("#fabName").textContent = `${grp.family} · ${col[0]}`;
+  $("#price").textContent = "$" + (st.price + (grp.up || 0));
+  $("#dropV").textContent = S.drop >= .99 ? "Fully down" : S.drop <= .02 ? "Up" : Math.round(S.drop * 100) + "% down";
+  $("#upDown").textContent = S.drop > .5 ? "Raise shades" : "Lower shades";
+  const LIGHT = ["Sheer","Filtering","Dimming","Blackout"], VIEW = ["Clear view","Soft view","No view"], NIGHT = ["See-through","Shadows only","Fully private"];
+  $("#read").innerHTML = [["Light", LIGHT[grp.t[0]]],["Daytime view", VIEW[grp.t[1]]],["At night", NIGHT[grp.t[2]]]].map(([a,b]) => `<div><small>${a}</small><b>${b}</b></div>`).join("");
+  applyTime();
+}
+$("#rooms").innerHTML = Object.entries(ROOMS).map(([k,r]) => `<button data-room="${k}" aria-pressed="false">${r.label}</button>`).join("");
+$("#rooms").onclick = e => { const b = e.target.closest("[data-room]"); if(!b) return; const d = ROOM_DEFAULTS[b.dataset.room]; S.style = d[0]; S.family = d[1]; S.color = ""; loadRoom(b.dataset.room); };
+$("#styles").onclick = e => { const b = e.target.closest("[data-style]"); if(!b) return; S.style = b.dataset.style; S.family = ""; S.color = ""; rebuildShades(); updateUI(); };
+$("#strip").onclick = e => { const b = e.target.closest("[data-fam]"); if(!b) return; S.family = b.dataset.fam; S.color = b.dataset.col; rebuildShades(); updateUI(); };
+const tw = {drop:null};
+$("#drop").oninput = e => { tw.drop = null; S.drop = +e.target.value / 100; shades.forEach(layoutShade); updateUI(); };
+$("#upDown").onclick = () => { tw.drop = {from:S.drop, to:S.drop > .5 ? 0 : 1, t0:performance.now()}; };
+$("#time").oninput = e => { stopPlay(); S.time = +e.target.value; applyTime(); };
+let play = null;
+function startPlay(){ if(play){ stopPlay(); return; } play = {t0:performance.now(), from:6, to:22.5}; S.drop = .65; shades.forEach(layoutShade); $("#playBtn").textContent = $("#play2").textContent = "■ Stop"; }
+function stopPlay(){ play = null; $("#playBtn").textContent = "▶ Play my day"; $("#play2").textContent = "▶ Day"; }
+$("#playBtn").onclick = startPlay; $("#play2").onclick = startPlay;
+
+/* text Dana: on a phone it opens Messages to the designer with this exact room and fabric */
+$("#text").onclick = () => {
+  const {st, grp, col} = current();
+  const link = `${location.origin}${location.pathname}?${new URLSearchParams({room:S.room, s:S.style, f:grp.family, c:col[0], t:S.time.toFixed(1)})}`;
+  const name = store.get("tl.fname");
+  const body = `Hi Dana! ${name ? "It's " + name + ". " : ""}I'm playing with ${grp.family} in ${col[0]} (${st.label.toLowerCase()}) in the ${ROOMS[S.room].label.toLowerCase()}. Can you help me see it on my windows? ${link}`;
+  if(CFG.designerSMS && /iPhone|iPad|Android/i.test(navigator.userAgent)){
+    location.href = `sms:${String(CFG.designerSMS).replace(/[^\d+]/g,"")}${/iPhone|iPad/i.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(body)}`;
+  } else {
+    const use = {nursery:"nursery", bedroom:"bedroom", living:"living", kitchen:"kitchen", bathroom:"bathroom", office:"living"}[S.room];
+    location.href = `./?${new URLSearchParams({s:S.style, f:grp.family, c:col[0], u:use, text:"1"})}`;
+  }
+};
+
+/* ---------- loop ---------- */
+let fitted = false;
+function resize(){ const r = canvas.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / Math.max(1, r.height);
+  // narrow screens: widen the view and step back so the whole room fits
+  camera.fov = camera.aspect < 1 ? 50 : 38; camera.updateProjectionMatrix();
+  if(!fitted){ fitted = true; const back = camera.aspect < 1 ? 7.4 / Math.max(.55, camera.aspect) * .62 : 7.4; camera.position.set(0, 2.6, back); controls.maxDistance = Math.max(10, back + 2); controls.update(); } }
+addEventListener("resize", resize);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function frame(now){
+  if(play){ const k = Math.min(1, (now - play.t0) / 14000); S.time = play.from + (play.to - play.from) * k; $("#time").value = S.time;
+    if(S.time > 18.4 && S.drop < .99){ S.drop = Math.min(1, S.drop + .012); shades.forEach(layoutShade); $("#drop").value = Math.round(S.drop*100); }
+    applyTime(); if(k >= 1) stopPlay(); }
+  if(tw.drop){ const k = Math.min(1, (now - tw.drop.t0) / 900), e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k+2, 2)/2; S.drop = tw.drop.from + (tw.drop.to - tw.drop.from) * e; shades.forEach(layoutShade); $("#drop").value = Math.round(S.drop*100); if(k >= 1){ tw.drop = null; } updateUI(); }
+  if(!reduce) trees.forEach(c => { c.rotation.z = Math.sin(now * .0008 + c.userData.sway) * .03; });
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(frame);
+}
+/* ---------- start ---------- */
+if(!ROOMS[S.room]) S.room = "nursery";
+if(!q.get("s")){ const d = ROOM_DEFAULTS[S.room]; S.style = d[0]; S.family = d[1]; }
+if(!CAT[S.style]) S.style = "roller";
+$("#time").value = S.time; $("#drop").value = Math.round(S.drop*100);
+resize(); loadRoom(S.room); requestAnimationFrame(frame);
+setTimeout(() => { $("#load").style.opacity = 0; setTimeout(() => $("#load").remove(), 600); }, 300);
+setTimeout(() => { $("#hint").style.opacity = 0; }, 6000);
+})();
+</script>
+</body>
+</html>
