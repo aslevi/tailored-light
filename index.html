@@ -300,6 +300,10 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
         <div class="lbl">Bands <span class="v" id="bandsV">Open</span></div>
         <input type="range" id="bands" min="0" max="100" value="30" aria-label="Zebra bands, open to closed">
       </div>
+      <div id="foldWrap">
+        <div class="lbl">Roman style <span class="v" id="foldV"></span></div>
+        <div class="seg" id="folds" style="grid-template-columns:repeat(3,1fr)"></div>
+      </div>
       <div id="liningWrap">
         <div class="lbl">Lining</div>
         <div class="seg" id="linings" style="grid-template-columns:repeat(3,1fr)"></div>
@@ -396,7 +400,11 @@ const CATALOG = {
 };
 const STYLE_IX = {roller:0, zebra:1, roman:2};
 const S = {style:"roman", family:"Raw Linen", color:"Flax", drop:.62, night:0, room:"sample", adjusting:false,
-  use:"living", need:"any", lining:1, showAll:false, mount:"inside"};
+  use:"living", need:"any", lining:1, showAll:false, mount:"inside", fold:"flat"};
+const FOLDS = {flat:{label:"Flat", up:0, note:"Clean, tailored panel that stacks into neat folds when raised."},
+  hobbled:{label:"Hobbled", up:40, note:"Soft folds cascade all the way down, even when lowered. The most traditional look."},
+  relaxed:{label:"Relaxed", up:30, note:"A gentle curve at the bottom edge. Casual and soft."}};
+function unitPrice(){ const {st,grp} = current(); return st.price + (grp.up||0) + (S.style === "roman" && !grp.weave ? FOLDS[S.fold].up : 0); }
 
 /* ---------- Designer rules (from the Designer Rulebook) ---------- */
 const LIGHT = ["Sheer","Filtering","Dimming","Blackout"], VIEW = ["Clear view","Soft view","No view"], NIGHT = ["See-through","Shadows only","Fully private"];
@@ -709,26 +717,41 @@ function clothProfile(style, drop, sway){
   for(let i=0;i<=8;i++){ const k=i/8; push(k*headH, .022*Math.sin(Math.PI*k) + .012, 0, -1, 1); }
   if(style === "roman"){
     const vb = Math.max(headH + .03, drop);
+    const fold = S.family === "Natural Reed" ? "flat" : S.fold;
     const n = Math.max(2, Math.min(7, Math.round((1 - drop) * 8) + 1));
     const stackH = drop >= .985 ? 0 : Math.min(.26, (1 - drop) * .34 + .05);
     const f0 = vb - stackH;
-    const flatRows = 60;
-    for(let i=0;i<=flatRows;i++){
-      const v = headH + (f0 - headH) * i / flatRows;
-      const ripple = .0025 * Math.sin(v * 40 + motion.swing * 3);
-      push(v, .006 + ripple + sway * (v - headH) * .5, v, 0);
-    }
-    if(stackH > 0){
-      const remaining = Math.max(.02, 1 - f0); const lf = remaining / n, h = stackH / n;
-      const A = Math.min(.028, Math.sqrt(Math.max(0, lf*lf - h*h)) * .3);
-      for(let j=0;j<n;j++) for(let i=1;i<=12;i++){
-        const k = i/12; const v = f0 + h * (j + k);
-        const bulge = A * Math.sin(Math.PI * k) * (1 + j * .08);
-        push(v, .006 + bulge + sway * .5 * (v - headH), f0 + lf * (j + k), Math.pow(Math.cos(Math.PI * k), 8));
+    if(fold === "hobbled"){
+      // soft loops all the way down: about one loop every 11% of the drop, deeper ones stacked when raised
+      const len = vb - headH, loops = Math.max(3, Math.round(len / .11)), lh = len / loops;
+      const A = .016 + Math.min(.02, (1 - drop) * .03);
+      for(let j=0;j<loops;j++) for(let i=0;i<=14;i++){
+        const k = i/14, v = headH + lh * (j + k);
+        const bulge = A * Math.pow(Math.sin(Math.PI * k), .8);
+        push(v, .006 + bulge + sway * .5 * (v - headH), headH + (1 - headH) * (j + k) / loops, Math.pow(Math.cos(Math.PI * k), 10) * .9);
+      }
+    } else {
+      const flatRows = 60;
+      for(let i=0;i<=flatRows;i++){
+        const v = headH + (f0 - headH) * i / flatRows;
+        const ripple = .0025 * Math.sin(v * 40 + motion.swing * 3);
+        // relaxed: the lower part billows forward and the hem curves down in the middle
+        const relax = fold === "relaxed" ? Math.max(0, (v - (f0 - .16)) / .16) : 0;
+        rows.push({v, z: .006 + ripple + sway * (v - headH) * .5 + relax * relax * .018, s: v, c: 0, hw: 0, curve: relax * relax * .045});
+      }
+      if(stackH > 0){
+        const remaining = Math.max(.02, 1 - f0); const lf = remaining / n, h = stackH / n;
+        const A = Math.min(.028, Math.sqrt(Math.max(0, lf*lf - h*h)) * .3);
+        for(let j=0;j<n;j++) for(let i=1;i<=12;i++){
+          const k = i/12; const v = f0 + h * (j + k);
+          const bulge = A * Math.sin(Math.PI * k) * (1 + j * .08);
+          rows.push({v, z: .006 + bulge + sway * .5 * (v - headH), s: f0 + lf * (j + k), c: Math.pow(Math.cos(Math.PI * k), 8), hw: 0, curve: fold === "relaxed" ? .045 : 0});
+        }
       }
     }
     // weighted bottom bar
-    for(let i=0;i<=3;i++) push(vb + i * .004, .012 + sway * .5, 1, -1, 1);
+    const hem = (S.family !== "Natural Reed" && S.fold === "relaxed") ? .045 : 0;
+    for(let i=0;i<=3;i++) rows.push({v: vb + i * .004, z: .012 + sway * .5, s: 1, c: -1, hw: hem ? 0 : 1, curve: hem});
   } else {
     const cas = headH, len = Math.max(.02, drop - cas);
     const N = 80;
@@ -746,7 +769,7 @@ function buildGeo(geo, rows, zOff, inset){
     const R = rows[r]; const edge = R.hw ? 0 : inset;
     u = edge + u * (1 - 2 * edge);
     const sag = R.hw ? 1 : (.9 + .1 * Math.sin(Math.PI * u));        // cloth bows slightly in the middle
-    pos[i*3] = u; pos[i*3+1] = R.v; pos[i*3+2] = R.z * sag + zOff;
+    pos[i*3] = u; pos[i*3+1] = R.v + (R.curve || 0) * Math.sin(Math.PI * u); pos[i*3+2] = R.z * sag + zOff;
     sArc[i] = R.s; cr[i] = R.c;
   }
   // normals from neighbours (window space; y down, z toward viewer)
@@ -912,10 +935,13 @@ function applyShade(){
   $("#traits").style.gridTemplateColumns = "repeat(3,1fr)";
   renderSteer(); renderPick();
   $("#liningWrap").hidden = S.style !== "roman";
+  $("#foldWrap").hidden = S.style !== "roman" || !!grp.weave;
+  $("#folds").innerHTML = Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${S.fold===k}">${f.label}${f.up ? ` <small>+$${f.up}</small>` : ""}</button>`).join("");
+  $("#foldV").textContent = FOLDS[S.fold].note;
   $("#bandsWrap").hidden = S.style !== "zebra";
   $("#linings").innerHTML = LININGS.map((l,i)=>`<button data-lin="${i}" aria-pressed="${S.lining===i}">${l.k.replace(" lining","")}</button>`).join("");
   $("#mountNote").textContent = USES[S.use].note;
-  $("#price").textContent = "$" + (st.price + (grp.up||0));
+  $("#price").textContent = "$" + unitPrice();
   $("#dropV").textContent = S.drop >= .995 ? "Fully down" : Math.round(S.drop*100) + "% down";
   draw();
 }
@@ -1024,6 +1050,7 @@ $("#styles").onclick = e => { const b=e.target.closest("[data-style]"); if(!b) r
 $("#uses").onclick = e => { const b=e.target.closest("[data-use]"); if(!b) return; S.use=b.dataset.use; S.need=USES[S.use].need; S.style=USES[S.use].style; S.showAll=false; applyRules(true); };
 $("#needs").onclick = e => { const b=e.target.closest("[data-need]"); if(!b) return; S.need=b.dataset.need; S.showAll=false; applyRules(true); };
 $("#mounts").onclick = e => { const b=e.target.closest("[data-mount]"); if(!b) return; S.mount=b.dataset.mount; updateGeometry(); applyShade(); };
+$("#folds").onclick = e => { const b=e.target.closest("[data-fold]"); if(!b) return; S.fold=b.dataset.fold; applyShade(); };
 $("#linings").onclick = e => { const b=e.target.closest("[data-lin]"); if(!b) return; S.lining=+b.dataset.lin;
   if(!fits(S.style, current().grp) && CATALOG[S.style].groups.some(g => fits(S.style, g))) pickBest();
   renderStrip(); applyShade(); };
@@ -1147,12 +1174,12 @@ function paintDesigner(){
 }
 const isPhone = /iPhone|iPad|Android/i.test(navigator.userAgent);
 function lookURL(){
-  const q = new URLSearchParams({s:S.style, f:S.family, c:S.color, u:S.use, n:S.need});
+  const q = new URLSearchParams({s:S.style, f:S.family, c:S.color, u:S.use, n:S.need, ...(S.style==="roman" ? {r:S.fold} : {})});
   return `${location.origin}${location.pathname}?${q}`;
 }
 function textDesignerForReal(){
   const d = designer(), p = profile(), {st,grp,col} = current();
-  const body = `Hi ${d.name}! I'm ${p.fname || "interested"}${p.fname ? "" : " in shades"}. I'm looking at ${grp.family} in ${col[0]} (${st.label.toLowerCase()}) for my ${USES[S.use].label.toLowerCase()}. ${lookURL()}`;
+  const body = `Hi ${d.name}! I'm ${p.fname || "interested"}${p.fname ? "" : " in shades"}. I'm looking at ${grp.family} in ${col[0]} (${S.style==="roman" && !grp.weave ? FOLDS[S.fold].label.toLowerCase() + " " : ""}${st.label.toLowerCase()}) for my ${USES[S.use].label.toLowerCase()}. ${lookURL()}`;
   const num = String(CFG.designerSMS).replace(/[^\d+]/g, "");
   location.href = `sms:${num}${/iPhone|iPad/i.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(body)}`;
 }
@@ -1340,7 +1367,7 @@ function onFree(v, q){
     if(last && last.who === "them") push({quick:q.quick}); else if(++tries < 12) setTimeout(back, 500); }; setTimeout(back, 900); }
   if(/install|hang|mount/.test(t)) say(["They're easy to put up: a few screws per bracket. Any handyman can do it in under an hour."]);
   else if(/clean/.test(t)) say(["Just dust them with a vacuum brush, a dry cloth or compressed air."]);
-  else if(/price|cost|how much/.test(t)) { const {st,grp} = current(); say([`That one is $${st.price + (grp.up||0)} per window, made to your exact size. I'll send a full quote once I have your measurements.`]); }
+  else if(/price|cost|how much/.test(t)) { const {st,grp} = current(); say([`That one is $${unitPrice()} per window, made to your exact size. I'll send a full quote once I have your measurements.`]); }
   else if(/long|ship|when/.test(t)) say(["About 2 to 4 weeks from when you order, shipped to your door."]);
   else say(["Great question. Let me check and get right back to you."]);
 }
@@ -1434,7 +1461,7 @@ $("#kitForm").addEventListener("submit", async e => {
   const {st,grp,col} = current();
   const order = {kind:"swatches", fname:$("#kName").value.trim(), phone:ph, email,
     address:`${$("#kAddr").value.trim()}, ${$("#kCity").value.trim()}, ${$("#kState").value.trim().toUpperCase()} ${zip}`,
-    style:st.label, family:grp.family, color:col[0], sku:col[3]||"", supplier:grp.src||"", lining:S.style==="roman"?LININGS[S.lining].k:"", roomUse:USES[S.use].label, need:NEEDS[S.need].label, type:NEEDS[S.need].label, price:st.price+(grp.up||0), kitFee:9,
+    style:st.label, family:grp.family, color:col[0], sku:col[3]||"", supplier:grp.src||"", lining:S.style==="roman"?LININGS[S.lining].k:"", roomUse:USES[S.use].label, need:NEEDS[S.need].label, type:NEEDS[S.need].label, price:unitPrice(), fold:S.style==="roman"?FOLDS[S.fold].label:"", kitFee:9,
     room:ROOMS[S.room]?.label || "", image:snapshot(), status:"new", createdAt:new Date().toISOString()};
   kit.close ? kit.close() : kit.removeAttribute("open");
   try { await saveLead({kind:"swatches", name:order.fname, phone:ph, email, address:order.address, look:order}); } catch(err){}
@@ -1458,7 +1485,7 @@ function describeEl(el){
   const sec = t.closest("section,dialog,.sms,.live,.stickycta,header");
   return `${t.tagName.toLowerCase()}${t.id ? "#" + t.id : ""}${txt ? ` "${txt}"` : ""}${sec && sec.id ? ` in #${sec.id}` : ""}`;
 }
-function noteState(){ return {style:S.style, fabric:S.family, color:S.color, room:USES[S.use].label, need:NEEDS[S.need].label, photo:S.room, mount:S.mount, lining:S.style==="roman"?LININGS[S.lining].k:"", drop:Math.round(S.drop*100)+"%", time:["Day","Evening","Night"][S.night>.8?2:S.night>.2?1:0], zoom:Z.s.toFixed(1), screen:`${innerWidth}x${innerHeight}`}; }
+function noteState(){ return {style:S.style + (S.style==="roman" ? "/" + S.fold : ""), fabric:S.family, color:S.color, room:USES[S.use].label, need:NEEDS[S.need].label, photo:S.room, mount:S.mount, lining:S.style==="roman"?LININGS[S.lining].k:"", drop:Math.round(S.drop*100)+"%", time:["Day","Evening","Night"][S.night>.8?2:S.night>.2?1:0], zoom:Z.s.toFixed(1), screen:`${innerWidth}x${innerHeight}`}; }
 function pinShot(rx, ry){
   try { const src = snapshot(); return new Promise(res => { const im = new Image(); im.onload = () => {
     const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const g = c.getContext("2d"); g.drawImage(im, 0, 0);
@@ -1556,7 +1583,7 @@ addStaged().then(() => {
   renderRooms(); loadRoom(first); applyRules();
   const q = new URLSearchParams(location.search);
   if(q.get("s") && CATALOG[q.get("s")]){
-    if(USES[q.get("u")]) S.use = q.get("u"); if(NEEDS[q.get("n")]) S.need = q.get("n");
+    if(USES[q.get("u")]) S.use = q.get("u"); if(NEEDS[q.get("n")]) S.need = q.get("n"); if(FOLDS[q.get("r")]) S.fold = q.get("r");
     S.style = q.get("s"); applyRules(true);
     const g = CATALOG[S.style].groups.find(g => g.family === q.get("f"));
     if(g){ S.family = g.family; S.color = (g.colors.find(c => c[0] === q.get("c")) || g.colors[0])[0]; renderStrip(); applyShade(); }
