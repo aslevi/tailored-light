@@ -197,6 +197,8 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
 .clipsheet .row1 small{color:var(--muted)}
 .clipsheet .btn{width:100%}
 .clipsheet .note{font-size:12.5px;color:var(--muted);text-align:center;margin:0}
+#playBtn{white-space:nowrap}
+@media (max-width:360px){ #playBtn,.tod button{font-size:12.5px} }
 .live{position:fixed;inset:0;z-index:31;background:#000;display:flex;flex-direction:column}
 .live .lv-top{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;z-index:2}
 .live .lv-stage{flex:1;display:grid;place-items:center;overflow:hidden;position:relative}
@@ -207,6 +209,12 @@ dialog::backdrop{background:rgba(8,12,10,.55)}
 .live .lv-strip button{flex:none;width:52px;height:52px;border-radius:50%;border:3px solid rgba(255,255,255,.5);padding:0;overflow:hidden}
 .live .lv-strip button[aria-pressed="true"]{border-color:#fff}
 .live .lv-strip img{width:100%;height:100%;object-fit:cover}
+@media (orientation:landscape) and (max-height:520px){
+  .live .lv-bar{left:auto;right:calc(12px + env(safe-area-inset-right,0px));top:64px;bottom:12px;width:200px;align-content:end}
+  .live .lv-strip{flex-wrap:wrap;overflow:visible}
+  .live .lv-strip button{width:40px;height:40px}
+  .live .lv-note{display:none}
+}
 .live .lv-note{color:#fff;font-size:12.5px;text-align:center;opacity:.85;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -398,7 +406,18 @@ function steerOptions(){
 }
 function renderSteer(){
   const el = $("#steer"); if(!el) return;
-  if(styleCanFit(S.style)){ el.hidden = true; el.innerHTML = ""; return; }
+  if(styleCanFit(S.style)){
+    // a roman whose chosen lining can't meet the need: offer the right lining
+    const best = bestLining(S.need);
+    if(S.style === "roman" && !CATALOG.roman.groups.some(g => fits("roman", g)) && best !== S.lining){
+      el.hidden = false;
+      el.innerHTML = `<div class="who"><span class="av" style="width:24px;height:24px;font-size:11px">D</span><span></span></div><div class="opts"><button></button></div>`;
+      el.querySelector(".who span:last-child").textContent = `Dana: that lining won't give you ${NEEDS[S.need].label.toLowerCase()}. Go with ${LININGS[best].k.toLowerCase()}.`;
+      const b = el.querySelector(".opts button"); b.textContent = `Use ${LININGS[best].k.toLowerCase()}`;
+      b.onclick = () => { S.lining = best; pickBest(); renderStrip(); applyShade(); };
+      return;
+    }
+    el.hidden = true; el.innerHTML = ""; return; }
   const opts = steerOptions(); const need = NEEDS[S.need].label.toLowerCase();
   const why = {dark:"let some light through, so they won't get a room fully dark", privacy:"show what's inside at night with the lights on", bath:"aren't private enough for a bathroom at night", view:"block the view more than you'd like"}[S.need] || "aren't a great match here";
   el.hidden = false;
@@ -408,7 +427,8 @@ function renderSteer(){
 }
 const ROOMS = {}; // id -> {label, img, corners:[[x,y]x4] in 0..1 image coords, TL,TR,BR,BL}
 const $ = s => document.querySelector(s);
-const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+const memStore = {};
+const store = { get(k){ try{ const v = localStorage.getItem(k); if(v != null) return v; }catch(e){} return memStore[k] ?? null; }, set(k,v){ memStore[k] = v; try{ localStorage.setItem(k,v); }catch(e){} } };
 
 /* ---------- Sample room, painted until staged photos arrive ---------- */
 function paintSampleRoom(){
@@ -734,7 +754,7 @@ function toWindow(x, y){ // image coords -> window (u,v)
 let imgW = 1200, imgH = 1500, corners = null, tileIn = 18;
 function loadRoom(id){
   const R = ROOMS[id]; if(!R) return;
-  S.room = id; corners = R.corners.map(p=>p.slice()); extras = (R.extra||[]).map(w=>w.map(p=>p.slice()));
+  S.room = id; corners = R.corners.map(p=>p.slice()); lastGoodCorners = null; extras = (R.extra||[]).map(w=>w.map(p=>p.slice()));
   const t = new THREE.Texture(R.src); t.needsUpdate = true; t.minFilter = THREE.LinearFilter;
   if(uniforms.photo.value) uniforms.photo.value.dispose();
   uniforms.photo.value = t;
@@ -752,14 +772,36 @@ function estimateLum(src){
 }
 function applyH(H, u, v){ const e = H.elements; const X = e[0]*u + e[3]*v + e[6], Y = e[1]*u + e[4]*v + e[7], Z = e[2]*u + e[5]*v + e[8]; return [X/Z, Y/Z]; }
 let extras = [];
+// how far an outside-mounted shade may extend past each side, stopping halfway into the gap to a neighbouring window
+function sideExpand(c, wins){
+  const xs = q => q.map(p => p[0]), ys = q => q.map(p => p[1]);
+  const L = Math.min(...xs(c)), R = Math.max(...xs(c)), T = Math.min(...ys(c)), B = Math.max(...ys(c)), w = Math.max(1e-4, R - L);
+  let eL = .07, eR = .07;
+  wins.forEach(o => { if(o === c) return;
+    const oL = Math.min(...xs(o)), oR = Math.max(...xs(o)), oT = Math.min(...ys(o)), oB = Math.max(...ys(o));
+    if(oB < T || oT > B) return; // not side by side
+    if(oR <= L) eL = Math.min(eL, Math.max(0, (L - oR) / 2 - .002) / w);
+    if(oL >= R) eR = Math.min(eR, Math.max(0, (oL - R) / 2 - .002) / w);
+  });
+  return [eL, eR];
+}
+function quadOK(c){
+  let sign = 0, area = 0;
+  for(let i = 0; i < 4; i++){ const a = c[i], b = c[(i+1)%4], d = c[(i+2)%4];
+    const cr = (b[0]-a[0])*(d[1]-b[1]) - (b[1]-a[1])*(d[0]-b[0]); if(Math.abs(cr) < 1e-9) return false;
+    if(sign && Math.sign(cr) !== sign) return false; sign = Math.sign(cr); area += a[0]*b[1] - b[0]*a[1]; }
+  return Math.abs(area) / 2 > .0015;
+}
+let lastGoodCorners = null;
 function windowList(){ return [corners, ...extras].slice(0, MAXW); }
 function updateGeometry(){
+  if(quadOK(corners)) lastGoodCorners = corners.map(p=>p.slice()); else if(lastGoodCorners) corners = lastGoodCorners.map(p=>p.slice());
   const out0 = S.mount === "outside";
   const wins = windowList(); uniforms.nW.value = wins.length;
   wins.forEach((c, i) => {
     const Hc = quadH(c);
     uniforms.HinvX.value[i].copy(Hc).invert();
-    const scc = out0 ? [applyH(Hc,-.07,-.09), applyH(Hc,1.07,-.09), applyH(Hc,1.07,1.05), applyH(Hc,-.07,1.05)] : c;
+    const scc = out0 ? (() => { const [eL, eR] = sideExpand(c, wins); return [applyH(Hc,-eL,-.09), applyH(Hc,1+eR,-.09), applyH(Hc,1+eR,1.05), applyH(Hc,-eL,1.05)]; })() : c;
     HSX[i].copy(quadH(scc)); uniforms.HinvSX.value[i].copy(HSX[i]).invert();
     uniforms.winCX.value[i].set(c.reduce((a,p)=>a+p[0],0)/4, c.reduce((a,p)=>a+p[1],0)/4);
     uniforms.winRX.value[i] = Math.max(Math.abs(c[1][0]-c[0][0]) * imgW/imgH, Math.abs(c[3][1]-c[0][1])) * .9;
@@ -873,6 +915,7 @@ requestAnimationFrame(renderFrame);
 const CAPS = [[0,"7:00 am · Morning light, softened"],[.3,"1:00 pm · Bright, no glare"],[.5,"6:30 pm · Golden hour through the fabric"],[.62,"7:30 pm · The shade comes down"],[.85,"10:00 pm · Lamps on. Private."]];
 function startPlay(){
   if(playDay){ stopPlay(); return; }
+  if(S.adjusting) setAdjust(false);
   playDay = {t0: performance.now(), dur: 11000, lowered:false, start:S.drop};
   delete tweens.night; S.drop = .45; $("#playBtn").textContent = "■ Stop"; $("#cap").hidden = false;
 }
@@ -905,15 +948,15 @@ function pickBest(){
 }
 function applyRules(showcase){
   if(S.style==="roman") S.lining = bestLining(S.need);
-  S.mount = S.need === "dark" ? "outside" : "inside";
+  if(showcase) S.mount = S.need === "dark" ? "outside" : "inside";
   if(corners) updateGeometry();
-  if(showcase){ const to = S.need==="view" ? .45 : S.need==="any" ? .7 : 1; tween("drop", to, 1100); }
+  if(showcase){ const to = S.need==="view" ? .45 : S.need==="any" ? .7 : 1; if(S.adjusting) S._dropBefore = to; else tween("drop", to, 1100); }
   pickBest(); renderUses(); renderStyles(); renderStrip(); applyShade();
 }
 function renderStrip(){
   const st = CATALOG[S.style]; const strip = $("#strip"); strip.innerHTML = "";
   const groups = st.groups.filter(g => S.showAll || fits(S.style, g));
-  const hidden = st.groups.length - groups.length;
+  const hidden = groups.length ? st.groups.length - groups.length : 0;
   $("#showAll").hidden = !hidden && !S.showAll;
   $("#showAll").textContent = S.showAll ? "Show only fabrics that fit" : `Show all fabrics (${hidden} more don't fit this room)`;
   (groups.length ? groups : st.groups).forEach(g => g.colors.forEach(([n,h,uri,sku]) => {
@@ -935,7 +978,9 @@ $("#styles").onclick = e => { const b=e.target.closest("[data-style]"); if(!b) r
 $("#uses").onclick = e => { const b=e.target.closest("[data-use]"); if(!b) return; S.use=b.dataset.use; S.need=USES[S.use].need; S.style=USES[S.use].style; S.showAll=false; applyRules(true); };
 $("#needs").onclick = e => { const b=e.target.closest("[data-need]"); if(!b) return; S.need=b.dataset.need; S.showAll=false; applyRules(true); };
 $("#mounts").onclick = e => { const b=e.target.closest("[data-mount]"); if(!b) return; S.mount=b.dataset.mount; updateGeometry(); applyShade(); };
-$("#linings").onclick = e => { const b=e.target.closest("[data-lin]"); if(!b) return; S.lining=+b.dataset.lin; renderStrip(); applyShade(); };
+$("#linings").onclick = e => { const b=e.target.closest("[data-lin]"); if(!b) return; S.lining=+b.dataset.lin;
+  if(!fits(S.style, current().grp) && CATALOG[S.style].groups.some(g => fits(S.style, g))) pickBest();
+  renderStrip(); applyShade(); };
 $("#bands").oninput = e => { const v = +e.target.value/100; tween("bands", v, 250); $("#bandsV").textContent = v < .35 ? "Open" : v > .75 ? "Closed" : "Half open"; };
 $("#showAll").onclick = () => { S.showAll = !S.showAll; renderStrip(); };
 $("#strip").onclick = e => { const b=e.target.closest("[data-fam]"); if(!b) return; S.family=b.dataset.fam; S.color=b.dataset.col; document.querySelectorAll("#strip .sw").forEach(x=>x.setAttribute("aria-pressed", x===b)); applyShade(); };
@@ -987,16 +1032,18 @@ handleEls.forEach((b,i) => {
   let on = false;
   b.addEventListener("pointerdown", e => { on = true; b.setPointerCapture(e.pointerId); e.preventDefault(); });
   b.addEventListener("pointermove", e => { if(!on) return; const [x,y] = evToImg(e); corners[i] = [Math.max(0,Math.min(1,x)), Math.max(0,Math.min(1,y))]; updateGeometry(); draw(); });
-  b.addEventListener("pointerup", () => { on = false; if(ROOMS[S.room]) ROOMS[S.room].corners = corners.map(p=>p.slice()); });
+  b.addEventListener("pointerup", () => { on = false; if(ROOMS[S.room]) ROOMS[S.room].corners = corners.map(p=>p.slice()); drawHandles(); });
   b.addEventListener("keydown", e => {
     const d = {ArrowLeft:[-.005,0],ArrowRight:[.005,0],ArrowUp:[0,-.005],ArrowDown:[0,.005]}[e.key]; if(!d) return; e.preventDefault();
-    corners[i] = [corners[i][0]+d[0], corners[i][1]+d[1]]; updateGeometry(); draw();
+    corners[i] = [Math.max(0, Math.min(1, corners[i][0]+d[0])), Math.max(0, Math.min(1, corners[i][1]+d[1]))]; updateGeometry(); draw();
+    if(ROOMS[S.room]) ROOMS[S.room].corners = corners.map(p=>p.slice());
   });
 });
 function setAdjust(on){
-  S.adjusting = on; $("#handles").hidden = !on; $("#coach").hidden = !on;
+  if(on && playDay) stopPlay();
+  const was = S.adjusting; S.adjusting = on; $("#handles").hidden = !on; $("#coach").hidden = !on;
   $("#adjust").textContent = on ? "Done" : "Adjust window";
-  if(on){ S._dropBefore = S.drop; S.drop = .12; } else if(S._dropBefore != null){ S.drop = S._dropBefore; S._dropBefore = null; }
+  if(on){ if(!was){ delete tweens.drop; S._dropBefore = S.drop; } S.drop = .12; } else if(was && S._dropBefore != null){ S.drop = S._dropBefore; S._dropBefore = null; }
   $("#drop").value = Math.round(S.drop*100); applyShade(); drawHandles();
 }
 $("#adjust").onclick = () => setAdjust(!S.adjusting);
@@ -1073,7 +1120,13 @@ function openChat(){
     </div>`;
     document.body.append(d);
     $("#smsBack").onclick = () => { d.remove(); };
-    const send = () => { const v = $("#smsIn").value.trim(); if(!v) return; $("#smsIn").value = ""; me(v); onFree(v); };
+    const send = () => { const v = $("#smsIn").value.trim(); if(!v) return; $("#smsIn").value = "";
+      const q = pendingQuick(); me(v);
+      // a typed answer that matches a button counts as tapping it
+      const hit = q && q.quick.find(x => x.toLowerCase().replace(/[^a-z ]/g,"").trim().split(" ")[0] === v.toLowerCase().replace(/[^a-z ]/g,"").trim().split(" ")[0])
+        || (q && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(v) && q.quick.find(x => /^yes/i.test(x)));
+      if(hit){ onQuick(hit); return; }
+      onFree(v, q); };
     $("#smsGo").onclick = send; $("#smsIn").addEventListener("keydown", e => { if(e.key === "Enter") send(); });
     $("#smsCam").onclick = () => $("#smsFile").click();
     redraw();
@@ -1106,6 +1159,7 @@ function reason(){
 }
 function push(m){ chat.msgs.push(m); redraw(); }
 function me(t){ chat.msgs = chat.msgs.filter(m => !m.quick); push({who:"me", text:t}); }
+function pendingQuick(){ for(let i = chat.msgs.length - 1; i >= 0; i--){ if(chat.msgs[i].quick) return chat.msgs[i]; if(chat.msgs[i].who === "me") return null; } return null; }
 function redraw(){
   const body = document.getElementById("smsBody"); if(!body) return;
   body.querySelectorAll(":scope > :not(.sms-day)").forEach(n => n.remove());
@@ -1144,9 +1198,9 @@ function onQuick(q){
       {quick:["📷 Send a measurement photo","Use a sample photo"]}
     ]);
   } else if(chat.stage === 2){
-    if(q.startsWith("📷")) $("#smsFile").click(); else measured(null);
+    if(q.startsWith("📷")){ push({quick:["📷 Send a measurement photo","Use a sample photo"]}); $("#smsFile").click(); } else measured(null);
   } else if(chat.stage === 4){
-    if(q.startsWith("Yes")) { say(["Done. Your kit ships tomorrow and I'll text you the tracking. Want me to put together a quote for the rest of the house too?"]); chat.stage = 5; }
+    if(q.startsWith("Yes")) { say(["Great. Where should I send it? Fill this in and it's on its way."]); setTimeout(() => { chat.kitPending = true; $("#kitBtn").onclick(); }, 900); }
     else say(["No problem. It's here whenever you want it."]);
   }
 }
@@ -1166,8 +1220,10 @@ function measured(src){
   ]);
   setTimeout(() => { chat.stage = 4; }, 50);
 }
-function onFree(v){
+function onFree(v, q){
   const t = v.toLowerCase();
+  if(q){ let tries = 0; const back = () => { if(pendingQuick()) return; const last = chat.msgs[chat.msgs.length-1];
+    if(last && last.who === "them") push({quick:q.quick}); else if(++tries < 12) setTimeout(back, 500); }; setTimeout(back, 900); }
   if(/install|hang|mount/.test(t)) say(["They're easy to put up: a few screws per bracket. Any handyman can do it in under an hour."]);
   else if(/clean/.test(t)) say(["Just dust them with a vacuum brush, a dry cloth or compressed air."]);
   else if(/price|cost|how much/.test(t)) { const {st,grp} = current(); say([`That one is $${st.price + (grp.up||0)} per window, made to your exact size. I'll send a full quote once I have your measurements.`]); }
@@ -1186,7 +1242,8 @@ document.body.insertAdjacentHTML("beforeend", '<input type="file" id="smsFile" a
 $("#smsFile").addEventListener("change", e => {
   const f = e.target.files[0]; e.target.value = ""; if(!f) return;
   const rd = new FileReader();
-  rd.onload = () => { const img = new Image(); img.onload = () => { const k = Math.min(1, 900/Math.max(img.width,img.height)); const c = document.createElement("canvas"); c.width = img.width*k; c.height = img.height*k; c.getContext("2d").drawImage(img,0,0,c.width,c.height); const url = c.toDataURL("image/jpeg",.8); if(chat.stage === 2) measured(url); else { push({who:"me", img:url}); say(["Thanks! I'll mock this room up and send it back shortly."]); } }; img.src = rd.result; };
+  rd.onerror = () => toast("That photo didn't open. Try a JPEG or PNG.");
+  rd.onload = () => { const img = new Image(); img.onerror = () => toast("That photo didn't open. Try a JPEG or PNG."); img.onload = () => { const k = Math.min(1, 900/Math.max(img.width,img.height)); const c = document.createElement("canvas"); c.width = img.width*k; c.height = img.height*k; c.getContext("2d").drawImage(img,0,0,c.width,c.height); const url = c.toDataURL("image/jpeg",.8); if(chat.stage === 2) measured(url); else { push({who:"me", img:url}); say(["Thanks! I'll mock this room up and send it back shortly."]); } }; img.src = rd.result; };
   rd.readAsDataURL(f);
 });
 
@@ -1215,7 +1272,8 @@ function openLive(){
   const fit = () => { const W = innerWidth, H = innerHeight; const k = Math.max(W / imgW, H / imgH); const cw = Math.round(imgW*k), ch = Math.round(imgH*k);
     renderer.setSize(cw, ch, false); Object.assign(canvas.style, {width:cw+"px", height:ch+"px", position:"absolute", maxWidth:"none", maxHeight:"none"});
     let cx = .5, cy = .5; if(corners){ const n = corners[0][0] > 1.5 ? [imgW, imgH] : [1, 1]; cx = corners.reduce((a,c)=>a+c[0],0)/4/n[0]; cy = corners.reduce((a,c)=>a+c[1],0)/4/n[1]; }
-    const left = Math.min(0, Math.max(W - cw, W/2 - cx*cw)), top = Math.min(0, Math.max(H - ch, H*0.42 - cy*ch));
+    const land = W > H && H <= 520, aimX = land ? (W - 224) / 2 : W / 2;
+    const left = Math.min(0, Math.max(W - cw, aimX - cx*cw)), top = Math.min(0, Math.max(H - ch, H*0.42 - cy*ch));
     canvas.style.left = left+"px"; canvas.style.top = top+"px"; };
   fit(); addEventListener("resize", fit);
   const strip = $("#lvStrip");
@@ -1243,7 +1301,9 @@ $("#kitBtn").onclick = () => {
   $("#kEmail").value = store.get("tl.email") || ""; $("#kitErr").textContent = "";
   kit.showModal ? kit.showModal() : kit.setAttribute("open","");
 };
-$("#kitCancel").onclick = () => kit.close ? kit.close() : kit.removeAttribute("open");
+kit.addEventListener("cancel", () => setTimeout(() => $("#kitCancel").onclick(), 0));
+$("#kitCancel").onclick = () => { kit.close ? kit.close() : kit.removeAttribute("open");
+  if(chat.kitPending){ chat.kitPending = false; say(["No problem. It's here whenever you want it.", {quick:["Yes, send swatches","Not yet"]}]); } };
 $("#kitForm").addEventListener("submit", async e => {
   e.preventDefault();
   const ph = cleanPhone($("#kPhone").value), email = $("#kEmail").value.trim(), zip = $("#kZip").value.trim();
@@ -1261,6 +1321,7 @@ $("#kitForm").addEventListener("submit", async e => {
   kit.close ? kit.close() : kit.removeAttribute("open");
   try { await saveLead({kind:"swatches", name:order.fname, phone:ph, email, address:order.address, look:order}); } catch(err){}
   toast(`Swatches ordered. Dana will text ${ph} when they ship.`);
+  if(chat.kitPending){ chat.kitPending = false; chat.stage = 5; say([`Done! Your kit is on its way to ${$("#kCity").value.trim()}. I'll text you the tracking. Want me to put together a quote for the rest of the house too?`]); }
 });
 
 let toastT;
