@@ -78,3 +78,37 @@ footer span{opacity:.8}
 }
 .ov button svg{display:block;margin:auto}
 @media(max-width:700px){.ov-br #zoom-in,.ov-br #zoom-out,.ov-bl #ceiling-toggle{display:none}.ov-bl .sep{width:2px}}
+/* hotspots on lights */
+.hotspot,#lamp-hotspot{position:absolute;width:56px;height:56px;margin:0;padding:0;background:none;border-radius:50%;transform:translate(-50%,-50%) scale(calc(1/var(--z,1)));z-index:4;cursor:pointer}
+.hotspot .ring{position:absolute;inset:14px;border-radius:50%;border:2px solid #fff;background:#ffffff33;box-shadow:0 0 0 1px #0003,0 2px 8px #0004}
+.hotspot .ring:after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid #fff;animation:ping 2s ease-out infinite}
+.hotspot[aria-pressed=true] .ring{background:#ffd98a;border-color:#fff6dc;box-shadow:0 0 18px 6px #ffcf7099}
+.hotspot[aria-pressed=true] .ring:after,body.lit .hotspot .ring:after{animation:none;opacity:0}
+@keyframes ping{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(2);opacity:0}}
+.tip{position:absolute;left:50%;top:100%;transform:translateX(-50%);white-space:nowrap;background:#2f3128e6;color:#fff9eb;font-size:11px;font-weight:600;padding:4px 9px;border-radius:12px;pointer-events:none;transition:opacity .4s}
+body.lit .hotspot .tip{opacity:0}
+#ceiling-hotspot .tip{display:none}
+/* the shade itself is grabbable */
+#shade-grab{position:absolute;z-index:3;touch-action:none;cursor:ns-resize}
+#shade-handle{position:absolute;z-index:4;transform:translate(-50%,-50%) scale(calc(1/var(--z,1)));background:#fffdf7;border-radius:16px;padding:7px 14px;box-shadow:0 2px 10px #0004;touch-action:none;cursor:ns-resize;min-width:48px;min-height:30px}
+#shade-handle .grip{display:flex;flex-direction:column;gap:3px;align-items:center}#shade-handle .grip i{display:block;width:22px;height:2px;border-radius:2px;background:#8a7e6c}
+#shade-handle .tip{top:calc(100% + 6px)}
+body:not(.dragged) #shade-handle{animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{margin-top:0}50%{margin-top:-10px}}
+body.dragged #shade-handle .tip{opacity:0}
+body.dragging-shade #shade-handle{background:#414438}body.dragging-shade #shade-handle .grip i{background:#fff9eb}
+body.dragging-shade{cursor:ns-resize;user-select:none}
+#viewport.inspecting #shade-handle,#viewport.inspecting .hotspot,#viewport.inspecting #shade-grab{display:none}
+/* Dana in the panel */
+.dana{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px}
+.dana .avatar{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#5C7F6E,#8DB09A);color:#fff;font:600 13px 'DM Sans',sans-serif}
+.dana p{margin:0;font-size:12px;line-height:1.45;color:#5d5747;background:#fffdf8;border:1px solid #e6dccb;border-radius:4px 12px 12px 12px;padding:7px 10px}
+.dana.pop p{animation:pop .35s ease-out}@keyframes pop{0%{transform:scale(.96);opacity:.4}100%{transform:none;opacity:1}}
+@media(max-width:700px){.dana p{font-size:11.5px;padding:6px 9px}.dana{margin-bottom:6px}.hotspot{width:48px;height:48px}.hotspot .ring{inset:13px}.panel-body{padding-bottom:200px}footer{padding-bottom:200px}}
+@media(prefers-reduced-motion:reduce){.hotspot .ring:after,#shade-handle{animation:none!important}}
+.rooms{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;width:min(100%,calc((100vh - var(--hdr) - 84px)*1.5));padding:2px 2px 10px;flex:none}.rooms::-webkit-scrollbar{display:none}
+.rooms button{flex:none;font-size:12px;min-height:36px;padding:0 14px;border-radius:20px;border:1px solid #ded5c5;background:#faf7f0;color:var(--ink)}
+.rooms button[aria-pressed=true]{background:var(--dark);color:#fff9eb;border-color:var(--dark)}
+#viewport{width:min(100%,calc((100vh - var(--hdr) - 84px)*1.5))}
+#viewport.inspecting~*{}
+@media(max-width:700px){.rooms{width:100%;padding:8px 10px;margin:0}.rooms button{min-height:34px;font-size:12px}#viewport{width:100%}.tabs{top:calc(var(--hdr) + 50px + 66.67vw)}}
