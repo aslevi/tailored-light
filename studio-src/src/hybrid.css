@@ -187,3 +187,4 @@ body.dragged .offer span{}
 }
 .offer{border-radius:0}
 @media(max-width:700px),(orientation:portrait) and (max-width:1100px){.offer{height:54px;overflow:hidden}.brand span{display:none}}
+.style-tiles button[data-style=roller] img{object-position:center top}
