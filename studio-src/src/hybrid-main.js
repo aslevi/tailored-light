@@ -239,12 +239,12 @@ function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCas
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
   `<strong>Dana</strong> · Want to feel it first? I'll mail you swatches for $9, credited to your order.`];
- const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));if(touched.size===3||touched.size===6||touched.size===9)toast(lines[Math.min(lines.length-1,touched.size/3-1)]);}
+ const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
 document.addEventListener('click',e=>{const pk=e.target.closest('[data-family],[data-pick],[data-style],[data-fold]');if(pk)engaged('pick:'+(pk.dataset.pick||pk.dataset.family||pk.dataset.style||pk.dataset.fold));});
 /* Share the look (spouse approval is a real step) */
-$('share-look').addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${ROOMS.find(r=>r.id===state.room).label.toLowerCase()}? ${summary()}`;
+$('share-look')?.addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${ROOMS.find(r=>r.id===state.room).label.toLowerCase()}? ${summary()}`;
  try{if(navigator.share){await navigator.share({title:'Tailored Light',text,url});return;}await navigator.clipboard.writeText(text+' '+url);toast('<strong>Link copied</strong> · send it to whoever gets a vote.');}catch{}});
 /* Intro: the shade lowers itself once so visitors see it's alive */
 (function intro(){if(reduced||new URLSearchParams(location.search).has('s'))return;const target=state.drop,t0=performance.now()+700;state.drop=.04;
@@ -252,7 +252,7 @@ $('share-look').addEventListener('click',async()=>{const url=lookURL(),text=`Wha
 
 
 /* ---------- Guided steps ---------- */
-function goStep(name){const sb=document.querySelector('.step-body');sb.dataset.show=name;sb.scrollTop=0;document.querySelectorAll('[data-step]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.step===name)));document.querySelector('.panel').dataset.step=name;}
+function goStep(name){const sb=document.querySelector('.step-body');sb.dataset.show=name;sb.scrollTop=0;document.querySelectorAll('[data-step]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.step===name)));document.querySelector('.panel').dataset.current=name;}
 document.querySelectorAll('[data-step]').forEach(t=>t.addEventListener('click',()=>goStep(t.dataset.step)));
 document.querySelectorAll('[data-goto]').forEach(t=>t.addEventListener('click',()=>goStep(t.dataset.goto)));
 document.addEventListener('click',e=>{
