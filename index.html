@@ -1,38 +1,52 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp">  <script type="module" crossorigin src="./assets/index-BmsBI2gC.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BK8Y2POd.css">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp">  <script type="module" crossorigin src="./assets/index-4A4Q4zGQ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BGSOVH0a.css">
 </head>
 <body>
-<header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><button class="header-cta" data-text="look">Text Dana</button></header>
-<main><section class="experience" aria-label="Interactive living room">
- <div class="intro"><p class="eyebrow">MAKE YOURSELF AT HOME</p><h1>A little change.<br>A whole new light.</h1><p>Pick a room. Try a shade. Text Dana when you find the one.</p></div>
- <nav id="room-choices" aria-label="Choose a room"></nav><p id="room-status" role="status" aria-live="polite"></p>
- <div id="viewport" tabindex="0" aria-label="Room view. Use zoom controls to look closer. Drag to pan when zoomed.">
+<header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><p class="tagline">Try a shade in a real room. Text Dana when you find the one.</p><button class="header-cta" data-text="look">Text Dana</button></header>
+<main class="app">
+<section class="stage" aria-label="Room preview">
+ <div id="viewport" tabindex="0" aria-label="Room view. Pinch or use zoom buttons to look closer.">
   <div id="composition">
    <div id="room-plate" class="plate"></div>
    <div id="window-depth-layer"><div id="shade-canvas"></div></div>
-   <button id="lamp-hotspot" aria-label="Turn lamp off" title="Tap the lamp"><span class="hotspot-dot"></span></button>
+   <button id="lamp-hotspot" aria-label="Turn lamp on" title="Tap the lamp"><span class="hotspot-dot"></span></button>
   </div>
-  <div id="inspect-stage" hidden></div><div id="loading" role="status">Letting the light in…</div><div id="inspect-caption" hidden>Drag to turn · Scroll to zoom</div>
+  <div id="inspect-stage" hidden></div><div id="loading" role="status">Letting the light in…</div><div id="inspect-caption" hidden>Drag to turn · Pinch to zoom</div>
+  <nav id="room-choices" class="ov ov-top" aria-label="Choose a room"></nav>
+  <div class="ov ov-bl" role="group" aria-label="Lighting">
+   <button data-mood="morning" aria-label="Morning" title="Morning"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.5v2.2M10 16.3v2.2M1.5 10h2.2M16.3 10h2.2M4 4l1.6 1.6M14.4 14.4 16 16M4 16l1.6-1.6M14.4 5.6 16 4"/></svg></button><button data-mood="afternoon" aria-label="Afternoon" title="Afternoon"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 14.5h16M5.5 14.5a4.5 4.5 0 0 1 9 0M10 4.5v2M3.6 8.2l1.4 1.2M16.4 8.2 15 9.4"/></svg></button><button data-mood="evening" aria-label="Evening" title="Evening"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15.5 12.6A6.5 6.5 0 0 1 7.4 4.5a6.5 6.5 0 1 0 8.1 8.1Z"/></svg></button>
+   <span class="sep"></span><button id="lamp-toggle" aria-pressed="false" title="Lamp">Lamp</button><button id="ceiling-toggle" aria-pressed="false" title="Ceiling light">Ceiling</button>
+  </div>
+  <div class="ov ov-br" role="group" aria-label="View">
+   <button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-value" aria-live="polite">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-view" aria-label="Reset view" title="Reset view">⟲</button><button id="inspect-toggle" aria-pressed="false" title="See the shade up close in 3D">3D</button>
+  </div>
  </div>
- <div class="view-toolbar"><div class="zoom-control"><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-value" aria-live="polite">100%</output><button id="zoom-in" aria-label="Zoom in">+</button></div><button id="window-zoom">Zoom to window ↗</button><button id="reset-view">Reset view</button></div><p class="scene-hint" id="scene-hint">Try the lamp. Change the light. Make it yours.</p>
-</section><aside aria-label="Shade and lighting controls">
- <p id="room-description" class="fine-print"></p>
- <p class="eyebrow">YOUR WINDOW, YOUR WAY</p><h2>Find your kind <br>of light.</h2>
- <fieldset><legend>Choose your shade</legend><div class="choices"><button data-style="roller" aria-pressed="false">Roller<small id="from-roller"></small></button><button data-style="roman" aria-pressed="true">Roman<small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false">Zebra<small id="from-zebra"></small></button></div></fieldset>
- <p class="mechanism-description" id="mechanism-description"></p><div class="look-actions"><button id="inspect-toggle" aria-pressed="false">Explore the shade in 3D ↗</button><button id="play" aria-pressed="false">▷ Watch it move</button></div>
- <fieldset><legend>Fabric <span id="fabric-name"></span></legend><div class="choices wrap" id="families"></div></fieldset>
- <fieldset id="fold-set"><legend>Fold style <span id="fold-name"></span></legend><div class="choices" id="folds"></div><p class="fine-print fold-note" id="fold-note"></p></fieldset>
- <fieldset><legend>Color <span id="color-name"></span></legend><div class="swatches" id="colors"></div></fieldset>
- <label class="range-label" for="drop">Raise or lower <output id="drop-value">65% down</output></label><input type="range" id="drop" min="0" max="100" value="65"><div class="range-ends"><span>Raised</span><span>Lowered</span></div>
- <div id="zebra-controls" hidden><label class="range-label" for="alignment">Align the bands <output id="alignment-value">Sheer</output></label><input type="range" id="alignment" min="0" max="100" value="100"><div class="range-ends"><span>Privacy</span><span>Sheer</span></div><p class="fine-print">Slide to line the bands up for privacy or offset them for a soft view.</p></div>
- <fieldset id="opacity-options"><legend>Lining</legend><div class="choices"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening</button></div></fieldset>
- <div class="quote" id="quote"><p class="price"><strong id="price">$309</strong> per window</p><p id="selection" role="status" aria-live="polite"></p><p class="fine-print">Made to your exact size. Ships in 2–4 weeks.</p>
-  <button class="cta" data-text="look">Text Dana about this look</button><p class="cta-sub">A real designer. She'll help you measure and send a link to see it on your own window.</p>
-  <button class="cta-secondary" data-text="kit">Or get a $9 swatch kit, credited to your order</button></div>
- <div class="light-section"><fieldset><legend>Set the mood</legend><div class="choices"><button data-mood="morning" aria-pressed="false">Morning</button><button data-mood="afternoon" aria-pressed="true">Afternoon</button><button data-mood="evening" aria-pressed="false">Evening</button></div></fieldset><button id="lamp-toggle" class="lamp-button" aria-pressed="true"><span>☼</span> Lamp on <span class="switch"></span></button></div>
- <div class="ceiling-controls"><button id="ceiling-toggle" class="lamp-button" aria-pressed="false">Ceiling lights off</button><label class="range-label" for="ceiling-brightness">Ceiling brightness <output id="ceiling-value">75%</output></label><input id="ceiling-brightness" type="range" min="0" max="100" value="75" disabled></div>
- <button id="outside-toggle" class="outside-toggle" aria-pressed="true">Outdoor breeze on · Pause</button>
- <p class="fine-print">Colors and light are illustrative. Dana mails real swatches before you order.</p>
-</aside></main><div class="sticky-cta" id="sticky-cta"><span><strong id="sticky-price">$309</strong> per window</span><button class="cta" data-text="look">Text Dana</button></div><footer>Tailored Light · Custom shades, made to measure.<nav><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a></nav></footer></body></html>
+ <p id="room-status" role="status" aria-live="polite"></p>
+</section>
+<aside class="panel" aria-label="Design your shade">
+ <nav class="tabs" role="tablist"><button data-tab="shade" aria-selected="true">Shade</button><button data-tab="fabric" aria-selected="false">Fabric</button><button data-tab="color" aria-selected="false">Color</button><button data-tab="adjust" aria-selected="false">Adjust</button></nav>
+ <div class="panel-body" data-show="shade">
+  <section class="group" data-group="shade">
+   <h3>Shade <span id="mechanism-description"></span></h3>
+   <div class="seg"><button data-style="roller" aria-pressed="false">Roller<small id="from-roller"></small></button><button data-style="roman" aria-pressed="true">Roman<small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false">Zebra<small id="from-zebra"></small></button></div>
+   <div id="fold-set"><h3>Fold <span id="fold-note"></span></h3><div class="seg" id="folds"></div></div>
+  </section>
+  <section class="group" data-group="fabric"><h3>Fabric <span id="fabric-name"></span></h3><div class="pills" id="families"></div></section>
+  <section class="group" data-group="color"><h3>Color <span id="color-name"></span></h3><div class="swatches" id="colors"></div>
+   <div id="opacity-options"><h3>Lining</h3><div class="seg"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening <small>+$20</small></button></div></div></section>
+  <section class="group" data-group="adjust">
+   <h3>Raise or lower <output id="drop-value">65% down</output></h3><input type="range" id="drop" min="0" max="100" value="65" aria-label="Raise or lower">
+   <div id="zebra-controls" hidden><h3>Bands <output id="alignment-value">Sheer</output></h3><input type="range" id="alignment" min="0" max="100" value="100" aria-label="Align the bands"></div>
+  </section>
+ </div>
+ <div class="panel-foot">
+  <div class="price-row"><p><strong id="price">$309</strong> / window</p><p id="selection" role="status" aria-live="polite"></p></div>
+  <button class="cta" data-text="look">Text Dana about this look</button>
+  <p class="foot-meta"><button class="link" data-text="kit">$9 swatch kit</button> · Made to measure · Ships in 2–4 weeks</p>
+ </div>
+</aside>
+</main>
+<footer><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a><span>Colors are illustrative. Dana mails real swatches before you order.</span></footer>
+<div hidden><span id="room-description"></span><span id="fabric-sub"></span><button id="play"></button><button id="window-zoom"></button><p id="scene-hint"></p><span id="fold-name"></span><span id="sticky-price"></span><input id="ceiling-brightness" type="range" value="75"><output id="ceiling-value"></output><button id="outside-toggle"></button></div></body></html>

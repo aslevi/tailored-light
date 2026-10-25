@@ -17,7 +17,8 @@ let roomPlate,ceilingLight,roomRequest=0;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 state.breeze=!reduced;
 let renderer,scene,camera,roomCamera,inspectCamera,controls,mechanism,installation,key,fill,ambient,environment,frame=0,last=0,actualDrop=.65,actualOpen=1,playTime=0,zoom=1,pan={x:0,y:0},drag=null;
-const descriptions={roller:'A single length of fabric winds neatly onto its top roller.',roman:'Soft fabric gathers from below into rounded, layered folds.',zebra:'One continuous fabric loop. Two layers move past each other to change the light.'};
+const descriptions={roller:'Clean, simple, rolls up tight',roman:'Soft folds, tailored look',zebra:'Sheer + solid bands you can align'};
+const FOLD_SHORT={flat:'Stacks into neat folds',hobbled:'Folds even when lowered',relaxed:'Gentle curve at the hem'};
 const fam=()=>CATALOG[state.style].families.find(f=>f.name===state.family)||CATALOG[state.style].families[0];
 const col=()=>fam().colors.find(c=>c.name===state.colorName)||fam().colors[0];
 const hex=()=>col().hex;
@@ -33,18 +34,18 @@ function renderOptions(){
 }
 const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=new URL('textures/'+name+'-web.webp',document.baseURI).href;});
 function refresh(){
- $('ceiling-toggle').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-toggle').textContent='Ceiling lights '+(state.ceiling?'on':'off');
+ $('ceiling-toggle').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-toggle').textContent='Ceiling';
  $('ceiling-brightness').disabled=!state.ceiling;$('ceiling-value').textContent=Math.round(state.ceilingBrightness*100)+'%';
  document.querySelectorAll('[data-room]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.room===state.room)));
  for(const key of['style','mood','opacity','fold'])document.querySelectorAll('[data-'+key+']').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===state[key])));
  document.querySelectorAll('[data-family]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.family===state.family)));document.querySelectorAll('[data-colorname]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.colorname===state.colorName)));
- $('fabric-name').textContent=state.family;$('color-name').textContent=state.colorName;$('fold-set').hidden=!foldsApply();$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=FOLDS[state.fold].note;
+ $('fabric-name').textContent=state.family;$('color-name').textContent=state.colorName;$('fold-set').hidden=!foldsApply();$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=FOLD_SHORT[state.fold];
  $('price').textContent=$('sticky-price').textContent='$'+price();
  $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
  $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!(state.style==='roman'&&!fam().weave&&!fam().blackout);
  $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();
- $('lamp-toggle').innerHTML='<span>☼</span> Lamp '+(state.lamp?'on':'off')+' <span class="switch"></span>';$('lamp-toggle').setAttribute('aria-pressed',String(state.lamp));$('lamp-hotspot').setAttribute('aria-label',state.lamp?'Turn lamp off':'Turn lamp on');
- $('inspect-toggle').textContent=state.inspect?'Back to the room ↗':'Explore the shade in 3D ↗';$('inspect-toggle').setAttribute('aria-pressed',String(state.inspect));
+ $('lamp-toggle').textContent='Lamp';$('lamp-toggle').setAttribute('aria-pressed',String(state.lamp));$('lamp-hotspot').setAttribute('aria-label',state.lamp?'Turn lamp off':'Turn lamp on');
+ $('inspect-toggle').textContent=state.inspect?'Back to room':'3D';$('inspect-toggle').setAttribute('aria-pressed',String(state.inspect));
  $('play').textContent=state.playing?'Ⅱ Pause movement':'▷ Watch it move';$('play').setAttribute('aria-pressed',String(state.playing));
  $('outside-toggle').textContent=state.breeze?'Outdoor breeze on · Pause':'Outdoor breeze paused · Play';$('outside-toggle').setAttribute('aria-pressed',String(state.breeze));
 }
@@ -199,3 +200,5 @@ for(const type of['pointerup','pointercancel'])$('viewport').addEventListener(ty
 $('viewport').addEventListener('wheel',e=>{if(state.inspect)return;if(e.ctrlKey||zoom>1){e.preventDefault();setZoom(zoom-e.deltaY*.003);}},{passive:false});
 $('viewport').addEventListener('keydown',e=>{if(e.key==='+'||e.key==='=')setZoom(zoom+.25);if(e.key==='-')setZoom(zoom-.25);if(e.key==='Escape'){if(state.inspect)showInspect(false);setZoom(1);}});
 document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(frame);if(!document.hidden&&mechanism){last=performance.now();frame=requestAnimationFrame(frameLoop);}});
+
+document.querySelectorAll('[data-tab]').forEach(t=>t.addEventListener('click',()=>{document.querySelector('.panel-body').dataset.show=t.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===t)));}));
