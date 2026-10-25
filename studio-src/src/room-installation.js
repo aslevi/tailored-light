@@ -28,7 +28,9 @@ export async function createRoomInstallation(initialTexture){
   p+=strength*vec2(3.0*sin(clock*.91+p.y*.017)+.8*sin(clock*1.57+p.x*.023),1.2*sin(clock*1.13+p.x*.018));
   vec2 uv=vec2(p.x/1536.,1.-p.y/1024.);
   vec4 c=texture2D(day,uv);
-  c.rgb*=mood>1.5?vec3(.045,.065,.11):mood>.5?vec3(1.02,1.,.96):vec3(.94,.98,1.03);
+  if(mood>1.5)c.rgb*=vec3(.045,.065,.11);
+  else if(mood>.5){float l=dot(c.rgb,vec3(.3,.59,.11));c.rgb=mix(vec3(l),c.rgb,.82)*vec3(1.16,.97,.70);c.rgb+=vec3(.22,.12,.02)*smoothstep(.55,.95,l);c.rgb+=vec3(.16,.08,0.)*(1.-smoothstep(0.,700.,length(p-vec2(560.,170.))));}
+  else c.rgb*=vec3(.94,.98,1.03);
   gl_FragColor=c;
   #include <colorspace_fragment>
  }`});

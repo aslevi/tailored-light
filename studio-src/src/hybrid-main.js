@@ -79,7 +79,7 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  m.emissive.copy(m.color).lerp(new THREE.Color('#fff2df'),.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
+  m.emissive.copy(m.color).lerp(new THREE.Color(state.mood==='afternoon'?'#ffc06a':'#fff2df'),state.mood==='afternoon'?.38:.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);

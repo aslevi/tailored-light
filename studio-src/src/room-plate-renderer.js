@@ -41,38 +41,46 @@ export function createRoomPlateRenderer(host){
   float lampMask=(1.-smoothstep(.75,1.1,length((p-lampPosition)/vec2(60.,48.))))*(1.-outside);
   color=mix(color,max(color,texture2D(ceilingMap,st).rgb),fixtureMask*ceilingLevel);
   color=mix(color,max(color,texture2D(lampMap,st).rgb),lampMask*lampLevel);
-  // Golden-hour sun: light through the open glass lands on the floor; fabric lets a little through.
-  float d=p.y-floorY;
-  if(d>0.&&sunAmt>0.){
-   float L=(1024.-floorY)*1.05,t=d/(1024.-floorY);
-   float yw=512.-d*(332./L);
-   float xw=772.+(p.x-772.-.42*d)/(1.+.85*t);
-   float inX=smoothstep(528.,548.,xw)*(1.-smoothstep(997.,1017.,xw));
-   float glass=smoothstep(176.,186.,yw)*(1.-smoothstep(508.,516.,yw));
-   float openG=smoothstep(shadeBottom-5.,shadeBottom+5.,yw);
-   float mull=1.-.55*(1.-smoothstep(1.5,4.5,abs(xw-772.)));
-   float sunPatch=inX*glass*mix(trans*.35,1.,openG)*mull*(1.-.45*t);
-   color+=b*sunPatch*sunAmt*vec3(1.,.70,.36)*1.15*(1.-outside);
+  // Golden-hour sun, traced with simple perspective. Wall plane = image plane (px).
+  // Camera distance D, eye line E. Sun: elevation tan TE, sideways drift TA per px of depth.
+  float D=1800.,E=300.,TE=.52,TA=.62,cx=772.;
+  float top=max(shadeBottom,182.);
+  float openFrac=clamp((508.-top)/326.,0.,1.);
+  float sunIn=0.;
+  if(sunAmt>0.){
+   // floor patch
+   if(p.y>floorY+1.){
+    float k=(p.y-E)/(floorY-E),Z=D*(1.-1./k);
+    float yw=floorY-TE*Z,xw=cx+(p.x-cx)/k-TA*Z;
+    float soft=2.+Z*.012;
+    float inX=smoothstep(536.-soft,536.+soft,xw)*(1.-smoothstep(1008.-soft,1008.+soft,xw));
+    float inOpen=smoothstep(top-soft,top+soft,yw)*(1.-smoothstep(508.-soft,508.+soft,yw));
+    float inCloth=smoothstep(182.-soft,182.+soft,yw)*(1.-smoothstep(top-soft,top+soft,yw));
+    sunIn=inX*(inOpen+inCloth*trans*.18);
+    float lum=dot(b,vec3(.299,.587,.114));
+    color+=b*sunIn*sunAmt*vec3(1.,.64,.28)*2.0*(.65+.35*smoothstep(.15,.6,lum));
+   }
+   // sun shafts: sample the view ray at several depths, light where the ray crosses a beam
+   if(outside<.5&&openFrac>0.&&p.y>top){
+    float acc=0.;
+    for(int i=0;i<12;i++){
+     float Z=(float(i)+.5)/12.*1100.,k=D/(D-Z);
+     float Y=E+(p.y-E)/k;if(Y>floorY)continue;
+     float X=(p.x-cx)/k;
+     float yw=Y-TE*Z,xw=cx+X-TA*Z;
+     acc+=step(538.,xw)*step(xw,1006.)*step(top,yw)*step(yw,506.)*smoothstep(160.,420.,Z);
+    }
+    color+=vec3(1.,.74,.42)*(acc/12.)*sunAmt*.34;
+   }
   }
-  // sunbeams in the air: march toward the window; light only where the ray passes open glass
-  if(sunAmt>0.&&outside<.5&&p.y>200.){
-   float Lb=(1024.-floorY)*1.05;
-   vec2 pc=vec2(772.+.42*Lb*.5,floorY+Lb*.5),wcn=vec2(772.,346.);
-   vec2 v=wcn-pc;float beam=0.;
-   for(int k=1;k<=14;k++){vec2 q=p+v*(float(k)/14.);
-    float g=step(536.,q.x)*step(q.x,1010.)*step(max(shadeBottom,182.),q.y)*step(q.y,510.);
-    float g2=step(536.,q.x)*step(q.x,1010.)*step(182.,q.y)*step(q.y,max(shadeBottom,182.));
-    beam+=g+g2*trans*.25;}
-   beam=beam/14.;
-   float streak=.75+.25*sin(dot(p,vec2(.9,-.45))*.045);
-   float fade=smoothstep(530.,600.,p.y)*(1.-smoothstep(floorY+Lb*.9,floorY+Lb*1.1,p.y));
-   color+=vec3(1.,.78,.48)*beam*streak*fade*sunAmt*.24;
+  // golden-hour grade: warmer, and a touch darker away from the sun so the light reads
+  if(sunAmt>0.){
+   vec3 graded=color*vec3(1.04,.97,.86)*mix(.80,1.,clamp(sunIn,0.,1.));
+   color=mix(color,graded,sunAmt*(1.-outside));
+   vec2 wc=vec2(772.,(top+508.)*.5);
+   float halo=(1.-smoothstep(120.,480.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
+   color+=b*halo*sunAmt*(.12*openFrac+.05*trans)*vec3(1.,.78,.45);
   }
-  // warm spill around the window frame
-  float openFrac=clamp((512.-max(shadeBottom,180.))/332.,0.,1.);
-  vec2 wc=vec2(772.,(max(shadeBottom,180.)+512.)*.5);
-  float halo=(1.-smoothstep(150.,520.,length((p-wc)*vec2(.75,1.))))*(1.-outside);
-  color+=b*halo*sunAmt*(.10*openFrac+.04*trans)*vec3(1.,.8,.5);
   gl_FragColor=vec4(color,1.);
   #include <colorspace_fragment>
  }`});
