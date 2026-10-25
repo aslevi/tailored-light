@@ -4,6 +4,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { configureTextureImages } from './materials.js';
 import { CATALOG, FOLDS } from './tl-catalog.js';
 import { DANA_SMS, smsHref } from './dana.js';
+import { SWATCH } from './swatch-map.js';
+const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${new URL('swatches/'+SWATCH[f+'|'+c]+'.webp',document.baseURI).href})`:/Reed/.test(f)?'url(https://images.unsplash.com/photo-1765366600893-f540fe17288d?w=300&h=200&fit=crop&auto=format&q=70)':'none';
 import { createMechanism } from './shade-mechanisms.js';
 import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
 import { roomResponse } from './room-response.js';
@@ -29,8 +31,8 @@ function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weav
 function renderOptions(){
  for(const k of['roller','roman','zebra'])$('from-'+k).textContent='from $'+CATALOG[k].price;
  $('families').innerHTML=CATALOG[state.style].families.map(f=>`<div class="card tex-${f.tex}${f.weave?' tex-reed':''}" data-card="${f.name}" aria-current="${f.name===state.family}">
-  <button class="card-face" data-family="${f.name}" style="--c:${(f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0]).hex}"><span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}${f.up?` · +$${f.up}`:''}</span></button>
-  <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex}"></button>`).join('')}</div></div>`).join('');
+  ${(()=>{const cc=f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0];return `<button class="card-face" data-family="${f.name}" style="--c:${cc.hex};--img:${swatchURL(f.name,cc.name)}">`;})()}<span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}${f.up?` · +$${f.up}`:''}</span></button>
+  <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex};--img:${swatchURL(f.name,c.name)}"></button>`).join('')}</div></div>`).join('');
  $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}${f.up?` <small>+$${f.up}</small>`:''}</button>`).join('');
 }
 const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=new URL('textures/'+name+'-web.webp',document.baseURI).href;});
@@ -39,7 +41,7 @@ function refresh(){
  $('ceiling-brightness').disabled=!state.ceiling;$('ceiling-value').textContent=Math.round(state.ceilingBrightness*100)+'%';
  document.querySelectorAll('[data-room]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.room===state.room)));
  for(const key of['style','mood','opacity','fold'])document.querySelectorAll('[data-'+key+']').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===state[key])));
- document.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===state.family;c.setAttribute('aria-current',String(on));if(on)c.querySelector('.card-face').style.setProperty('--c',hex());});document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===state.family+'|'+state.colorName)));
+ document.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===state.family;c.setAttribute('aria-current',String(on));if(on){const cf=c.querySelector('.card-face');cf.style.setProperty('--c',hex());cf.style.setProperty('--img',swatchURL(state.family,state.colorName));}});document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===state.family+'|'+state.colorName)));
  $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven wood comes in a classic flat fold';
  $('price').textContent=$('sticky-price').textContent='$'+price();
  $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;if(state.style==='zebra'&&document.activeElement!==$('alignment'))$('alignment').value=band*100;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';

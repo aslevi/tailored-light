@@ -2,9 +2,10 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp"><link rel="stylesheet" href="./src/hybrid.css"></head>
 <body>
-<header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><p class="tagline">Design your shade in a real room, then send it to Dana, your designer.</p><button class="header-cta" data-text="look"><span class="avatar sm">D</span>Text Dana</button></header>
+<header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><p class="tagline">Custom shades, made to measure. Try one on, then text Dana to see it on your own window.</p><button class="header-cta" data-text="look"><span class="avatar sm">D</span>Text Dana</button></header>
 <main class="app">
 <section class="stage" aria-label="Room preview">
+ <div class="offer"><b>Custom shades, made to measure.</b> <span>From $199 a window · Try one on below, then see it on yours.</span></div>
  <div id="viewport" tabindex="0" aria-label="Room preview. Drag the shade to raise or lower it. Swipe to change rooms.">
   <div id="composition">
    <div id="room-plate" class="plate"></div>
@@ -14,6 +15,7 @@
    <button id="ceiling-hotspot" class="hotspot" aria-label="Turn ceiling light on" aria-pressed="false"><span class="ring"></span></button>
    <button id="shade-handle" aria-label="Drag to raise or lower the shade. Arrow keys also work."><span class="grip"><i></i><i></i><i></i></span><span class="tip">Drag the shade</span></button>
   </div>
+  <div class="ov sample-tag">Sample room</div>
   <div id="inspect-stage" hidden></div><div id="loading" role="status"><span>Letting the light in…</span></div>
   <button class="ov ov-bl daynight" id="night-toggle" aria-pressed="false"><span class="dn-day">☀︎ Day</span><span class="dn-night">☾ Night</span></button>
   <div class="ov ov-br swipe-hint" aria-hidden="true">‹ swipe rooms ›</div>
@@ -29,7 +31,7 @@
  <div class="step-body" data-show="fabric">
   <section class="pane" data-pane="room"><h3>Which room is it for?</h3><div class="room-tiles" id="room-choices"></div></section>
   <section class="pane" data-pane="style"><h3>Pick a style <span id="mechanism-description"></span></h3>
-   <div class="style-tiles"><button data-style="roller" aria-pressed="false"><svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="5" rx="2.5"/><rect x="8" y="11" width="24" height="20" fill-opacity=".35"/><rect x="7" y="30" width="26" height="2.5" rx="1"/></svg><b>Roller</b><small id="from-roller"></small></button><button data-style="roman" aria-pressed="true"><svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="3" rx="1"/><path d="M8 9h24v6c0 2-24 2-24 0zM8 16h24v6c0 2-24 2-24 0zM8 23h24v6c0 2-24 2-24 0z" fill-opacity=".35"/></svg><b>Roman</b><small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false"><svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="4" rx="2"/><rect x="8" y="10" width="24" height="22" fill-opacity=".12"/><rect x="8" y="12" width="24" height="4" fill-opacity=".5"/><rect x="8" y="19" width="24" height="4" fill-opacity=".5"/><rect x="8" y="26" width="24" height="4" fill-opacity=".5"/></svg><b>Zebra</b><small id="from-zebra"></small></button></div>
+   <div class="style-tiles"><button data-style="roller" aria-pressed="false"><img src="https://images.unsplash.com/photo-1695719088412-a1c9ac8a031b?w=300&h=220&fit=crop&auto=format&q=70" alt="Real roller shade" loading="lazy"><b>Roller</b><small id="from-roller"></small></button><button data-style="roman" aria-pressed="true"><img src="https://images.unsplash.com/photo-1746933075302-e88d565d4189?w=300&h=220&fit=crop&auto=format&q=70" alt="Real roman shade" loading="lazy"><b>Roman</b><small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false"><img src="https://images.unsplash.com/photo-1558337430-2a627a302c0e?w=300&h=220&fit=crop&auto=format&q=70" alt="Real zebra shade" loading="lazy"><b>Zebra</b><small id="from-zebra"></small></button></div>
    <div id="fold-set"><h3>Fold <span id="fold-note"></span></h3><div class="chips" id="folds"></div></div>
    <div id="zebra-controls" hidden><h3>Bands <output id="alignment-value">Sheer</output></h3><div class="chips"><button data-bands="100">Open (soft view)</button><button data-bands="0">Closed (privacy)</button></div><input type="range" id="alignment" min="0" max="100" value="100" hidden></div>
    <button class="next" data-goto="fabric">Next: fabric &amp; color →</button>
@@ -38,12 +40,13 @@
    <div id="opacity-options"><div class="chips"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening +$20</button></div></div>
   </section>
   <ul class="trust"><li><b>Free measuring help</b> by text, about two minutes</li><li><b>Fit guaranteed</b> when Dana checks your measurements</li><li><b><button class="link strong" data-text="kit">$9 swatch kit</button></b>, credited to your order</li><li><button class="link strong" id="share-look">Share this design</button> with whoever gets a vote</li></ul>
+  <section class="real"><h3>Real shades, real homes <span>The styles we make</span></h3><div class="real-strip"><figure><img src="https://images.unsplash.com/photo-1746933075302-e88d565d4189?w=360&h=440&fit=crop&auto=format&q=70" alt="Linen Roman" loading="lazy"><figcaption>Linen Roman</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1631345346020-f9ca0902f5be?w=360&h=440&fit=crop&auto=format&q=70" alt="Romans, dining room" loading="lazy"><figcaption>Romans, dining room</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1695719088412-a1c9ac8a031b?w=360&h=440&fit=crop&auto=format&q=70" alt="Roller shade" loading="lazy"><figcaption>Roller shade</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1558337430-2a627a302c0e?w=360&h=440&fit=crop&auto=format&q=70" alt="Zebra shades" loading="lazy"><figcaption>Zebra shades</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1765366600893-f540fe17288d?w=360&h=440&fit=crop&auto=format&q=70" alt="Woven wood" loading="lazy"><figcaption>Woven wood</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1776872124466-64a0cd11f5dd?w=360&h=440&fit=crop&auto=format&q=70" alt="Fabric up close" loading="lazy"><figcaption>Fabric up close</figcaption></figure></div><p class="credit">Photos via Unsplash: Brooke Balentine, biyunfei yang, Joe, Haibin Wu, AO NURA, Hardik P.</p></section>
   <footer class="fine"><span>Colors are illustrative. Dana mails real swatches before you order.</span><nav><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a></nav></footer>
  </div>
  <div class="dana-toast" id="dana" role="status" aria-live="polite"><span class="avatar">D</span><p id="dana-line"></p></div>
  <div class="panel-foot">
   <button class="cta" data-text="look"><span class="avatar">D</span><span class="cta-text"><b>Send my design to Dana</b><small><span id="price">$309</span>/window · <span id="selection"></span></small></span></button>
-  <p class="foot-meta">Free · She replies in minutes · No pressure · <button class="link" data-text="self">Text it to myself</button></p>
+  <p class="foot-meta">Free · See it on your own window · <button class="link" data-text="self">Text it to myself</button></p>
  </div>
 </aside>
 </main>
