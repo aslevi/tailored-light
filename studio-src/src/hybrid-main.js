@@ -29,11 +29,11 @@ const price=()=>CATALOG[state.style].price+fam().up+(foldsApply()?FOLDS[state.fo
 function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weave?'reed':/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
  if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';}
 function renderOptions(){
- for(const k of['roller','roman','zebra'])$('from-'+k).textContent='from $'+CATALOG[k].price;
+ 
  $('families').innerHTML=CATALOG[state.style].families.map(f=>`<div class="card tex-${f.tex}${f.weave?' tex-reed':''}" data-card="${f.name}" aria-current="${f.name===state.family}">
-  ${(()=>{const cc=f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0];return `<button class="card-face" data-family="${f.name}" style="--c:${cc.hex};--img:${swatchURL(f.name,cc.name)}">`;})()}<span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}${f.up?` · +$${f.up}`:''}</span></button>
+  ${(()=>{const cc=f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0];return `<button class="card-face" data-family="${f.name}" style="--c:${cc.hex};--img:${swatchURL(f.name,cc.name)}">`;})()}<span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}</span></button>
   <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex};--img:${swatchURL(f.name,c.name)}"></button>`).join('')}</div></div>`).join('');
- $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}${f.up?` <small>+$${f.up}</small>`:''}</button>`).join('');
+ $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}</button>`).join('');
 }
 const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=new URL('textures/'+name+'-web.webp',document.baseURI).href;});
 function refresh(){
@@ -43,7 +43,7 @@ function refresh(){
  for(const key of['style','mood','opacity','fold'])document.querySelectorAll('[data-'+key+']').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===state[key])));
  document.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===state.family;c.setAttribute('aria-current',String(on));if(on){const cf=c.querySelector('.card-face');cf.style.setProperty('--c',hex());cf.style.setProperty('--img',swatchURL(state.family,state.colorName));}});document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===state.family+'|'+state.colorName)));
  $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven wood comes in a classic flat fold';
- $('price').textContent=$('sticky-price').textContent='$'+price();
+ $('price').textContent='From $95';
  $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;if(state.style==='zebra'&&document.activeElement!==$('alignment'))$('alignment').value=band*100;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
  $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!(state.style==='roman'&&!fam().weave&&!fam().blackout);
  $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();
@@ -65,7 +65,7 @@ function lighting(){
  const even=state.mood==='evening',afternoon=state.mood==='afternoon',alignment=mechanism.state.bandAlignment??1;
  const response=roomResponse({...state,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- roomPlate?.update(state,response);
+ const by=mechanism.state.bottomY??-1.3;roomPlate?.update({...state,shadeBottom:154+(.07-by)/1.38*381},response);
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
  ambient.intensity=response.ambient;key.intensity=response.bounce;fill.intensity=response.lampIntensity;
@@ -130,8 +130,8 @@ function lookURL(){const q=new URLSearchParams({room:state.room,s:state.style,f:
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';
- if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}, $${price()}/window. ${lookURL()}`);return;}
- const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} ($${price()}/window). Can you help me measure? ${lookURL()}`;
+ if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}. ${lookURL()}`);return;}
+ const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()}. Can you help me measure and price it? ${lookURL()}`;
  location.href=smsHref(DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));
