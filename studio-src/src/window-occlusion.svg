@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024">
+<!-- Room-coordinate foreground matte. The chair cuts a hole in the window
+     rendering, revealing the already-lit original pixels beneath it. -->
+<path fill="white" fill-rule="evenodd" d="M0 0H1536V1024H0Z
+ M1093 514 C1092 504 1110 499 1134 496
+ C1174 494 1203 486 1217 457
+ C1226 434 1232 426 1244 425
+ C1275 421 1329 430 1356 444
+ L1385 713 L1080 716Z"/>
+</svg>

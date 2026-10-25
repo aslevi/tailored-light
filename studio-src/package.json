@@ -1,0 +1,19 @@
+{
+  "name": "@shadys/living-room-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4173",
+    "build": "vite build",
+    "export": "node scripts/export-models.mjs",
+    "verify": "node scripts/verify-assets.mjs",
+    "verify:mechanisms": "node scripts/verify-mechanisms.mjs",
+    "export:mechanisms": "node scripts/verify-mechanisms.mjs --export",
+    "prepare:hybrid": "node scripts/prepare-hybrid-assets.mjs",
+    "verify:hybrid": "node scripts/verify-hybrid-build.mjs",
+    "verify:room": "node scripts/verify-room-response.mjs"
+  },
+  "dependencies": { "three": "0.180.0" },
+  "devDependencies": { "@napi-rs/canvas": "0.1.80", "gltf-validator": "2.0.0-dev.3.10", "vite": "8.3.5" }
+}

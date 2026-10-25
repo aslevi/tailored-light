@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp"><link rel="stylesheet" href="./src/hybrid.css"></head>
+<body>
+<header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><button class="header-cta" data-text="look">Text Dana</button></header>
+<main><section class="experience" aria-label="Interactive living room">
+ <div class="intro"><p class="eyebrow">MAKE YOURSELF AT HOME</p><h1>A little change.<br>A whole new light.</h1><p>Pick a room. Try a shade. Text Dana when you find the one.</p></div>
+ <nav id="room-choices" aria-label="Choose a room"></nav><p id="room-status" role="status" aria-live="polite"></p>
+ <div id="viewport" tabindex="0" aria-label="Room view. Use zoom controls to look closer. Drag to pan when zoomed.">
+  <div id="composition">
+   <div id="room-plate" class="plate"></div>
+   <div id="window-depth-layer"><div id="shade-canvas"></div></div>
+   <button id="lamp-hotspot" aria-label="Turn lamp off" title="Tap the lamp"><span class="hotspot-dot"></span></button>
+  </div>
+  <div id="inspect-stage" hidden></div><div id="loading" role="status">Letting the light in…</div><div id="inspect-caption" hidden>Drag to turn · Scroll to zoom</div>
+ </div>
+ <div class="view-toolbar"><div class="zoom-control"><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-value" aria-live="polite">100%</output><button id="zoom-in" aria-label="Zoom in">+</button></div><button id="window-zoom">Zoom to window ↗</button><button id="reset-view">Reset view</button></div><p class="scene-hint" id="scene-hint">Try the lamp. Change the light. Make it yours.</p>
+</section><aside aria-label="Shade and lighting controls">
+ <p id="room-description" class="fine-print"></p>
+ <p class="eyebrow">YOUR WINDOW, YOUR WAY</p><h2>Find your kind <br>of light.</h2>
+ <fieldset><legend>Choose your shade</legend><div class="choices"><button data-style="roller" aria-pressed="false">Roller<small id="from-roller"></small></button><button data-style="roman" aria-pressed="true">Roman<small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false">Zebra<small id="from-zebra"></small></button></div></fieldset>
+ <p class="mechanism-description" id="mechanism-description"></p><div class="look-actions"><button id="inspect-toggle" aria-pressed="false">Explore the shade in 3D ↗</button><button id="play" aria-pressed="false">▷ Watch it move</button></div>
+ <fieldset><legend>Fabric <span id="fabric-name"></span></legend><div class="choices wrap" id="families"></div></fieldset>
+ <fieldset id="fold-set"><legend>Fold style <span id="fold-name"></span></legend><div class="choices" id="folds"></div><p class="fine-print fold-note" id="fold-note"></p></fieldset>
+ <fieldset><legend>Color <span id="color-name"></span></legend><div class="swatches" id="colors"></div></fieldset>
+ <label class="range-label" for="drop">Raise or lower <output id="drop-value">65% down</output></label><input type="range" id="drop" min="0" max="100" value="65"><div class="range-ends"><span>Raised</span><span>Lowered</span></div>
+ <div id="zebra-controls" hidden><label class="range-label" for="alignment">Align the bands <output id="alignment-value">Sheer</output></label><input type="range" id="alignment" min="0" max="100" value="100"><div class="range-ends"><span>Privacy</span><span>Sheer</span></div><p class="fine-print">Slide to line the bands up for privacy or offset them for a soft view.</p></div>
+ <fieldset id="opacity-options"><legend>Lining</legend><div class="choices"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening</button></div></fieldset>
+ <div class="quote" id="quote"><p class="price"><strong id="price">$309</strong> per window</p><p id="selection" role="status" aria-live="polite"></p><p class="fine-print">Made to your exact size. Ships in 2–4 weeks.</p>
+  <button class="cta" data-text="look">Text Dana about this look</button><p class="cta-sub">A real designer. She'll help you measure and send a link to see it on your own window.</p>
+  <button class="cta-secondary" data-text="kit">Or get a $9 swatch kit, credited to your order</button></div>
+ <div class="light-section"><fieldset><legend>Set the mood</legend><div class="choices"><button data-mood="morning" aria-pressed="false">Morning</button><button data-mood="afternoon" aria-pressed="true">Afternoon</button><button data-mood="evening" aria-pressed="false">Evening</button></div></fieldset><button id="lamp-toggle" class="lamp-button" aria-pressed="true"><span>☼</span> Lamp on <span class="switch"></span></button></div>
+ <div class="ceiling-controls"><button id="ceiling-toggle" class="lamp-button" aria-pressed="false">Ceiling lights off</button><label class="range-label" for="ceiling-brightness">Ceiling brightness <output id="ceiling-value">75%</output></label><input id="ceiling-brightness" type="range" min="0" max="100" value="75" disabled></div>
+ <button id="outside-toggle" class="outside-toggle" aria-pressed="true">Outdoor breeze on · Pause</button>
+ <p class="fine-print">Colors and light are illustrative. Dana mails real swatches before you order.</p>
+</aside></main><div class="sticky-cta" id="sticky-cta"><span><strong id="sticky-price">$309</strong> per window</span><button class="cta" data-text="look">Text Dana</button></div><footer>Tailored Light · Custom shades, made to measure.<nav><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a></nav></footer>
+<script type="module" src="./src/hybrid-main.js"></script></body></html>
