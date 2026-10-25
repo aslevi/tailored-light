@@ -127,9 +127,10 @@ function summary(){const st=CATALOG[state.style].label.toLowerCase(),fold=foldsA
 function lookURL(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return location.origin+location.pathname+'?'+q;}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 function textDana(kind){
- const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
- const body=kind==='kit'?`Hi Dana! I'd like the $9 swatch kit. I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! I like the ${summary()} for my ${room} ($${price()}/window). Can you help me with my windows? ${lookURL()}`;
- location.href=smsHref(DANA_SMS,body+(ref?` (via ${ref})`:''));
+ const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';
+ if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}, $${price()}/window. ${lookURL()}`);return;}
+ const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} ($${price()}/window). Can you help me measure? ${lookURL()}`;
+ location.href=smsHref(DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));
 {const q=new URLSearchParams(location.search);
@@ -177,7 +178,7 @@ function setRoomHotspot(room){
 }
 requestAnimationFrame(()=>document.querySelector('.rooms [aria-pressed=true]')?.scrollIntoView({inline:'center',block:'nearest'}));
 for(const room of ROOMS){
- const b=document.createElement('button');b.textContent=room.label;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
+ const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(rooms/frontal-v2/${room.id}.webp)"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
  b.addEventListener('click',async()=>{
   if(!roomPlate||!installation)return;
   const ticket=++roomRequest;$('room-status').textContent='Opening '+room.label.toLowerCase()+'…';$('viewport').setAttribute('aria-busy','true');
@@ -196,14 +197,13 @@ $('zoom-out').addEventListener('click',()=>state.inspect?inspectZoom(1.15):setZo
 $('window-zoom').addEventListener('click',()=>{if(state.inspect)showInspect(false);setZoom(2.5);pan={x:0,y:.16*$('viewport').clientHeight*zoom};renderZoom();});
 $('reset-view').addEventListener('click',()=>{if(state.inspect)showInspect(false);setZoom(1);});
 const pointers=new Map();let pinchStart=null;
-$('viewport').addEventListener('pointerdown',e=>{if(state.inspect||e.target.closest('button'))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const p=[...pointers.values()];pinchStart={distance:Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),zoom};}else if(zoom>1){drag={x:e.clientX,y:e.clientY,pan:{...pan}};$('viewport').setPointerCapture(e.pointerId);$('viewport').classList.add('dragging');}});
+$('viewport').addEventListener('pointerdown',e=>{if(state.inspect||e.target.closest('button'))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const p=[...pointers.values()];pinchStart=null&&{distance:Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),zoom};}else if(zoom>1){drag={x:e.clientX,y:e.clientY,pan:{...pan}};$('viewport').setPointerCapture(e.pointerId);$('viewport').classList.add('dragging');}});
 $('viewport').addEventListener('pointermove',e=>{if(state.inspect)return;if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&pinchStart){const p=[...pointers.values()];setZoom(pinchStart.zoom*Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y)/pinchStart.distance);}else if(drag){pan={x:drag.pan.x+e.clientX-drag.x,y:drag.pan.y+e.clientY-drag.y};renderZoom();}});
 for(const type of['pointerup','pointercancel'])$('viewport').addEventListener(type,e=>{pointers.delete(e.pointerId);drag=null;pinchStart=null;$('viewport').classList.remove('dragging');});
 $('viewport').addEventListener('wheel',e=>{if(state.inspect)return;if(e.ctrlKey||zoom>1){e.preventDefault();setZoom(zoom-e.deltaY*.003);}},{passive:false});
 $('viewport').addEventListener('keydown',e=>{if(e.key==='+'||e.key==='=')setZoom(zoom+.25);if(e.key==='-')setZoom(zoom-.25);if(e.key==='Escape'){if(state.inspect)showInspect(false);setZoom(1);}});
 document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(frame);if(!document.hidden&&mechanism){last=performance.now();frame=requestAnimationFrame(frameLoop);}});
 
-document.querySelectorAll('[data-tab]').forEach(t=>t.addEventListener('click',()=>{document.querySelector('.panel-body').dataset.show=t.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===t)));}));
 
 /* ---------- Direct manipulation ---------- */
 const OPEN={x0:504,x1:1040,y0:154,y1:535},SPAN=1.38;
@@ -232,12 +232,12 @@ function setDropFromY(clientY){const r=$('composition').getBoundingClientRect(),
 document.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(b)b.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});});
 /* Coach marks fade after the visitor interacts; Dana responds to what they do */
 const touched=new Set();
-function engaged(kind){touched.add(kind);if(kind==='drag')document.body.classList.add('dragged');if(kind==='lamp'||kind==='ceiling')document.body.classList.add('lit');danaSays();}
+function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classList.add('swiped');if(kind==='drag')document.body.classList.add('dragged');if(kind==='lamp'||kind==='ceiling')document.body.classList.add('lit');danaSays();}
 function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
-  `<strong>Dana</strong> · Not sure about sizing? I'll walk you through measuring in two minutes, by text.`,
+  `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
   `<strong>Dana</strong> · Want to feel it first? I'll mail you swatches for $9, credited to your order.`];
- const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));if(touched.size===1||touched.size===4||touched.size===7)toast(lines[i]);}
+ const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));if(touched.size===3||touched.size===6||touched.size===9)toast(lines[Math.min(lines.length-1,touched.size/3-1)]);}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
 document.addEventListener('click',e=>{const pk=e.target.closest('[data-family],[data-pick],[data-style],[data-fold]');if(pk)engaged('pick:'+(pk.dataset.pick||pk.dataset.family||pk.dataset.style||pk.dataset.fold));});
@@ -248,5 +248,18 @@ $('share-look').addEventListener('click',async()=>{const url=lookURL(),text=`Wha
 (function intro(){if(reduced||new URLSearchParams(location.search).has('s'))return;const target=state.drop,t0=performance.now()+700;state.drop=.04;
  const step=now=>{if(document.body.classList.contains('dragged'))return;const k=Math.min(1,Math.max(0,(now-t0)/1400)),e=1-Math.pow(1-k,3);state.drop=.04+(target-.04)*e;$('drop').value=state.drop*100;if(mechanism)refresh();if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);})();
 
-$('viewport').addEventListener('dblclick',e=>{if(state.inspect||e.target.closest('button,#shade-grab'))return;setZoom(zoom>1.01?1:2);});
-{let lastTap=0;$('viewport').addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||e.target.closest('button,#shade-grab'))return;const n=performance.now();if(n-lastTap<300&&zoom>1.01){setZoom(1);lastTap=0;}else lastTap=n;});}
+
+/* ---------- Guided steps ---------- */
+function goStep(name){const sb=document.querySelector('.step-body');sb.dataset.show=name;sb.scrollTop=0;document.querySelectorAll('[data-step]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.step===name)));document.querySelector('.panel').dataset.step=name;}
+document.querySelectorAll('[data-step]').forEach(t=>t.addEventListener('click',()=>goStep(t.dataset.step)));
+document.querySelectorAll('[data-goto]').forEach(t=>t.addEventListener('click',()=>goStep(t.dataset.goto)));
+document.addEventListener('click',e=>{
+ if(e.target.closest('#room-choices [data-room]'))setTimeout(()=>goStep('style'),450);
+ const st=e.target.closest('.style-tiles [data-style]');if(st&&st.dataset.style==='roller')setTimeout(()=>goStep('fabric'),450);
+ const bd=e.target.closest('[data-bands]');if(bd){const a=$('alignment');a.value=bd.dataset.bands;a.dispatchEvent(new Event('input'));document.querySelectorAll('[data-bands]').forEach(x=>x.setAttribute('aria-pressed',String(x===bd)));}
+ if(e.target.closest('[data-pick],[data-family]'))document.body.classList.add('designed');
+});
+goStep('fabric');
+/* Day / Night: night shows privacy and the room lit from inside */
+$('night-toggle').addEventListener('click',()=>{const night=state.mood!=='evening';state.mood=night?'evening':'afternoon';state.lamp=night;$('night-toggle').setAttribute('aria-pressed',String(night));engaged('night');lighting();refresh();});
+setTimeout(()=>document.body.classList.add('settled'),7000);
