@@ -24,12 +24,13 @@ const col=()=>fam().colors.find(c=>c.name===state.colorName)||fam().colors[0];
 const hex=()=>col().hex;
 const foldsApply=()=>state.style==='roman'&&!fam().weave;
 const price=()=>CATALOG[state.style].price+fam().up+(foldsApply()?FOLDS[state.fold].up:0)+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?20:0);
-function syncFamily(){const f=fam();state.family=f.name;state.fabric=f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
- if(state.style!=='roman'||f.weave)state.opacity=f.blackout?'blackout':'filtering';else if(f.blackout)state.opacity='blackout';}
+function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weave?'reed':/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
+ if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';}
 function renderOptions(){
  for(const k of['roller','roman','zebra'])$('from-'+k).textContent='from $'+CATALOG[k].price;
- $('families').innerHTML=CATALOG[state.style].families.map(f=>`<button data-family="${f.name}" aria-pressed="${f.name===state.family}">${f.name}${f.up?` <small>+$${f.up}</small>`:''}</button>`).join('');
- $('colors').innerHTML=fam().colors.map(c=>`<button data-colorname="${c.name}" aria-label="${c.name}" title="${c.name}" aria-pressed="${c.name===state.colorName}" style="--swatch:${c.hex}"></button>`).join('');
+ $('families').innerHTML=CATALOG[state.style].families.map(f=>`<div class="card tex-${f.tex}${f.weave?' tex-reed':''}" data-card="${f.name}" aria-current="${f.name===state.family}">
+  <button class="card-face" data-family="${f.name}" style="--c:${(f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0]).hex}"><span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}${f.up?` · +$${f.up}`:''}</span></button>
+  <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex}"></button>`).join('')}</div></div>`).join('');
  $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}${f.up?` <small>+$${f.up}</small>`:''}</button>`).join('');
 }
 const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=new URL('textures/'+name+'-web.webp',document.baseURI).href;});
@@ -38,10 +39,10 @@ function refresh(){
  $('ceiling-brightness').disabled=!state.ceiling;$('ceiling-value').textContent=Math.round(state.ceilingBrightness*100)+'%';
  document.querySelectorAll('[data-room]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.room===state.room)));
  for(const key of['style','mood','opacity','fold'])document.querySelectorAll('[data-'+key+']').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===state[key])));
- document.querySelectorAll('[data-family]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.family===state.family)));document.querySelectorAll('[data-colorname]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.colorname===state.colorName)));
- $('fabric-name').textContent=state.family;$('color-name').textContent=state.colorName;$('fold-set').hidden=!foldsApply();$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=FOLD_SHORT[state.fold];
+ document.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===state.family;c.setAttribute('aria-current',String(on));if(on)c.querySelector('.card-face').style.setProperty('--c',hex());});document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===state.family+'|'+state.colorName)));
+ $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven wood comes in a classic flat fold';
  $('price').textContent=$('sticky-price').textContent='$'+price();
- $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
+ $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;if(state.style==='zebra'&&document.activeElement!==$('alignment'))$('alignment').value=band*100;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
  $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!(state.style==='roman'&&!fam().weave&&!fam().blackout);
  $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();
  $('lamp-toggle').textContent='Lamp';$('lamp-toggle').setAttribute('aria-pressed',String(state.lamp));$('lamp-hotspot').setAttribute('aria-label',state.lamp?'Turn lamp off':'Turn lamp on');$('lamp-hotspot').setAttribute('aria-pressed',String(state.lamp));$('ceiling-hotspot').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-hotspot').setAttribute('aria-label',state.ceiling?'Turn ceiling light off':'Turn ceiling light on');
@@ -76,11 +77,11 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  m.emissive.copy(m.color).lerp(new THREE.Color('#fff2df'),.4);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
+  m.emissive.copy(m.color).lerp(new THREE.Color('#fff2df'),.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
-   m.roughness=.98;m.sheen=.28;m.normalScale?.set(.36,.36);
+   m.roughness=.98;m.sheen=.28;m.normalScale?.set(state.fabric==='reed'?.9:state.fabric==='stripe'?.5:.36,state.fabric==='reed'?.9:state.fabric==='stripe'?.5:.36);
    const transparent=response.clothOpacity<1;
    if(m.transparent!==transparent){m.transparent=transparent;m.needsUpdate=true;}
    m.opacity=response.clothOpacity;m.depthWrite=!transparent;
@@ -105,11 +106,11 @@ function renderZoom(){
  const maxX=(zoom-1)*$('viewport').clientWidth/2,maxY=(zoom-1)*$('viewport').clientHeight/2;
  pan.x=THREE.MathUtils.clamp(pan.x,-maxX,maxX);pan.y=THREE.MathUtils.clamp(pan.y,-maxY,maxY);
  $('composition').style.transform=`translate(${pan.x}px,${pan.y}px) scale(${zoom})`;$('composition').style.setProperty('--z',zoom);$('viewport').classList.toggle('zoomed',zoom>1.01);$('zoom-value').value=state.inspect?'3D':Math.round(zoom*100)+'%';
- $('zoom-in').disabled=!state.inspect&&zoom>=Math.max(1,Math.min(3.5,1536/$('viewport').clientWidth));
+ $('zoom-in').disabled=!state.inspect&&zoom>=Math.max(2.5,Math.min(3.5,1536/$('viewport').clientWidth));
 }
 function setZoom(next){
  // Do not magnify the fixed room beyond the source image's native CSS resolution.
- const maxZoom=Math.max(1,Math.min(3.5,1536/$('viewport').clientWidth));
+ const maxZoom=Math.max(2.5,Math.min(3.5,1536/$('viewport').clientWidth));
  zoom=THREE.MathUtils.clamp(next,1,maxZoom);if(zoom===1)pan={x:0,y:0};renderZoom();size();
  $('zoom-in').disabled=zoom>=maxZoom;
  $('zoom-in').title=zoom>=maxZoom?'Room image detail limit — explore the shade in 3D for a closer view':'Zoom in';
@@ -122,9 +123,9 @@ function frameLoop(now){
  if(Math.abs(actualDrop-mechanism.state.drop)>.00001||Math.abs(actualOpen-mechanism.state.openness)>.00001){mechanism.update({drop:actualDrop,openness:actualOpen,time:now/1000});lighting();}
  installation.update({...state,time:now/1000});placeHandle();if(state.inspect)controls.update();renderer.render(scene,camera);frame=requestAnimationFrame(frameLoop);
 }
-function summary(){return state.family+' '+state.colorName+' · '+(foldsApply()?FOLDS[state.fold].label.toLowerCase()+' ':'')+CATALOG[state.style].label.toLowerCase()+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?' · room-darkening lining':'');}
+function summary(){const st=CATALOG[state.style].label.toLowerCase(),fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?' with room-darkening lining':'');}
 function lookURL(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return location.origin+location.pathname+'?'+q;}
-let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
+let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const body=kind==='kit'?`Hi Dana! I'd like the $9 swatch kit. I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! I like the ${summary()} for my ${room} ($${price()}/window). Can you help me with my windows? ${lookURL()}`;
@@ -153,11 +154,11 @@ try{
  rebuild();const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
 }catch(error){$('loading').textContent='The shade viewer could not load. Please refresh or try a current browser.';console.error(error);}
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-style],[data-family],[data-colorname],[data-fold],[data-mood],[data-opacity]');if(!b||!mechanism)return;
+ const b=e.target.closest('[data-style],[data-family],[data-pick],[data-fold],[data-mood],[data-opacity]');if(!b||!mechanism)return;
  const d=b.dataset;
- if(d.style){state.style=d.style;state.family=CATALOG[d.style].families[0].name;syncFamily();renderOptions();rebuild();}
- else if(d.family){state.family=d.family;syncFamily();renderOptions();rebuild();}
- else if(d.colorname){state.colorName=d.colorname;mechanism.update({color:hex()});}
+ if(d.style){state.style=d.style;state.family=CATALOG[d.style].families[0].name;syncFamily(true);renderOptions();rebuild();}
+ else if(d.family){const ch=d.family!==state.family;state.family=d.family;syncFamily(ch);renderOptions();rebuild();}
+ else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed){rebuild();}else mechanism.update({color:hex()});}
  else if(d.fold){state.fold=d.fold;rebuild();}
  else if(d.mood)state.mood=d.mood;
  else if(d.opacity)state.opacity=d.opacity;
@@ -174,6 +175,7 @@ function setRoomHotspot(room){
  const place=(el,x,y)=>{el.style.left=(x/1536*100)+'%';el.style.top=(y/1024*100)+'%';};place($('lamp-hotspot'),...room.lamp);place($('ceiling-hotspot'),room.fixture[0],room.fixture[1]);
  $('room-description').textContent=room.note;
 }
+requestAnimationFrame(()=>document.querySelector('.rooms [aria-pressed=true]')?.scrollIntoView({inline:'center',block:'nearest'}));
 for(const room of ROOMS){
  const b=document.createElement('button');b.textContent=room.label;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
  b.addEventListener('click',async()=>{
@@ -235,11 +237,16 @@ function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCas
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Not sure about sizing? I'll walk you through measuring in two minutes, by text.`,
   `<strong>Dana</strong> · Want to feel it first? I'll mail you swatches for $9, credited to your order.`];
- $('dana-line').innerHTML=lines[Math.min(lines.length-1,Math.floor(touched.size/3))];$('dana').classList.remove('pop');void $('dana').offsetWidth;$('dana').classList.add('pop');}
-document.addEventListener('click',e=>{if(e.target.closest('[data-family],[data-colorname],[data-style],[data-fold]'))engaged('pick:'+(e.target.closest('button').textContent));});
+ const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));if(touched.size===1||touched.size===4||touched.size===7)toast(lines[i]);}
+let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
+$('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
+document.addEventListener('click',e=>{const pk=e.target.closest('[data-family],[data-pick],[data-style],[data-fold]');if(pk)engaged('pick:'+(pk.dataset.pick||pk.dataset.family||pk.dataset.style||pk.dataset.fold));});
 /* Share the look (spouse approval is a real step) */
 $('share-look').addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${ROOMS.find(r=>r.id===state.room).label.toLowerCase()}? ${summary()}`;
- try{if(navigator.share){await navigator.share({title:'Tailored Light',text,url});return;}await navigator.clipboard.writeText(text+' '+url);$('share-look').textContent='Link copied ✓';setTimeout(()=>$('share-look').textContent='Share this look',2000);}catch{}});
+ try{if(navigator.share){await navigator.share({title:'Tailored Light',text,url});return;}await navigator.clipboard.writeText(text+' '+url);toast('<strong>Link copied</strong> · send it to whoever gets a vote.');}catch{}});
 /* Intro: the shade lowers itself once so visitors see it's alive */
 (function intro(){if(reduced||new URLSearchParams(location.search).has('s'))return;const target=state.drop,t0=performance.now()+700;state.drop=.04;
  const step=now=>{if(document.body.classList.contains('dragged'))return;const k=Math.min(1,Math.max(0,(now-t0)/1400)),e=1-Math.pow(1-k,3);state.drop=.04+(target-.04)*e;$('drop').value=state.drop*100;if(mechanism)refresh();if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);})();
+
+$('viewport').addEventListener('dblclick',e=>{if(state.inspect||e.target.closest('button,#shade-grab'))return;setZoom(zoom>1.01?1:2);});
+{let lastTap=0;$('viewport').addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||e.target.closest('button,#shade-grab'))return;const n=performance.now();if(n-lastTap<300&&zoom>1.01){setZoom(1);lastTap=0;}else lastTap=n;});}

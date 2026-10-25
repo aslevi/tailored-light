@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp">  <script type="module" crossorigin src="./assets/index-C25Dpa1p.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Ds7cZwzI.css">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f5efe5"><title>Tailored Light · Custom shades, made to measure</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then text Dana, your designer. Made to measure, shipped to your door."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/rooms/frontal-v2/living-room.webp">  <script type="module" crossorigin src="./assets/index-DQmiGR9Z.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-AqHauic0.css">
 </head>
 <body>
 <header><a class="brand" href="./">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><p class="tagline">Try a shade in a real room. Text Dana when you find the one.</p><button class="header-cta" data-text="look">Text Dana</button></header>
@@ -18,39 +18,39 @@
    <button id="shade-handle" aria-label="Drag to raise or lower the shade. Arrow keys also work."><span class="grip"><i></i><i></i><i></i></span><span class="tip">Drag to raise</span></button>
   </div>
   <div id="inspect-stage" hidden></div><div id="loading" role="status">Letting the light in…</div><div id="inspect-caption" hidden>Drag to turn · Pinch to zoom</div>
-  <div class="ov ov-bl" role="group" aria-label="Lighting">
+  <div class="ov ov-bl mood" role="group" aria-label="Time of day">
    <button data-mood="morning" aria-label="Morning" title="Morning"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.5v2.2M10 16.3v2.2M1.5 10h2.2M16.3 10h2.2M4 4l1.6 1.6M14.4 14.4 16 16M4 16l1.6-1.6M14.4 5.6 16 4"/></svg></button><button data-mood="afternoon" aria-label="Afternoon" title="Afternoon"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 14.5h16M5.5 14.5a4.5 4.5 0 0 1 9 0M10 4.5v2M3.6 8.2l1.4 1.2M16.4 8.2 15 9.4"/></svg></button><button data-mood="evening" aria-label="Evening" title="Evening"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15.5 12.6A6.5 6.5 0 0 1 7.4 4.5a6.5 6.5 0 1 0 8.1 8.1Z"/></svg></button>
-   <span class="sep"></span><button id="lamp-toggle" aria-pressed="false" title="Lamp">Lamp</button><button id="ceiling-toggle" aria-pressed="false" title="Ceiling light">Ceiling</button>
+   
   </div>
   <div class="ov ov-br" role="group" aria-label="View">
-   <button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-value" aria-live="polite">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-view" aria-label="Reset view" title="Reset view">⟲</button><button id="inspect-toggle" aria-pressed="false" title="See the shade up close in 3D">3D</button>
+   <button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-value" aria-live="polite">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-view" aria-label="Reset view" title="Reset view">⟲</button><button id="inspect-toggle" aria-pressed="false" title="See the shade up close in 3D">3D</button><button id="share-look" aria-label="Share this look" title="Share this look"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 13V2.5M6.5 6 10 2.5 13.5 6M4.5 9.5v7h11v-7"/></svg></button>
   </div>
  </div>
  <p id="room-status" role="status" aria-live="polite"></p>
 </section>
 <aside class="panel" aria-label="Design your shade">
- <nav class="tabs" role="tablist"><button data-tab="shade" aria-selected="true">Shade</button><button data-tab="fabric" aria-selected="false">Fabric</button><button data-tab="color" aria-selected="false">Color</button><button data-tab="adjust" aria-selected="false">Adjust</button></nav>
- <div class="panel-body" data-show="shade">
+ <nav class="tabs" role="tablist"><button data-tab="shade" aria-selected="false">Style</button><button data-tab="fabric" aria-selected="true">Fabric &amp; color</button><button data-tab="adjust" aria-selected="false">Light &amp; fit</button></nav>
+ <div class="panel-body" data-show="fabric">
   <section class="group" data-group="shade">
-   <h3>Shade <span id="mechanism-description"></span></h3>
+   <h3>Style <span id="mechanism-description"></span></h3>
    <div class="seg"><button data-style="roller" aria-pressed="false">Roller<small id="from-roller"></small></button><button data-style="roman" aria-pressed="true">Roman<small id="from-roman"></small></button><button data-style="zebra" aria-pressed="false">Zebra<small id="from-zebra"></small></button></div>
    <div id="fold-set"><h3>Fold <span id="fold-note"></span></h3><div class="seg" id="folds"></div></div>
   </section>
-  <section class="group" data-group="fabric"><h3>Fabric <span id="fabric-name"></span></h3><div class="pills" id="families"></div></section>
-  <section class="group" data-group="color"><h3>Color <span id="color-name"></span></h3><div class="swatches" id="colors"></div>
-   <div id="opacity-options"><h3>Lining</h3><div class="seg"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening <small>+$20</small></button></div></div></section>
+  <section class="group" data-group="fabric"><h3>Fabric &amp; color <span id="fabric-name"></span></h3><div class="cards" id="families"></div>
+   <p class="kit-line">Want to feel it first? <button class="link" data-text="kit">Get the $9 swatch kit</button>, credited to your order.</p></section>
   <section class="group" data-group="adjust">
+   <div id="opacity-options"><h3>Lining</h3><div class="seg"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening <small>+$20</small></button></div></div>
    <h3>Raise or lower <output id="drop-value">65% down</output></h3><input type="range" id="drop" min="0" max="100" value="65" aria-label="Raise or lower">
    <div id="zebra-controls" hidden><h3>Bands <output id="alignment-value">Sheer</output></h3><input type="range" id="alignment" min="0" max="100" value="100" aria-label="Align the bands"></div>
+   <h3>Lights</h3><div class="seg"><button id="lamp-toggle" aria-pressed="false">Lamp</button><button id="ceiling-toggle" aria-pressed="false">Ceiling</button></div>
   </section>
+  <footer class="fine"><span>Colors are illustrative. Dana mails real swatches before you order.</span><nav><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a></nav></footer>
  </div>
+ <div class="dana-toast" id="dana" role="status" aria-live="polite"><span class="avatar">D</span><p id="dana-line"></p></div>
  <div class="panel-foot">
-  <div class="dana" id="dana"><span class="avatar">D</span><p id="dana-line"><strong>Dana</strong> · your designer. Text me a photo of your window and I'll show you this look on it.</p></div>
-  <div class="price-row"><p><strong id="price">$309</strong> / window</p><p id="selection" role="status" aria-live="polite"></p></div>
-  <button class="cta" data-text="look">Text Dana about this look</button>
-  <p class="foot-meta"><button class="link" data-text="kit">Get the $9 swatch kit</button> · <button class="link" id="share-look">Share this look</button> · Ships in 2–4 wks</p>
+  <div class="price-row"><p><strong id="price">$309</strong><span class="per"> / window</span></p><p id="selection"></p></div>
+  <button class="cta" data-text="look"><span class="avatar">D</span><span class="cta-label">Text Dana<span class="long"> about this look</span></span></button>
  </div>
 </aside>
 </main>
-<footer><a href="./privacy.html">Privacy</a><a href="./support.html">Support</a><a href="./try.html">Try it on a photo of your window</a><span>Colors are illustrative. Dana mails real swatches before you order.</span></footer>
 <div hidden><span id="room-description"></span><span id="fabric-sub"></span><button id="play"></button><button id="window-zoom"></button><p id="scene-hint"></p><span id="fold-name"></span><span id="sticky-price"></span><input id="ceiling-brightness" type="range" value="75"><output id="ceiling-value"></output><button id="outside-toggle"></button></div></body></html>
