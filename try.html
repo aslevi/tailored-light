@@ -950,7 +950,7 @@ function applyShade(){
   $("#mountNote").textContent = USES[S.use].note;
   $("#price").textContent = "$" + unitPrice();
   { const r3 = {nursery:"nursery", bedroom:"bedroom", bathroom:"bathroom", kitchen:"kitchen", living:"living", basement:"living"}[S.use] || "living";
-    const a = document.getElementById("to3d"); if(a) a.href = `rooms.html?${new URLSearchParams({room:r3, s:S.style, f:grp.family, c:col[0]})}`; }
+    const a = document.getElementById("to3d"); if(a) a.href = `./?${new URLSearchParams({room:r3, s:S.style, f:grp.family, c:col[0]})}`; }
   $("#dropV").textContent = S.drop >= .995 ? "Fully down" : Math.round(S.drop*100) + "% down";
   draw();
 }
