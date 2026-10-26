@@ -25,7 +25,6 @@ const fam=()=>CATALOG[state.style].families.find(f=>f.name===state.family)||CATA
 const col=()=>fam().colors.find(c=>c.name===state.colorName)||fam().colors[0];
 const hex=()=>col().hex;
 const foldsApply=()=>state.style==='roman'&&!fam().weave;
-const price=()=>CATALOG[state.style].price+fam().up+(foldsApply()?FOLDS[state.fold].up:0)+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?20:0);
 function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weave?'reed':/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
  if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';}
 function renderOptions(){

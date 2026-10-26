@@ -93,7 +93,7 @@ input[type=range]{width:100%;accent-color:var(--pine)}
     <div><div class="lbl">Raise or lower <span class="v" id="dropV"></span></div><input type="range" id="drop" min="0" max="100" value="70" aria-label="Shade height"></div>
     <div class="read" id="read"></div>
     <div class="cta">
-      <div class="price"><b id="price">$199</b><span>per window, made to measure</span></div>
+      <div class="price"><b id="price">From $95</b><span>a shade, made to measure</span></div>
       <button class="btn primary" id="text"><span class="av">D</span> Text Dana about this room</button>
       <p class="fine">She'll send it live on your own window next.</p>
     </div>
@@ -460,7 +460,7 @@ function updateUI(){
     const l = document.createElement("span"); l.textContent = n; b.append(l); strip.append(b);
   }));
   $("#fabName").textContent = `${grp.family} · ${col[0]}`;
-  $("#price").textContent = "$" + (st.price + (grp.up || 0));
+  $("#price").textContent = "From $95";
   $("#dropV").textContent = S.drop >= .99 ? "Fully down" : S.drop <= .02 ? "Up" : Math.round(S.drop * 100) + "% down";
   $("#upDown").textContent = S.drop > .5 ? "Raise shades" : "Lower shades";
   const LIGHT = ["Sheer","Filtering","Dimming","Blackout"], VIEW = ["Clear view","Soft view","No view"], NIGHT = ["See-through","Shadows only","Fully private"];

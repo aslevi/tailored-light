@@ -2,11 +2,9 @@
 export const CATALOG={
  "roller": {
   "label": "Roller",
-  "price": 199,
   "families": [
    {
     "name": "Daylight Weave",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -27,7 +25,6 @@ export const CATALOG={
    },
    {
     "name": "Morning Haze",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "smooth",
@@ -48,7 +45,6 @@ export const CATALOG={
    },
    {
     "name": "Deep Sleep",
-    "up": 20,
     "weave": false,
     "blackout": true,
     "tex": "smooth",
@@ -73,7 +69,6 @@ export const CATALOG={
    },
    {
     "name": "Clear View",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "basket",
@@ -96,11 +91,9 @@ export const CATALOG={
  },
  "roman": {
   "label": "Roman",
-  "price": 309,
   "families": [
    {
     "name": "Raw Linen",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -117,7 +110,6 @@ export const CATALOG={
    },
    {
     "name": "Soft Cotton",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "smooth",
@@ -142,7 +134,6 @@ export const CATALOG={
    },
    {
     "name": "Ticking Stripe",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -155,7 +146,6 @@ export const CATALOG={
    },
    {
     "name": "Sheer Voile",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "smooth",
@@ -168,7 +158,6 @@ export const CATALOG={
    },
    {
     "name": "Blackout Linen",
-    "up": 20,
     "weave": false,
     "blackout": true,
     "tex": "linen",
@@ -181,7 +170,6 @@ export const CATALOG={
    },
    {
     "name": "Natural Reed",
-    "up": 40,
     "weave": true,
     "blackout": false,
     "tex": "basket",
@@ -204,11 +192,9 @@ export const CATALOG={
  },
  "zebra": {
   "label": "Zebra",
-  "price": 229,
   "families": [
    {
     "name": "Twin Light",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -233,7 +219,6 @@ export const CATALOG={
    },
    {
     "name": "Sand Stripe",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -250,7 +235,6 @@ export const CATALOG={
    },
    {
     "name": "Twin Shade",
-    "up": 0,
     "weave": false,
     "blackout": false,
     "tex": "linen",
@@ -268,4 +252,4 @@ export const CATALOG={
   ]
  }
 };
-export const FOLDS={flat:{label:"Flat",up:0,note:"Clean, tailored panel that stacks into neat folds when raised."},hobbled:{label:"Hobbled",up:40,note:"Soft folds cascade all the way down, even when lowered."},relaxed:{label:"Relaxed",up:30,note:"A gentle curve at the bottom edge. Casual and soft."}};
+export const FOLDS={flat:{label:"Flat",note:"Clean, tailored panel that stacks into neat folds when raised."},hobbled:{label:"Hobbled",note:"Soft folds cascade all the way down, even when lowered."},relaxed:{label:"Relaxed",note:"A gentle curve at the bottom edge. Casual and soft."}};
