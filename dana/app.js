@@ -495,7 +495,7 @@ $('import-file').addEventListener('change', async e => {
 
 // ---------- sample ----------
 $('load-sample').onclick = async () => {
-  const look = new URL('../?room=kitchen&s=roman&f=Natural+Reed&c=Honey&ref=sample', BASE).href;
+  const look = new URL('../studio/?room=kitchen&s=roman&f=Natural+Reed&c=Honey&ref=sample', BASE).href;
   const p = parseText(`Hi Dana! Here's my design for my kitchen: Natural Reed roman in Honey. Can you help me measure and price it? ${look}`);
   const lead = newLead({ ...p.lead, name: 'Jamie Sample', phone: '', sample: true, notes: 'SAMPLE LEAD: fake customer for trying the board. Delete any time.' });
   lead.windows = [normalizeWindow({ id: 'w1', room: 'Kitchen', label: 'Kitchen 1', style: 'roman', mount: 'inside', w: [34.5, 34.375, 34.5], h: [52.375, 52.5, 52.375], depth: 3.25, photosReceived: true, measuredAt: now() })];

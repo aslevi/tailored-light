@@ -6,7 +6,8 @@ import { CATALOG, FOLDS } from './tl-catalog.js';
 import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
 import { designCode } from './design-code.js';
-const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${new URL('swatches/'+SWATCH[f+'|'+c]+'.webp',document.baseURI).href})`:/Reed/.test(f)?'url(https://images.unsplash.com/photo-1765366600893-f540fe17288d?w=300&h=200&fit=crop&auto=format&q=70)':'none';
+import { site } from './site-root.js';
+const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${site('swatches/'+SWATCH[f+'|'+c]+'.webp')})`:'none';
 import { createMechanism } from './shade-mechanisms.js';
 import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
 import { roomResponse } from './room-response.js';
@@ -35,7 +36,7 @@ function renderOptions(){
   <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex};--img:${swatchURL(f.name,c.name)}"></button>`).join('')}</div></div>`).join('');
  $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}</button>`).join('');
 }
-const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=new URL('textures/'+name+'-web.webp',document.baseURI).href;});
+const loadImage=name=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve([name,i]);i.onerror=()=>reject(new Error('Missing '+name+' texture'));i.src=site('textures/'+name+'-web.webp');});
 function refresh(){
  $('ceiling-toggle').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-toggle').textContent='Ceiling';
  $('ceiling-brightness').disabled=!state.ceiling;$('ceiling-value').textContent=Math.round(state.ceilingBrightness*100)+'%';
@@ -182,7 +183,7 @@ function setRoomHotspot(room){
 }
 requestAnimationFrame(()=>document.querySelector('.rooms [aria-pressed=true]')?.scrollIntoView({inline:'center',block:'nearest'}));
 for(const room of ROOMS){
- const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(rooms/frontal-v2/${room.id}.webp)"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
+ const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(${site('rooms/frontal-v2/'+room.id+'.webp')})"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
  b.addEventListener('click',async()=>{
   if(!roomPlate||!installation)return;
   const ticket=++roomRequest;$('room-status').textContent='Opening '+room.label.toLowerCase()+'…';$('viewport').setAttribute('aria-busy','true');

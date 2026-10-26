@@ -1,3 +1,4 @@
+import { site } from './site-root.js';
 // Every room uses the same front-on installation. Artwork is 1536 × 1024.
 export const ROOMS=[
  {id:'living-room',floor:640,label:'Living room',lamp:[228,305],fixture:[768,35,65,40],note:'Books, blue throws and a neighborhood street.'},
@@ -8,4 +9,4 @@ export const ROOMS=[
  {id:'bedroom',floor:660,label:'Bedroom',lamp:[202,393],fixture:[764,47,80,43],note:'Rumpled linen, dusty rose and a leafy backyard.'},
  {id:'nursery',floor:660,label:'Nursery',lamp:[265,320],fixture:[767,43,95,36],note:'Playful prints, a blue rug and a flowering tree.'}
 ];
-export const roomAsset=(id,kind='day')=>'rooms/frontal-v2/'+id+(kind==='day'?'':'-'+kind)+'.webp';
+export const roomAsset=(id,kind='day')=>site('rooms/frontal-v2/'+id+(kind==='day'?'':'-'+kind)+'.webp');
