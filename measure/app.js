@@ -372,7 +372,7 @@ function show() {
 // ---------- init ----------
 function init() {
   if (link?.code) { const c = $('#code'); c.textContent = link.code; c.hidden = false; c.title = 'Your design code'; }
-  if (link?.name) $('#dana-line').firstChild.textContent = `Hi ${link.name}! Take your time. I check every number and photo before anything gets made, so you can't really get this wrong. `;
+  if (link?.name) $('#dana-line').firstChild.textContent = `Hi ${link.name}! Take your time. a person on our team checks every number and photo before anything gets made, so you can't really get this wrong. `;
   $('#num').textContent = DANA_SMS.replace(/^\+1(\d{3})(\d{3})(\d{4})$/, '($1) $2-$3');
   const box = $('#windows');
   box.addEventListener('input', onChange); box.addEventListener('change', onChange); box.addEventListener('click', onClick);
