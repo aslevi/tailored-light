@@ -5,6 +5,7 @@ import { configureTextureImages } from './materials.js';
 import { CATALOG, FOLDS } from './tl-catalog.js';
 import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
+import { designCode } from './design-code.js';
 const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${new URL('swatches/'+SWATCH[f+'|'+c]+'.webp',document.baseURI).href})`:/Reed/.test(f)?'url(https://images.unsplash.com/photo-1765366600893-f540fe17288d?w=300&h=200&fit=crop&auto=format&q=70)':'none';
 import { createMechanism } from './shade-mechanisms.js';
 import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
@@ -125,12 +126,14 @@ function frameLoop(now){
  installation.update({...state,time:now/1000});placeHandle();if(state.inspect)controls.update();renderer.render(scene,camera);frame=requestAnimationFrame(frameLoop);
 }
 function summary(){const st=CATALOG[state.style].label.toLowerCase(),fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?' with room-darkening lining':'');}
-function lookURL(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return location.origin+location.pathname+'?'+q;}
+function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
+function lookURL(){return location.origin+location.pathname+'?'+lookQuery();}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';
  if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}. ${lookURL()}`);return;}
- const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()}. Can you help me measure and price it? ${lookURL()}`;
+ const code=designCode(lookQuery());
+ const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}). Can you help me measure and price it? ${lookURL()}`;
  location.href=smsHref(DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));

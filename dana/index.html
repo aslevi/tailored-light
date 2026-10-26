@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#3D4034">
+<title>Dana's board · Tailored Light</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-view="list">
+<header class="top">
+  <a class="brand" href="#" aria-label="All leads"><img src="../icon.svg" alt="" width="28" height="28"><span><b>Dana's board</b><small>Tailored Light</small></span></a>
+  <div class="top-actions">
+    <button class="btn ghost sm" id="backup-btn" type="button" aria-haspopup="dialog">Backup</button>
+    <a class="btn primary sm" href="#add" id="add-btn">+ Add<span class="long"> from text</span></a>
+  </div>
+</header>
+<p class="local-warn" id="local-warn"><b>Leads live only in this browser.</b> Clearing Safari data or switching phones loses them until a backend is added. <button type="button" class="linkish" id="warn-export">Export a backup</button> <span id="last-backup"></span></p>
+
+<main class="layout">
+  <section class="list-pane" aria-label="Leads">
+    <div class="filters">
+      <div class="filter-row">
+        <select id="stage-filter" aria-label="Filter by stage"><option value="">All stages</option></select>
+        <label class="toggle"><input type="checkbox" id="needs-filter"> <span>Needs reply</span></label>
+      </div>
+      <input type="search" id="search" placeholder="Search name, code, room, fabric" aria-label="Search leads">
+    </div>
+    <ul class="lead-list" id="lead-list"></ul>
+    <div class="empty" id="list-empty" hidden>
+      <h2>No leads yet</h2>
+      <p>When a customer texts their design, copy the whole text and tap <b>Add from text</b>.</p>
+      <a class="btn primary" href="#add">+ Add from text</a>
+      <button class="btn ghost" type="button" id="load-sample">Load a sample lead</button>
+      <p class="fine">The sample is fake (marked SAMPLE) so you can try the buttons. Delete it any time.</p>
+    </div>
+  </section>
+  <section class="detail-pane" id="detail" aria-live="polite"></section>
+</main>
+
+<dialog id="backup-dialog">
+  <form method="dialog" class="dlg">
+    <h2>Backup</h2>
+    <p>Leads are saved in this browser only. Export a file after each busy day and keep it in iCloud Drive or email it to yourself.</p>
+    <div class="btn-row">
+      <button class="btn primary" type="button" id="export-btn">Export JSON</button>
+      <label class="btn ghost file-btn">Import JSON<input type="file" id="import-file" accept="application/json,.json"></label>
+    </div>
+    <label class="toggle"><input type="checkbox" id="import-replace"> <span>Replace everything on import (default: merge, newer copy wins)</span></label>
+    <p class="fine" id="backup-status"></p>
+    <div class="btn-row end"><button class="btn ghost" value="close">Done</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
