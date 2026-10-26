@@ -28,9 +28,9 @@ export async function createRoomInstallation(initialTexture){
   p+=strength*vec2(3.0*sin(clock*.91+p.y*.017)+.8*sin(clock*1.57+p.x*.023),1.2*sin(clock*1.13+p.x*.018));
   vec2 uv=vec2(p.x/1536.,1.-p.y/1024.);
   vec4 c=texture2D(day,uv);
-  if(mood>1.5)c.rgb*=vec3(.045,.065,.11);
-  else if(mood>.5){float l=dot(c.rgb,vec3(.3,.59,.11));c.rgb=mix(vec3(l),c.rgb,.82)*vec3(1.16,.97,.70);c.rgb+=vec3(.22,.12,.02)*smoothstep(.55,.95,l);c.rgb+=vec3(.16,.08,0.)*(1.-smoothstep(0.,700.,length(p-vec2(560.,170.))));}
-  else c.rgb*=vec3(.94,.98,1.03);
+  float dk=max(0.,1.-abs(mood-1.45)*2.2);
+  c.rgb*=mood<1.?mix(vec3(.90,.96,1.05),vec3(1.02,1.,.96),mood):mix(vec3(1.02,1.,.96),vec3(.045,.065,.11),smoothstep(1.3,2.,mood));
+  c.rgb*=mix(vec3(1.),vec3(1.22,.80,.55),dk);
   gl_FragColor=c;
   #include <colorspace_fragment>
  }`});
@@ -38,9 +38,9 @@ export async function createRoomInstallation(initialTexture){
  let windTime=0,lastTime=null;
  return {group,camera,headbox,outside,lightField:material.uniforms,setExterior(texture){
   material.uniforms.day.value=material.uniforms.sun.value=material.uniforms.night.value=texture;
- },update({mood,breeze,time,inspect}){
+ },update({mood,tod,breeze,time,inspect}){
   if(breeze&&lastTime!==null)windTime+=Math.min(.1,Math.max(0,time-lastTime));lastTime=time;
-  outside.visible=!inspect;assembly.glass.visible=inspect;material.uniforms.mood.value=mood==='evening'?2:mood==='afternoon'?1:0;
+  outside.visible=!inspect;assembly.glass.visible=inspect;material.uniforms.mood.value=tod??(mood==='evening'?2:mood==='afternoon'?1:0);
   // Freeze the current breeze phase rather than snapping leaves back on Pause.
   material.uniforms.breeze.value=windTime>0?1:0;material.uniforms.clock.value=windTime;
  }};

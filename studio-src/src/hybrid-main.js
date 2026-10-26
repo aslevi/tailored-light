@@ -79,7 +79,7 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  m.emissive.copy(m.color).lerp(new THREE.Color(state.mood==='afternoon'?'#ffc06a':'#fff2df'),state.mood==='afternoon'?.38:.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
+  m.emissive.copy(m.color).lerp(new THREE.Color('#fff2df'),.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
@@ -263,5 +263,12 @@ document.addEventListener('click',e=>{
 });
 goStep('fabric');
 /* Day / Night: night shows privacy and the room lit from inside */
-$('night-toggle').addEventListener('click',()=>{const night=state.mood!=='evening';state.mood=night?'evening':'afternoon';state.lamp=night;$('night-toggle').setAttribute('aria-pressed',String(night));engaged('night');lighting();refresh();});
+const PHASES=['Morning','Midday','Evening','Night'];let dayAnim=null;
+function setTod(t){state.tod=t;state.mood=t<.5?'morning':t<1.5?'afternoon':'evening';state.lamp=t>1.45;const i=t<.45?0:t<1.2?1:t<1.85?2:3;$('day-label').textContent=PHASES[i];lighting();refresh();}
+$('play-day').addEventListener('click',()=>{if(dayAnim)return;const from=(state.tod??1)>1.9?2:0,to=from===0?2:1,t0=performance.now(),dur=from===0?1500:700;
+ $('play-day').classList.add('playing');engaged('day');
+ const step=now=>{const k=Math.min(1,(now-t0)/dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setTod(from+(to-from)*e);
+  if(k<1)dayAnim=requestAnimationFrame(step);else{dayAnim=null;$('play-day').classList.remove('playing');$('play-day').querySelector('b').textContent=to===2?'↺ Back to day':'▶ Play my day';}};
+ dayAnim=requestAnimationFrame(step);});
 setTimeout(()=>document.body.classList.add('settled'),7000);
+window.__tl={setTod};

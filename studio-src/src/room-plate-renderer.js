@@ -11,12 +11,12 @@ export function createRoomPlateRenderer(host){
  renderer.setPixelRatio(1);renderer.setSize(1536,1024,false);
  renderer.domElement.setAttribute('aria-hidden','true');host.append(renderer.domElement);
  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-1,1,1,-1,0,2);
- const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3}};
+ const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},dusk:{value:0},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3}};
  const material=new THREE.ShaderMaterial({toneMapped:false,uniforms:u,vertexShader:'varying vec2 st;void main(){st=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
  varying vec2 st;
  uniform sampler2D base,ceilingMap,lampMap;
  uniform float dayLevel,ceilingLevel,lampLevel,night,warm;
- uniform vec4 fixture;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans;
+ uniform vec4 fixture;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans,dusk;
  vec3 blurred(sampler2D tex,vec2 uv){
   vec2 d=vec2(14./1536.,14./1024.);
   return (texture2D(tex,uv).rgb*4.+texture2D(tex,uv+d).rgb+texture2D(tex,uv-d).rgb+texture2D(tex,uv+vec2(d.x,-d.y)).rgb+texture2D(tex,uv+vec2(-d.x,d.y)).rgb)/8.;
@@ -32,7 +32,8 @@ export function createRoomPlateRenderer(host){
   // Keep artificial light out of the exterior and confine lamp illumination.
   float outside=step(504.,p.x)*step(p.x,1040.)*step(154.,p.y)*step(p.y,535.);
   float nearLamp=1.-smoothstep(190.,570.,length((p-lampPosition)*vec2(1.,.75)));
-  vec3 daylightTint=mix(vec3(.94,.98,1.04),vec3(1.07,.99,.88),warm);
+  vec3 daylightTint=mix(vec3(.88,.95,1.08),vec3(1.04,1.,.94),warm);
+  daylightTint=mix(daylightTint,vec3(1.24,.80,.55),dusk*.9);
   daylightTint=mix(daylightTint,vec3(.48,.62,.90),night);
   vec3 color=b*dayLevel*daylightTint;
   color+=b*(cg+.22)*vec3(1.,.88,.70)*ceilingLevel*(1.-outside);
@@ -98,9 +99,11 @@ export function createRoomPlateRenderer(host){
    u.fixture.value.set(...room.fixture);u.floorY.value=room.floor||660;u.lampPosition.value.set(...room.lamp);ready=true;return loaded[0];
   },
   update(state,response){
-   u.night.value=state.mood==='evening'?1:0;u.warm.value=state.mood==='afternoon'?1:0;
-   const levels=roomLightingLevels(state,response);
-   u.sunAmt.value=state.mood==='afternoon'?1:state.mood==='morning'?.45:0;u.shadeBottom.value=state.shadeBottom??535;u.trans.value=state.opacity==='blackout'?0:Math.min(1,(response.transmission||.3)*1.6);
+   const tod=state.tod??(state.mood==='evening'?2:state.mood==='afternoon'?1:0),night=Math.min(1,Math.max(0,tod-1));
+   u.night.value=night;u.warm.value=Math.min(1,tod)*(1-night);
+   const levels=roomLightingLevels({...state,mood:'afternoon'},response);const dusk=Math.max(0,1-Math.abs(tod-1.45)*2.2);u.dusk.value=dusk;
+   const curve=tod<1?.78+.22*tod:1-.25*Math.min(1,(tod-1)*2);levels.day=levels.day*curve*(1-night)+.065*night;
+   u.sunAmt.value=0;u.shadeBottom.value=state.shadeBottom??535;
    u.dayLevel.value=levels.day;u.ceilingLevel.value=levels.ceiling;u.lampLevel.value=levels.lamp;
    if(ready)renderer.render(scene,camera);
   }

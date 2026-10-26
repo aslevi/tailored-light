@@ -198,3 +198,8 @@ body.dragged .offer span{}
 .trust li:before{color:#C98A3B}
 .cta .avatar{background:linear-gradient(135deg,#E2A54B,#C98A3B)}.avatar{background:linear-gradient(135deg,#E2A54B,#C98A3B)}
 @media(max-width:700px),(orientation:portrait) and (max-width:1100px){.brand .mark{width:28px;height:28px;grid-row:1}}
+.playday{bottom:12px;left:12px;display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:22px;background:#fbf8f2e8;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 2px 8px #0003;font-size:12px}
+.playday b{background:var(--dark);color:#fff9eb;padding:8px 13px;border-radius:18px;font-weight:600}
+.playday span{color:#5d5747;font-weight:600;min-width:52px;text-align:left}
+.playday.playing b{background:var(--gold);color:#2f2d26}
+@media(max-width:700px),(orientation:portrait) and (max-width:1100px){.playday{bottom:8px;left:8px;font-size:11.5px}.playday b{padding:8px 11px}}
