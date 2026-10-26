@@ -169,7 +169,7 @@ function checks(w) {
     W.forEach(v => range(v, W_RANGE, 'a width')); H.forEach(v => range(v, H_RANGE, 'a height'));
     const sw = spread(W), sh = spread(H);
     if (sw > 0.5) out.push(['warn', `Your widths differ by ${fmt(sw)}". Older windows are often a bit out of square. Please re-check, and if it holds, measure corner to corner both ways and add both numbers in the notes.`]);
-    else if (sw > 0.25) out.push(['warn', `Your widths differ by ${fmt(sw)}". That's more than 1/4", so give them a quick re-check. If they hold, no problem: Dana will use the narrowest.`]);
+    else if (sw > 0.25) out.push(['warn', `Your widths differ by ${fmt(sw)}". That's more than 1/4", so give them a quick re-check. If they hold, no problem: we'll use the narrowest.`]);
     if (sh > 0.5) out.push(['warn', `Your heights differ by ${fmt(sh)}". Please re-check them.`]);
     if (D != null) {
       if (D < MIN_DEPTH) out.push(['warn', `${fmt(D)}" is shallow for an inside shade. We suggest outside mount instead.`, 'outside']);
@@ -178,7 +178,7 @@ function checks(w) {
     }
   } else if (w.mount === 'outside') {
     range(val(w.ow), [W_RANGE[0], 120], 'the width'); range(val(w.oh), H_RANGE, 'the height');
-    if (w.clear === 'no') out.push(['info', 'No problem. Tell Dana what\'s in the way (molding, a corner, a vent) in the notes and she\'ll suggest options.']);
+    if (w.clear === 'no') out.push(['info', 'No problem. Note what\'s in the way (molding, a corner, a vent) and we\'ll suggest options.']);
   }
   return out;
 }
@@ -358,7 +358,7 @@ function renderReview() {
       ${x ? `<p class="sum-x">${esc(x)}</p>` : ''}
       ${warns.map(([, m]) => `<p class="note warn">${esc(m)}</p>`).join('')}
     </div>`;
-  }).join('') + `<p class="sub center">All in inches, exact opening. Dana makes the adjustments.</p>`;
+  }).join('') + `<p class="sub center">All in inches, exact opening. We make the adjustments.</p>`;
   $('#send').href = smsHref(DANA_SMS, smsBody());
   $('#after').hidden = true;
 }
