@@ -1,8 +1,19 @@
 # Tailored Light — website
 
-- `index.html` — the try-on (rooms, fabrics, 3D shade, day/night, text Dana, swatch kit). Works with no backend.
-- `inbox.html` — designer inbox (leads + swatch orders), protected by an inbox key.
-- `config.js` — Supabase URL, publishable key, inbox function URL.
-- `supabase/` — table + security rules (`schema.sql`) and the inbox function.
+Live at https://aslevi.github.io/tailored-light/ (GitHub Pages, branch `main`, no build step for site pages).
 
-Hosting: any static host (GitHub Pages, Vercel, Netlify, Cloudflare Pages). No build step.
+## Pages
+- `index.html` — marketing home. Old studio links (`/?room=…&s=…`) redirect to `/studio/`.
+- `shades/`, `fabrics/`, `how-it-works/`, `measuring/`, `swatch-kit/`, `faq/`, `about/` — marketing pages.
+- `terms.html`, `privacy.html`, `sms.html` (texting terms), `contact.html`, `thanks.html` (after swatch-kit payment), `support.html` (app support).
+- `studio/` — the room studio (built output; Instagram ads link here). Source: `studio-src/` (Vite + three.js).
+  Build: `npm run build` in the source folder, then copy `dist/index.html` and `dist/assets/` into `studio/`.
+  The studio loads `rooms/`, `swatches/`, `textures/` and `images/` from the site root via `<meta name="tl-site-root" content="../">`.
+- `measure/`, `quote/`, `dana/` — customer measuring form, quote page, Dana's board.
+- `try.html`, `rooms.html`, `inbox.html` — older tools, left as is.
+
+## Shared files
+- `flow/config.js` — Dana's number (`DANA_SMS`), `CONTACT_EMAIL` ('' hides the email line), `SWATCH_KIT_URL` (Stripe link; '' makes swatch-kit buttons text Dana).
+- `flow/site.css`, `flow/site.js` — styles and small behavior for the site pages (light and dark mode).
+- `images/` — marketing images rendered from our sample rooms in the studio.
+- `config.js`, `supabase/` — inbox backend (Supabase).
