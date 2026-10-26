@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4EEE4">
+<meta name="robots" content="noindex">
+<title>Measure your windows · Tailored Light</title>
+<meta name="description" content="Measure your windows for Tailored Light shades. Give us the exact opening, we make the adjustments, and Dana checks every number.">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<!-- Shared arrow markers for every diagram on the page -->
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#E2A54B"/></marker>
+    <marker id="arrk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3D4034"/></marker>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../"><img src="../icon.svg" alt="" width="28" height="28">Tailored Light</a>
+    <span class="code" id="code" hidden></span>
+  </header>
+
+  <main id="app">
+    <section id="form-view">
+      <h1>Measure your windows</h1>
+      <div class="dana">
+        <div class="avatar" aria-hidden="true">D</div>
+        <p id="dana-line">Take your time. I check every number and photo before anything gets made, so you can't really get this wrong. <span class="sig">Dana</span></p>
+      </div>
+
+      <div class="need">
+        <h2 class="small">What you need</h2>
+        <ul>
+          <li><b>A steel tape measure</b> (the kind that snaps back, not a sewing tape)</li>
+          <li><b>About 10 minutes per room</b></li>
+          <li><b>Your phone</b> for 3 quick photos per window</li>
+        </ul>
+        <p class="promise"><b>Give us the exact opening, we make the adjustments.</b> Don't subtract anything. Nearest 1/8".</p>
+      </div>
+
+      <div id="windows"></div>
+
+      <button type="button" class="btn ghost add" id="add">+ Add another window</button>
+    </section>
+
+    <section id="review-view" hidden>
+      <button type="button" class="link back" id="back">&larr; Edit measurements</button>
+      <h1>Check and send</h1>
+      <p class="sub">Look it over once. Dana double-checks everything after you send.</p>
+      <div id="summary"></div>
+
+      <div class="photos-box">
+        <h2>Then send 3 photos per window</h2>
+        <p class="sub">Attach them in the same text thread, right after your measurements.</p>
+        <ol class="photos">
+          <li>
+            <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="5" width="32" height="34" rx="2" fill="none" stroke="#3D4034" stroke-width="3"/><rect x="11" y="10" width="22" height="24" fill="#E6ECE4"/><line x1="11" y1="22" x2="33" y2="22" stroke="#E2A54B" stroke-width="3"/></svg>
+            <div><b>The whole window</b>Step back so the full frame and a bit of wall show, tape across the width if you can.</div>
+          </li>
+          <li>
+            <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M6 8 H38 V16 H14 V38 H6 Z" fill="#3D4034"/><line x1="16" y1="24" x2="36" y2="24" stroke="#E2A54B" stroke-width="3"/><circle cx="36" cy="36" r="5" fill="none" stroke="#3D4034" stroke-width="2"/></svg>
+            <div><b>A top corner, close up</b>With the tape showing the depth, hooked on the glass (or crank).</div>
+          </li>
+          <li>
+            <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="5" width="32" height="34" rx="2" fill="none" stroke="#3D4034" stroke-width="3"/><rect x="16" y="26" width="14" height="5" rx="2" fill="#B7836D"/><circle cx="14" cy="28.5" r="3.5" fill="#B7836D"/></svg>
+            <div><b>Anything in the way</b>Crank, handle, alarm sensor, tile. Nothing there? The other top corner.</div>
+          </li>
+        </ol>
+      </div>
+
+      <a class="btn primary send" id="send" href="#">Send to Dana</a>
+      <p class="legal">Opens a text to Dana, our designer at Tailored Light. Msg &amp; data rates may apply. Reply STOP anytime to opt out, HELP for help. <a href="../privacy.html">Privacy</a></p>
+      <div class="after" id="after" hidden>
+        <p><b>Now attach your photos</b> in that same thread. Text app didn't open? Copy the message and text it to Dana at <span id="num"></span>.</p>
+        <button type="button" class="btn ghost" id="copy">Copy message</button>
+      </div>
+      <p class="guarantee">Once Dana has checked your numbers and photos, you're covered by our fit guarantee: if a shade doesn't fit, we remake it free.</p>
+    </section>
+  </main>
+</div>
+
+<div class="bar" id="bar">
+  <button type="button" class="btn primary" id="review">Review &amp; send</button>
+</div>
+</body>
+</html>
