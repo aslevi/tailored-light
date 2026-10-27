@@ -263,3 +263,77 @@ body{background:#F6F0E6;color:#2B2420}
 .lead-consent{display:flex;gap:6px;align-items:flex-start;margin-top:6px;color:#6E6258;font-size:11.5px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media(max-width:700px),(orientation:portrait) and (max-width:1100px){.trust-chips{flex-wrap:wrap;overflow:visible;margin:5px 0 0;padding:0;gap:4px}.trust-chips li{font-size:11px;padding:2px 8px}}
+
+/* ===== Simple first screen: the room is the hero, one way to change it, one action ===== */
+header.sh{display:flex;align-items:center;justify-content:space-between;gap:12px;height:var(--hdr);padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg);max-width:none;width:100%;flex:none}
+header.sh .brand{display:inline-flex;align-items:center;gap:8px;font:22px/1 'DM Serif Display',Georgia,serif;color:#2B2420;text-decoration:none}
+header.sh .brand .mark{width:28px;height:28px;border-radius:7px}
+.sh-nav{display:flex;align-items:center;gap:6px}
+.sh-nav a{font-size:14px;font-weight:600;color:#2B2420;text-decoration:none;padding:10px 8px}
+.icon-btn{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:none;border:0;color:#2B2420;cursor:pointer}
+.icon-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.room-name{position:absolute;top:12px;left:12px;z-index:6;background:#FFFCF7e6;color:#2B2420;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;pointer-events:none}
+.swipe-hint{position:absolute;right:12px;top:12px;left:auto;bottom:auto;z-index:6;background:#2B2420b3;color:#FFFCF7;font-size:12px;padding:5px 11px;border-radius:999px;pointer-events:none;animation:hintout .6s ease 3s forwards}
+body.swiped .swipe-hint{display:none}
+@keyframes hintout{to{opacity:0;visibility:hidden}}
+.sample-tag,.offer,.trust-chips{display:none!important}
+.hotspot .tip,#shade-handle .tip{display:none!important}
+.playday{font-size:12px!important}
+.playday #day-label{display:none!important}
+.pick{padding:14px 16px 6px}
+.style-chips{display:flex;gap:6px}
+.style-chips button{flex:1;min-height:40px;border:1px solid var(--line);border-radius:999px;background:#FFFCF7;color:#2B2420;font:600 14px 'DM Sans',sans-serif;cursor:pointer}
+.style-chips button[aria-pressed=true]{background:#2B2420;color:#FFFCF7;border-color:#2B2420}
+.pick-name{margin:12px 0 8px;font-size:14px;color:#6E6258}
+.pick-name b{color:#2B2420;font-weight:600;margin-right:4px}
+.swatch-row{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 6px}
+.swatch-row::-webkit-scrollbar{display:none}
+.swatch-row button{flex:none;width:40px;height:40px;border-radius:50%;padding:0;border:0;background:var(--swatch) center/cover;background-image:var(--img);box-shadow:inset 0 0 0 1px #0000001f;cursor:pointer}
+.swatch-row button[aria-pressed=true]{box-shadow:0 0 0 2px #FFFCF7,0 0 0 4px #2B2420}
+.swatch-row .sep{flex:none;width:1px;height:26px;background:var(--line);margin:0 2px}
+.size-link{margin:6px 0 0;padding:8px 0;background:none;border:0;color:#56624A;font:600 14px 'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cta{background:#E3A33F!important;color:#2B2420!important;justify-content:center!important;text-align:center!important}
+.cta .cta-text{align-items:center}
+.cta-text b{font-size:17px}
+.cta-text small{font-size:12.5px;opacity:.9}
+.panel-foot .foot-meta,.panel-foot .optin,.next-steps,.real,.fine,.steps,.step-body,.trust{display:none!important}
+/* Size sheet */
+.sz-sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:#1c181573}
+.sz-sheet[hidden]{display:none}
+.sz-card{position:relative;width:100%;max-width:480px;background:#FFFCF7;border-radius:16px 16px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px #0003}
+.sz-card h2{font:24px 'DM Serif Display',Georgia,serif;margin:0 0 12px}
+.sz-card h3{font-size:13px;margin:14px 0 6px}
+.sz-close{position:absolute;right:8px;top:6px;width:44px;height:44px;border:0;background:none;font-size:26px;color:#2B2420;cursor:pointer}
+.mount-chips{margin-top:12px}
+.sz-card .chips{display:flex;flex-wrap:wrap;gap:6px}
+.sz-card #price-out{min-height:22px;margin:14px 0 0}
+.sz-done{width:100%;min-height:48px;margin-top:12px;border:0;border-radius:12px;background:#2B2420;color:#FFFCF7;font:600 16px 'DM Sans',sans-serif;cursor:pointer}
+@media(min-width:701px){.sz-sheet{align-items:center}.sz-card{border-radius:16px}}
+@media(max-width:700px),(orientation:portrait) and (max-width:1100px){
+ :root{--hdr:50px}
+ html,body{height:100%}
+ body{display:flex!important;flex-direction:column;height:100dvh;overflow:hidden}
+ header.sh{position:static}
+ main.app{flex:1;min-height:0;display:flex!important;flex-direction:column}
+ .stage{position:relative!important;top:auto!important;flex:none;padding:0!important;background:#2B2420}
+ #viewport{width:100%!important;height:58dvh;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}
+ #composition{inset:auto!important;top:0!important;height:100%!important;width:87dvh!important;left:calc(50% - 43.5dvh)!important}
+ .panel{flex:1;min-height:0;display:flex!important;flex-direction:column;justify-content:space-between;border:0;background:#F6F0E6}
+ .panel-foot{position:static!important;box-shadow:none!important;padding:8px 16px calc(10px + env(safe-area-inset-bottom))!important;border-top:0!important}
+ .cta{min-height:58px!important;margin-top:0!important}
+ .playday{bottom:10px!important;left:10px!important}
+}
+@media(min-width:701px) and (orientation:landscape),(min-width:1101px){
+ .panel{justify-content:space-between}
+ .pick{padding:24px 24px 8px}
+ .swatch-row{flex-wrap:wrap;overflow:visible;margin:0;padding:2px 0 6px}
+}
+.pick-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 8px}
+.pick-line .pick-name{margin:0}
+.bo-chip{min-height:32px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;background:#FFFCF7;color:#2B2420;font:600 12.5px 'DM Sans',sans-serif;cursor:pointer}
+.bo-chip[aria-pressed=true]{background:#2B2420;color:#FFFCF7;border-color:#2B2420}
+.bo-chip[hidden]{display:none}
+.intro-line{position:absolute;left:0;right:0;top:0;z-index:7;padding:12px 16px 26px;color:#FFFCF7;font-size:13.5px;font-weight:600;text-align:center;background:linear-gradient(#1c1815b3,#1c181500);pointer-events:none;transition:opacity .4s}
+.intro-line.gone{opacity:0}
+.intro-line:not(.gone)~.room-name{top:44px}
+header.sh .brand .wm{display:inline!important;font:22px/1 "DM Serif Display",Georgia,serif!important;letter-spacing:0!important;margin:0!important;grid-column:auto!important}header.sh .brand{display:inline-flex!important}

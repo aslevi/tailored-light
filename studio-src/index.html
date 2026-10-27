@@ -1,58 +1,56 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#F6F0E6"><meta name="tl-site-root" content="../"><link rel="icon" href="../icon.svg" type="image/svg+xml"><link rel="icon" href="../favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><title>Design your room · Tailored Light</title><meta name="description" content="Try custom roller, Roman and zebra shades in a real room, then send your design to Dana, our AI design assistant. Made to measure, from $95 a shade."><meta property="og:title" content="Tailored Light · Find your kind of light"><meta property="og:description" content="Try a shade in a real room. Text Dana when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/og.jpg"><meta property="og:url" content="https://aslevi.github.io/tailored-light/studio/"><link rel="canonical" href="https://aslevi.github.io/tailored-light/studio/"><link rel="stylesheet" href="./src/hybrid.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#F6F0E6"><meta name="tl-site-root" content="../"><link rel="icon" href="../icon.svg" type="image/svg+xml"><link rel="icon" href="../favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><title>Try on · Tailored Light</title><meta name="description" content="Try on custom roller, Roman, zebra and woven shades in a real room, then text a designer. From $209 a shade."><meta property="og:title" content="Try on shades · Tailored Light"><meta property="og:description" content="Try on shades in a real room. Text a designer when you find the one."><meta property="og:image" content="https://aslevi.github.io/tailored-light/og.jpg"><meta property="og:url" content="https://aslevi.github.io/tailored-light/studio/"><link rel="canonical" href="https://aslevi.github.io/tailored-light/studio/"><link rel="stylesheet" href="./src/hybrid.css"></head>
 <body>
-<header><a class="brand" href="../" aria-label="Tailored Light home"><img class="mark" src="../icon.svg" alt="" width="30" height="30">Tailored Light<span>CUSTOM SHADES, MADE TO MEASURE</span></a><nav class="studio-nav" aria-label="Site"><a href="../shades/">Shades</a><a href="../how-it-works/">How it works</a><a href="../faq/">FAQ</a></nav></header>
+<header class="sh"><a class="brand" href="../" aria-label="Tailored Light home"><img class="mark" src="../icon.svg" alt="" width="28" height="28"><span class="wm">Tailored Light</span></a>
+ <nav class="sh-nav" aria-label="Site"><button class="icon-btn" type="button" data-text="self" aria-label="Share this design by text" title="Share this design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><a href="../how-it-works/">How it works</a></nav></header>
 <main class="app">
 <section class="stage" aria-label="Room preview">
- <div class="offer"><b>From $95 · your price in minutes</b><ul class="trust-chips" aria-label="Why Tailored Light"><li>Free swatches</li><li>Measure wrong? Free remake</li><li>Real people reply in minutes</li></ul></div>
  <div id="viewport" tabindex="0" aria-label="Room preview. Drag the shade to raise or lower it. Swipe to change rooms.">
   <div id="composition">
    <div id="room-plate" class="plate"></div>
    <div id="window-depth-layer"><div id="shade-canvas"></div></div>
    <div id="shade-grab" aria-hidden="true"></div>
-   <button id="lamp-hotspot" class="hotspot" aria-label="Turn lamp on" aria-pressed="false"><span class="ring"></span><span class="tip">Tap the lamp</span></button>
-   <button id="ceiling-hotspot" class="hotspot" aria-label="Turn ceiling light on" aria-pressed="false"><span class="ring"></span></button>
-   <button id="shade-handle" aria-label="Drag to raise or lower the shade. Arrow keys also work."><span class="grip"><i></i><i></i><i></i></span><span class="tip">Drag the shade</span></button>
+   <button id="lamp-hotspot" class="hotspot" aria-label="Turn lamp on" aria-pressed="false"><span class="ring"></span></button>
+   <button id="ceiling-hotspot" class="hotspot" aria-label="Turn ceiling light on" aria-pressed="false" hidden><span class="ring"></span></button>
+   <button id="shade-handle" aria-label="Drag to raise or lower the shade. Arrow keys also work."><span class="grip"><i></i><i></i><i></i></span></button>
   </div>
-  <div class="ov sample-tag">Sample room</div>
-  <div id="inspect-stage" hidden></div><div id="loading" role="status" style="background-image:url(../images/studio/raw-linen-flax.webp)"><span>Loading the 3D shade…</span></div>
+  <div class="ov intro-line" id="intro-line">No home visit needed. Try it here, then text a designer.</div>
+  <div class="ov room-name" id="room-name">Living room</div>
+  <div id="inspect-stage" hidden></div><div id="loading" role="status" style="background-image:url(../images/studio/raw-linen-flax.webp)"><span class="sr-only">Loading the 3D shade</span></div>
   <script>/* Show a rendered still of the requested look right away; 3D replaces it when ready. */(function(){var q=new URLSearchParams(location.search),D={roller:['Daylight Weave','White'],roman:['Raw Linen','Flax'],zebra:['Twin Light','White']},R={"Daylight Weave":"living-room","Morning Haze":"kitchen","Deep Sleep":"bedroom","Clear View":"home-office","Raw Linen":"living-room","Soft Cotton":"bedroom","Ticking Stripe":"bathroom","Sheer Voile":"dining-room","Blackout Linen":"nursery","Natural Reed":"kitchen","Twin Light":"living-room","Sand Stripe":"home-office","Twin Shade":"bedroom"},S=["blackout-linen-cream","clear-view-mist","clear-view-slate","clear-view-white","daylight-weave-mocha","daylight-weave-oat","daylight-weave-white","deep-sleep-fog","deep-sleep-latte","deep-sleep-oat","deep-sleep-white","morning-haze-cream","morning-haze-harbor-blue","morning-haze-oat","natural-reed-driftwood","natural-reed-honey","natural-reed-natural","raw-linen-cream","raw-linen-flax","sand-stripe-oat","sand-stripe-walnut","sheer-voile-harbor","soft-cotton-mist","soft-cotton-sage","soft-cotton-sand","soft-cotton-slate","ticking-stripe-cream-fog","twin-light-mist","twin-light-oat","twin-light-slate","twin-light-white","twin-shade-mist","twin-shade-sand"],sl=function(x){return x.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')};var st=D[q.get('s')]?q.get('s'):'roman',f=q.get('f')||D[st][0],c=q.get('c')||D[st][1],room=q.get('room')||'living-room',k=sl(f)+'-'+sl(c),el=document.getElementById('loading');if(S.indexOf(k)<0||R[f]!==room){if(q.get('f')||q.get('s')||q.get('room'))el.style.backgroundImage='url(../rooms/frontal-v2/'+(/^[a-z-]+$/.test(room)?room:'living-room')+'.webp)';}else el.style.backgroundImage='url(../images/studio/'+k+'.webp)';})();</script>
-  <button class="ov ov-bl playday" id="play-day"><b>▶ Play my day</b><span id="day-label">Midday</span></button>
-  <div class="ov ov-br swipe-hint" aria-hidden="true">‹ swipe rooms ›</div>
+  <button class="ov ov-bl playday" id="play-day"><b>▶ Day to night</b><span id="day-label" hidden>Midday</span></button>
+  <div class="ov swipe-hint" aria-hidden="true">‹ swipe for rooms ›</div>
  </div>
- <p id="room-status" role="status" aria-live="polite"></p>
+ <p id="room-status" class="sr-only" role="status" aria-live="polite"></p>
 </section>
 <aside class="panel" aria-label="Design your shade">
- <ol class="steps" role="tablist">
-  <li><button data-step="room" aria-selected="false"><b>1</b>Room</button></li>
-  <li><button data-step="style" aria-selected="false"><b>2</b>Style</button></li>
-  <li><button data-step="fabric" aria-selected="true"><b>3</b>Fabric</button></li>
- </ol>
- <div class="step-body" data-show="fabric">
-  <section class="pane" data-pane="room"><h3>Which room is it for?</h3><div class="room-tiles" id="room-choices"></div></section>
-  <section class="pane" data-pane="style"><h3>Pick a style <span id="mechanism-description"></span></h3>
-   <div class="style-tiles"><button data-style="roller" aria-pressed="false"><img src="../images/roller-office-window.webp" alt="Roller shade" loading="lazy"><b>Roller</b><small id="from-roller">Simple, clean</small></button><button data-style="roman" aria-pressed="true"><img src="../images/roman-bedroom-window.webp" alt="Roman shade" loading="lazy"><b>Roman</b><small id="from-roman">Soft folds</small></button><button data-style="zebra" aria-pressed="false"><img src="../images/zebra-living-window.webp" alt="Zebra shade" loading="lazy"><b>Zebra</b><small id="from-zebra">Adjustable bands</small></button></div>
-   <div id="fold-set"><h3>Fold <span id="fold-note"></span></h3><div class="chips" id="folds"></div></div>
-   <div id="zebra-controls" hidden><h3>Bands <output id="alignment-value">Sheer</output></h3><div class="chips"><button data-bands="100">Open (soft view)</button><button data-bands="0">Closed (privacy)</button></div><input type="range" id="alignment" min="0" max="100" value="100" hidden></div>
-   <button class="next" data-goto="fabric">Next: fabric &amp; color →</button>
-  </section>
-  <section class="pane" data-pane="fabric"><h3>Fabric &amp; color <span id="fabric-name"></span></h3><div class="cards" id="families"></div>
-   <div id="opacity-options"><div class="chips"><button data-opacity="filtering" aria-pressed="true">Light filtering</button><button data-opacity="blackout" aria-pressed="false">Room darkening</button></div></div>
-   <div class="price-box" id="price-box"><h3>See your price <span>inches</span></h3><div class="size-row"><label><span>Width</span><input id="size-w" inputmode="decimal" autocomplete="off" placeholder="34 3/8"></label><span aria-hidden="true">&times;</span><label><span>Height</span><input id="size-h" inputmode="decimal" autocomplete="off" placeholder="52 1/2"></label></div><p id="price-out" aria-live="polite">Your exact price in minutes by text.</p></div>
-  </section>
-  <section class="next-steps" aria-label="What happens next"><h3>What happens next</h3><ol><li><b>Design</b><span>You're here</span></li><li><b><button class="link strong" data-text="kit">Free swatches</button></b><span>Up to 5, mailed free</span></li><li><b>Measure with our help</b><span>We check every number</span></li><li><b>Made &amp; shipped</b><span>In 2–4 weeks</span></li></ol></section>
-  <section class="real"><h3>The styles we make <span>Shown in our sample rooms</span></h3><div class="real-strip"><figure><img src="../images/hero-living-roman-800.webp" alt="Raw Linen Roman shade in a living room" loading="lazy"><figcaption>Roman, Raw Linen</figcaption></figure><figure><img src="../images/roman-reed-dining-800.webp" alt="Natural Reed woven wood Roman shade in a dining room" loading="lazy"><figcaption>Woven wood, Natural Reed</figcaption></figure><figure><img src="../images/zebra-living-800.webp" alt="Twin Light zebra shade in a living room" loading="lazy"><figcaption>Zebra, Twin Light</figcaption></figure><figure><img src="../images/roller-kitchen-800.webp" alt="Morning Haze roller shade in Harbor Blue in a kitchen" loading="lazy"><figcaption>Roller, Morning Haze</figcaption></figure></div></section>
-  <footer class="fine"><span>Colors are illustrative. Free swatches show the real fabric.</span><nav><a href="../how-it-works/">How it works</a><a href="../faq/">FAQ</a><a href="../terms.html">Terms</a><a href="../privacy.html">Privacy</a><a href="../sms.html">Texting terms</a><a href="../contact.html">Contact</a><a href="../try.html">Try it on a photo of your window</a></nav></footer>
+ <div class="pick">
+  <div class="style-chips" role="group" aria-label="Style"><button type="button" data-chip="roller" aria-pressed="false">Roller</button><button type="button" data-chip="roman" aria-pressed="true">Roman</button><button type="button" data-chip="zebra" aria-pressed="false">Zebra</button><button type="button" data-chip="woven" aria-pressed="false">Woven</button></div>
+  <div class="pick-line"><p class="pick-name"><b id="pick-fabric">Raw Linen</b> <span id="pick-color">Flax</span></p><button type="button" class="bo-chip" id="bo-chip" aria-pressed="false">Blackout</button></div>
+  <div class="swatch-row" id="swatch-row" role="group" aria-label="Fabric and color"></div>
+  <button type="button" class="size-link" id="size-open">Add your window size</button>
  </div>
- <div class="dana-toast" id="dana" role="status" aria-live="polite"><span class="avatar">D</span><p id="dana-line"></p></div>
  <div class="panel-foot">
-  <button class="cta" data-text="look"><span class="avatar">D</span><span class="cta-text"><b>Send my design to Dana</b><small><span id="price">From $95</span>/shade · <span id="selection"></span></small></span></button>
-  <p class="foot-meta"><span id="reply-promise">Dana replies in minutes, 8am–10pm ET</span> · <button class="link" data-text="self" title="Opens a text with a link to this design, for you to send to yourself or anyone">Share this design by text</button></p>
-  <p class="optin">Opens a text to Dana, Tailored Light's AI design assistant; a person on our team reviews every reply. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. We never share your number for marketing. <a href="../privacy.html">Privacy</a> · <a href="../sms.html">Texting terms</a></p>
+  <button class="cta" data-text="look"><span class="cta-text"><b>Text a designer</b><small id="cta-sub">Raw Linen roman in Flax · from $259</small></span></button>
   <form class="lead" id="lead-form" hidden novalidate><p><b>Prefer we text you?</b> Enter your number.</p><div class="lead-row"><label class="sr-only" for="lead-phone">Mobile number</label><input id="lead-phone" type="tel" name="phone" autocomplete="tel" placeholder="Mobile number"><button type="submit">Text me</button></div><label class="lead-consent"><input type="checkbox" name="consent"> <span id="lead-consent-text">I agree to receive texts from Tailored Light about my design and order. Msg &amp; data rates may apply. Reply STOP to opt out.</span></label><p id="lead-status" role="status"></p></form>
  </div>
 </aside>
 </main>
+<div class="sz-sheet" id="size-sheet" hidden>
+ <div class="sz-card" role="dialog" aria-modal="true" aria-labelledby="sz-title">
+  <button type="button" class="sz-close" id="size-close" aria-label="Close">&times;</button>
+  <h2 id="sz-title">Your window</h2>
+  <div class="size-row"><label><span>Width (in)</span><input id="size-w" inputmode="decimal" autocomplete="off" placeholder="34 3/8"></label><span aria-hidden="true">&times;</span><label><span>Height (in)</span><input id="size-h" inputmode="decimal" autocomplete="off" placeholder="52 1/2"></label></div>
+  <div class="chips mount-chips" role="group" aria-label="Mount"><button type="button" data-mount="Inside" aria-pressed="true">Inside the frame</button><button type="button" data-mount="Outside" aria-pressed="false">Outside, on the wall</button></div>
+  <div id="fold-set"><h3>Fold <span id="fold-note"></span></h3><div class="chips" id="folds"></div></div>
+  <div id="opacity-options"><div class="chips"><button data-opacity="filtering" aria-pressed="true">Standard lining</button><button data-opacity="blackout" aria-pressed="false">Room-darkening lining</button></div></div>
+  <div id="zebra-controls" hidden><h3>Bands <output id="alignment-value">Sheer</output></h3><div class="chips"><button data-bands="100">Open (soft view)</button><button data-bands="0">Closed (privacy)</button></div><input type="range" id="alignment" min="0" max="100" value="100" hidden></div>
+  <p id="price-out" aria-live="polite"></p>
+  <button type="button" class="sz-done" id="size-done">Done</button>
+ </div>
+</div>
+<div class="dana-toast" id="dana" role="status" aria-live="polite" hidden><span class="avatar">D</span><p id="dana-line"></p></div>
+<div hidden><div class="step-body" data-show="fabric"></div><ol class="steps"><li><button data-step="fabric" aria-selected="true">Fabric</button></li></ol><div class="room-tiles rooms" id="room-choices"></div><div class="cards" id="families"></div><span id="mechanism-description"></span><span id="fabric-name"></span><span id="price"></span><span id="selection"></span></div>
 <div hidden><span id="room-description"></span><button id="play"></button><button id="window-zoom"></button><p id="scene-hint"></p><span id="fold-name"></span><span id="sticky-price"></span><input id="ceiling-brightness" type="range" value="75"><output id="ceiling-value"></output><button id="outside-toggle"></button><button id="zoom-out"></button><output id="zoom-value"></output><button id="zoom-in"></button><button id="reset-view"></button><button id="inspect-toggle"></button><button id="lamp-toggle"></button><button id="ceiling-toggle"></button><input type="range" id="drop" min="0" max="100" value="65"><output id="drop-value"></output><div id="inspect-caption"></div></div>
 <script type="module" src="./src/hybrid-main.js"></script></body></html>

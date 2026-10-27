@@ -7,8 +7,8 @@ import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
 import { designCode } from './design-code.js';
 import { site } from './site-root.js';
-let SITE={DANA_SMS,LEAD_FORM_URL:'',REPLY_PROMISE:'',priceFor:()=>null,parseInches:v=>{const n=parseFloat(v);return v===''?'':isFinite(n)&&n>0?n:null;},formatInches:n=>n+'"',money:n=>'$'+n,PRICE_HOLD_NOTE:''};
-const siteReady=Promise.all([import(/* @vite-ignore */ site('flow/config.js')),import(/* @vite-ignore */ site('flow/pricing.js'))]).then(([c,pr])=>{SITE={...SITE,...c,...pr};setupLead();updatePrice();if(c.REPLY_PROMISE){const el=document.getElementById('reply-promise');if(el)el.textContent=c.REPLY_PROMISE.replace(/\.$/,'');}}).catch(()=>{});
+let SITE={DANA_SMS,LEAD_FORM_URL:'',REPLY_PROMISE:'',priceFor:()=>null,quote:()=>({price:null}),fromPrice:()=>null,parseInches:v=>{const n=parseFloat(v);return v===''?'':isFinite(n)&&n>0?n:null;},formatInches:n=>n+'"',money:n=>'$'+n,PRICE_HOLD_NOTE:''};
+const siteReady=Promise.all([import(/* @vite-ignore */ site('flow/config.js')),import(/* @vite-ignore */ site('flow/pricing.js'))]).then(([c,pr])=>{SITE={...SITE,...c,...pr};setupLead();updatePrice();updatePick();if(c.REPLY_PROMISE){const el=document.getElementById('reply-promise');if(el)el.textContent=c.REPLY_PROMISE.replace(/\.$/,'');}}).catch(()=>{});
 const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${site('swatches/'+SWATCH[f+'|'+c]+'.webp')})`:'none';
 import { createMechanism } from './shade-mechanisms.js';
 import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
@@ -34,7 +34,7 @@ function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weav
 function renderOptions(){
  
  $('families').innerHTML=CATALOG[state.style].families.map(f=>`<div class="card tex-${f.tex}${f.weave?' tex-reed':''}" data-card="${f.name}" aria-current="${f.name===state.family}">
-  ${(()=>{const cc=f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0];return `<button class="card-face" data-family="${f.name}" style="--c:${cc.hex};--img:${swatchURL(f.name,cc.name)}">`;})()}<span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven wood':'Light filtering'}</span></button>
+  ${(()=>{const cc=f.name===state.family?(f.colors.find(c=>c.name===state.colorName)||f.colors[0]):f.colors[0];return `<button class="card-face" data-family="${f.name}" style="--c:${cc.hex};--img:${swatchURL(f.name,cc.name)}">`;})()}<span class="card-name">${f.name}</span><span class="card-meta">${f.blackout?'Blackout':f.weave?'Woven':'Light filtering'}</span></button>
   <div class="dots">${f.colors.map(c=>`<button data-pick="${f.name}|${c.name}" aria-label="${f.name} in ${c.name}" title="${c.name}" aria-pressed="${f.name===state.family&&c.name===state.colorName}" style="--swatch:${c.hex};--img:${swatchURL(f.name,c.name)}"></button>`).join('')}</div></div>`).join('');
  $('folds').innerHTML=Object.entries(FOLDS).map(([k,f])=>`<button data-fold="${k}" aria-pressed="${k===state.fold}">${f.label}</button>`).join('');
 }
@@ -45,11 +45,11 @@ function refresh(){
  document.querySelectorAll('[data-room]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.room===state.room)));
  for(const key of['style','mood','opacity','fold'])document.querySelectorAll('[data-'+key+']').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===state[key])));
  document.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===state.family;c.setAttribute('aria-current',String(on));if(on){const cf=c.querySelector('.card-face');cf.style.setProperty('--c',hex());cf.style.setProperty('--img',swatchURL(state.family,state.colorName));}});document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===state.family+'|'+state.colorName)));
- $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven wood comes in a classic flat fold';
- $('price').textContent='From $95';
+ $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven comes in a classic flat fold';
+ $('price').textContent=SITE.fromPrice(state.style,state.family)?'From '+SITE.money(SITE.fromPrice(state.style,state.family)):'';
  $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;if(state.style==='zebra'&&document.activeElement!==$('alignment'))$('alignment').value=band*100;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
  $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!(state.style==='roman'&&!fam().weave&&!fam().blackout);
- $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();
+ $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();if($('swatch-row'))updatePrice();
  $('lamp-toggle').textContent='Lamp';$('lamp-toggle').setAttribute('aria-pressed',String(state.lamp));$('lamp-hotspot').setAttribute('aria-label',state.lamp?'Turn lamp off':'Turn lamp on');$('lamp-hotspot').setAttribute('aria-pressed',String(state.lamp));$('ceiling-hotspot').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-hotspot').setAttribute('aria-label',state.ceiling?'Turn ceiling light off':'Turn ceiling light on');
  $('inspect-toggle').textContent=state.inspect?'Back to room':'3D';$('inspect-toggle').setAttribute('aria-pressed',String(state.inspect));
  $('play').textContent=state.playing?'Ⅱ Pause movement':'▷ Watch it move';$('play').setAttribute('aria-pressed',String(state.playing));
@@ -97,7 +97,7 @@ function lighting(){
 }
 function size(){
  zoom=Math.min(zoom,Math.max(1,1536/$('viewport').clientWidth));
- fitShadeCanvas($('shade-canvas'),$('viewport'));
+ fitShadeCanvas($('shade-canvas'),$('composition'));
  const host=state.inspect?$('inspect-stage'):$('shade-canvas'),width=host.clientWidth,height=host.clientHeight;
  if(!renderer||!width||!height)return;renderer.setPixelRatio(Math.min(devicePixelRatio*(state.inspect?1:zoom),6));renderer.setSize(width,height,false);inspectCamera.aspect=width/height;inspectCamera.updateProjectionMatrix();
 }
@@ -133,23 +133,63 @@ function summary(){const st=CATALOG[state.style].label.toLowerCase(),fold=foldsA
 function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
 function lookURL(){return location.origin+location.pathname+'?'+lookQuery();}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
-function sizeInfo(){const w=SITE.parseInches($('size-w').value),h=SITE.parseInches($('size-h').value);const ok=w&&h;const price=ok?SITE.priceFor({style:state.style,family:state.family,width:w,height:h}):null;return{w,h,ok,bad:w===null||h===null,price,text:ok?`${SITE.formatInches(w)} wide x ${SITE.formatInches(h)} high`:''};}
-function updatePrice(){const out=$('price-out');if(!out)return;const z=sizeInfo();
- if(z.price)out.innerHTML=`<b>${SITE.money(z.price)}</b> <span>${SITE.PRICE_HOLD_NOTE}</span>`;
- else if(z.bad)out.textContent='Check the size: use inches, like 34 3/8.';
- else out.textContent=z.ok?`${z.text}: your exact price in minutes by text.`:'Your exact price in minutes by text.';}
+let mount='Inside';
+function sizeInfo(){const w=SITE.parseInches($('size-w').value),h=SITE.parseInches($('size-h').value);const ok=!!(w&&h);
+ const q=ok?SITE.quote({style:state.style,family:state.family,width:w,height:h,lining:state.style==='roman'&&state.opacity==='blackout'&&!fam().blackout&&!fam().weave}):{price:null};
+ return{w,h,ok,bad:w===null||h===null,price:q.price,estimate:!!q.estimate,outOfRange:!!q.outOfRange,text:ok?`${SITE.formatInches(w)} wide x ${SITE.formatInches(h)} high`:''};}
+function updatePrice(){const out=$('price-out');const z=sizeInfo();
+ if(out){if(z.price)out.innerHTML=`<b>${SITE.money(z.price)}</b>${z.estimate?' <span class="est">estimate</span>':''} <span>${SITE.PRICE_HOLD_NOTE||''}</span>`;
+  else if(z.bad)out.textContent='Check the size: use inches, like 34 3/8.';
+  else if(z.outOfRange)out.textContent=SITE.OUT_OF_RANGE_NOTE||'For this size, text a designer for your price.';
+  else out.textContent='';}
+ updatePick();}
+/* ---------- Simple picker: style chips, one row of swatches, one action ---------- */
+const chipOf=()=>state.style==='roman'&&fam().weave?'woven':state.style;
+function updatePick(){
+ const f=fam(),c=col(),chip=chipOf();
+ document.querySelectorAll('[data-chip]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chip===chip)));
+ $('pick-fabric').textContent=f.name;$('pick-color').textContent=c.name;
+ const bo=$('bo-chip'),hasBo=chip!=='woven'&&CATALOG[state.style].families.some(x=>x.blackout);bo.hidden=!hasBo;bo.setAttribute('aria-pressed',String(!!f.blackout));
+ const row=$('swatch-row'),fams=CATALOG[state.style].families.filter(x=>chip==='woven'?x.weave:!x.weave);
+ const key=chip+'|'+fams.map(x=>x.name).join();
+ if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>`<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="--swatch:${cc.hex};--img:${swatchURL(x.name,cc.name)}"></button>`).join('')).join('<i class="sep" aria-hidden="true"></i>');}
+ row.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===f.name+'|'+c.name)));
+ const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label;
+ const from=SITE.fromPrice(state.style,f.name);
+ $('cta-sub').textContent=`${f.name} ${label} in ${c.name}`+(z.price?` · ${SITE.money(z.price)}${z.estimate?' est.':''}`:from?` · from ${SITE.money(from)}`:'');
+ $('size-open').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','')}, ${mount.toLowerCase()} mount · edit`:'Add your window size';
+ const rn=ROOMS.find(r=>r.id===state.room);if(rn)$('room-name').textContent=rn.label;
+}
+document.addEventListener('click',e=>{
+ if(!e.target.closest('#bo-chip'))return;
+ const fams=CATALOG[state.style].families,cur=fam(),target=cur.blackout?fams.find(x=>!x.blackout&&!x.weave):fams.find(x=>x.blackout);if(!target)return;
+ state.family=target.name;state.colorName=target.colors[0].name;syncFamily(true);renderOptions();rebuild();lighting();refresh();engaged('pick:blackout');
+});
+document.addEventListener('click',e=>{
+ const ch=e.target.closest('[data-chip]');if(!ch)return;
+ const k=ch.dataset.chip,style=k==='woven'?'roman':k;
+ const fams=CATALOG[style].families.filter(x=>k==='woven'?x.weave:!x.weave);
+ state.style=style;state.family=fams[0].name;state.colorName=fams[0].colors[0].name;syncFamily(true);renderOptions();rebuild();lighting();refresh();engaged('pick:'+k);document.body.classList.add('designed');
+});
+{const sheet=$('size-sheet');let last=null;
+ const open=()=>{last=document.activeElement;sheet.hidden=false;$('size-w').focus();};
+ const close=()=>{sheet.hidden=true;updatePick();last?.focus();};
+ $('size-open').addEventListener('click',open);$('size-close').addEventListener('click',close);$('size-done').addEventListener('click',close);
+ sheet.addEventListener('click',e=>{if(e.target===sheet)close();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)close();});
+ sheet.addEventListener('click',e=>{const m=e.target.closest('[data-mount]');if(!m)return;mount=m.dataset.mount;sheet.querySelectorAll('[data-mount]').forEach(b=>b.setAttribute('aria-pressed',String(b===m)));updatePick();});}
 function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)return;form.hidden=false;
  form.addEventListener('submit',async e=>{e.preventDefault();const st=$('lead-status'),phone=form.phone.value.replace(/[^\d+]/g,'');
   if(phone.replace(/\D/g,'').length<10){st.textContent='Please enter a 10-digit mobile number.';return;}
   if(!form.consent.checked){st.textContent='Please check the box so we can text you.';return;}
   st.textContent='Sending…';
-  try{const r=await fetch(SITE.LEAD_FORM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,consent:true,consentText:$('lead-consent-text').textContent.trim(),context:'studio:'+designCode(lookQuery())+' '+summary()+(sizeInfo().ok?' '+sizeInfo().text:''),page:lookURL(),ts:new Date().toISOString()})});if(!r.ok)throw 0;st.textContent="Thanks! We'll text you shortly.";}catch{st.textContent="That didn't go through. Please text Dana instead.";}});}
+  try{const r=await fetch(SITE.LEAD_FORM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,consent:true,consentText:$('lead-consent-text').textContent.trim(),context:'studio:'+designCode(lookQuery())+' '+summary()+(sizeInfo().ok?' '+sizeInfo().text:''),page:lookURL(),ts:new Date().toISOString()})});if(!r.ok)throw 0;st.textContent="Thanks! We'll text you shortly.";}catch{st.textContent="That didn't go through. Please text a designer instead.";}});}
 for(const id of['size-w','size-h'])$(id).addEventListener('input',updatePrice);
 function textDana(kind){
- const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}.`+(z.price?` Shown price ${SITE.money(z.price)}.`:''):'';
+ const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
  if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
- const body=kind==='kit'?`Hi Dana! Can I get free swatches? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} Can you help me measure and price it? ${lookURL()}`;
+ const body=kind==='kit'?`Hi Dana! Can I get free samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
  location.href=smsHref(SITE.DANA_SMS||DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));
@@ -291,11 +331,12 @@ function setDropFromY(clientY){const r=$('composition').getBoundingClientRect(),
 document.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(b)b.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});});
 /* Coach marks fade after the visitor interacts; Dana responds to what they do */
 const touched=new Set();
+{const hide=()=>{const el=document.getElementById('intro-line');if(el)el.classList.add('gone');};['pointerdown','keydown','wheel'].forEach(t=>addEventListener(t,hide,{once:true,passive:true}));}
 function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classList.add('swiped');if(kind==='drag')document.body.classList.add('dragged');if(kind==='lamp'||kind==='ceiling')document.body.classList.add('lit');danaSays();}
 function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
-  `<strong>Dana</strong> · Want to feel it first? I'll mail you free swatches, up to 5 fabrics.`];
+  `<strong>Dana</strong> · Want to feel it first? I'll mail you free samples, up to 5 fabrics.`];
  const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
@@ -325,7 +366,7 @@ function setTod(t){state.tod=t;state.mood=t<.5?'morning':t<1.5?'afternoon':'even
 $('play-day').addEventListener('click',()=>{if(dayAnim)return;const from=(state.tod??1)>1.9?2:0,to=from===0?2:1,t0=performance.now(),dur=from===0?1500:700;
  $('play-day').classList.add('playing');engaged('day');
  const step=now=>{const k=Math.min(1,(now-t0)/dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setTod(from+(to-from)*e);
-  if(k<1)dayAnim=requestAnimationFrame(step);else{dayAnim=null;$('play-day').classList.remove('playing');$('play-day').querySelector('b').textContent=to===2?'↺ Back to day':'▶ Play my day';}};
+  if(k<1)dayAnim=requestAnimationFrame(step);else{dayAnim=null;$('play-day').classList.remove('playing');$('play-day').querySelector('b').textContent=to===2?'↺ Night to day':'▶ Day to night';}};
  dayAnim=requestAnimationFrame(step);});
 setTimeout(()=>document.body.classList.add('settled'),7000);
 window.__tl={setTod};
