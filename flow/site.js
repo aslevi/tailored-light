@@ -95,3 +95,8 @@ const menus = [...document.querySelectorAll('.site-header details')];
 menus.forEach(d => d.addEventListener('toggle', () => { if (d.open) menus.forEach(o => { if (o !== d) o.open = false; }); }));
 document.addEventListener('click', e => { menus.forEach(d => { if (d.open && !d.contains(e.target)) d.open = false; }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') menus.forEach(d => { if (d.open) { d.open = false; d.querySelector('summary').focus(); } }); });
+
+// Hero loop: respect reduced motion (show the still poster instead).
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('[data-hero-video]').forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.currentTime = 0; v.load(); });
+}
