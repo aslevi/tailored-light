@@ -88,4 +88,10 @@ document.addEventListener('click', e => {
 });
 
 // Close the phone menu after choosing an in-page link.
-document.querySelectorAll('.menu-panel a').forEach(a => a.addEventListener('click', () => a.closest('details')?.removeAttribute('open')));
+document.querySelectorAll('.menu-panel a, .mega a').forEach(a => a.addEventListener('click', () => a.closest('details')?.removeAttribute('open')));
+
+// Header menus (Shades mega menu, phone menu): one open at a time; close on outside click or Escape.
+const menus = [...document.querySelectorAll('.site-header details')];
+menus.forEach(d => d.addEventListener('toggle', () => { if (d.open) menus.forEach(o => { if (o !== d) o.open = false; }); }));
+document.addEventListener('click', e => { menus.forEach(d => { if (d.open && !d.contains(e.target)) d.open = false; }); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') menus.forEach(d => { if (d.open) { d.open = false; d.querySelector('summary').focus(); } }); });
