@@ -85,7 +85,7 @@ function show(id) { for (const s of ['loading', 'invalid', 'quote']) $(s).hidden
 function invalid() {
   show('invalid');
   $('invalid-sms').href = smsHref(DANA_SMS, 'Hi Dana, my quote link looks incomplete. Could you resend it?');
-  document.title = 'Quote link incomplete · Tailored Light';
+  document.title = 'Quote link incomplete · Hello Shade';
 }
 
 function render(q) {
@@ -95,7 +95,7 @@ function render(q) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const expired = until && until < today;
 
-  document.title = `Quote ${q.code} · Tailored Light`;
+  document.title = `Quote ${q.code} · Hello Shade`;
   $('top-code').textContent = q.code;
   $('q-code').textContent = q.code;
   $('q-title').textContent = first ? `${first}, here are your shades` : 'Here are your shades';

@@ -1,4 +1,4 @@
-// Shared settings for Tailored Light flow pages. Change Dana's number here only.
+// Shared settings for Hello Shade flow pages. Change Dana's number here only.
 export const DANA_SMS = '+12017453300';
 // Public contact email for policy pages. Leave '' to hide the email line.
 export const CONTACT_EMAIL = '';
@@ -28,7 +28,7 @@ export const PEOPLE_PHOTOS = {
   'rooms': { src: 'images/people/bedroom.webp', alt: 'A quiet bedroom with a blackout roller shade' },
   'about': { src: 'images/people/about.webp', alt: 'Looking through fabric samples at a desk' },
 };
-export const BRAND = { walnut:'#2B2420', linen:'#F6F0E6', paper:'#FFFCF7', gold:'#E3A33F', sage:'#56624A', oat:'#D9CBB4', driftwood:'#6E6258' };
+export const BRAND = { name:'Hello Shade', cream:'#FBF6F0', surface:'#FFFDFB', blush:'#F3DCD3', rose:'#A9594A', roseHover:'#8E4A3D', honey:'#E8AE45', cocoa:'#4A3530', muted:'#7A5F57' };
 export const isIOS = () => /iPhone|iPad|Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document || /iPhone|iPad/i.test(navigator.userAgent);
 export const smsHref = (num, body) => `sms:${num}${isIOS() ? '&' : '?'}body=${encodeURIComponent(body)}`;
 export const b64urlEncode = obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');

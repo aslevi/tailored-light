@@ -1,4 +1,4 @@
-// Tailored Light design code: reproducible from the look link.
+// Hello Shade design code: reproducible from the look link.
 // Code = 'TL-' + first 4 chars of a base36 hash (FNV-1a 32-bit) of the canonical look query string.
 // Canonical query = keys room,s,f,c,r,l in that order (only those present and non-empty), serialized
 // with URLSearchParams. 'ref' and anything else is excluded. Keep this file identical to /flow/code.js.

@@ -1,4 +1,4 @@
-// Tailored Light pricing: one source for every price on the site, the studio and Dana's board.
+// Hello Shade pricing: one source for every price on the site, the studio and Dana's board.
 // Costs are from our supplier's landed (DDP) quotes, with conservative formulas so a held price
 // never loses money. Sizes are the order size in inches.
 //

@@ -1,4 +1,4 @@
-// Shared behavior for the Tailored Light site pages. Reads flow/config.js so Dana's number,
+// Shared behavior for the Hello Shade site pages. Reads flow/config.js so Dana's number,
 // the contact email and the swatch-kit payment link are set in one place.
 // The HTML keeps working static fallbacks (sms: links) for visitors without JavaScript.
 import { DANA_SMS, CONTACT_EMAIL, SWATCH_KIT_URL, LEAD_FORM_URL, DESIGNER_NAME, DESIGNER_PHOTO, PEOPLE_PHOTOS, smsHref } from './config.js';

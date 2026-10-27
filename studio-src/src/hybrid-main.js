@@ -216,7 +216,7 @@ function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)ret
 for(const id of['size-w','size-h'])$(id).addEventListener('input',updatePrice);
 function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
- if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}. ${lookURL()}`);return;}
+ if(kind==='self'){location.href=smsHref('',`My Hello Shade design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
  const body=kind==='kit'?`Hi Dana! Can I get free samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
  location.href=smsHref(SITE.DANA_SMS||DANA_SMS,body+tag);
@@ -372,7 +372,7 @@ $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
 document.addEventListener('click',e=>{const pk=e.target.closest('[data-family],[data-pick],[data-style],[data-fold]');if(pk)engaged('pick:'+(pk.dataset.pick||pk.dataset.family||pk.dataset.style||pk.dataset.fold));});
 /* Share the look (spouse approval is a real step) */
 $('share-look')?.addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${ROOMS.find(r=>r.id===state.room).label.toLowerCase()}? ${summary()}`;
- try{if(navigator.share){await navigator.share({title:'Tailored Light',text,url});return;}await navigator.clipboard.writeText(text+' '+url);toast('<strong>Link copied</strong> · send it to whoever gets a vote.');}catch{}});
+ try{if(navigator.share){await navigator.share({title:'Hello Shade',text,url});return;}await navigator.clipboard.writeText(text+' '+url);toast('<strong>Link copied</strong> · send it to whoever gets a vote.');}catch{}});
 /* Intro: the shade lowers itself once so visitors see it's alive */
 (function intro(){if(reduced||new URLSearchParams(location.search).has('s'))return;const target=state.drop,t0=performance.now()+700;state.drop=.04;
  const step=now=>{if(document.body.classList.contains('dragged'))return;const k=Math.min(1,Math.max(0,(now-t0)/1400)),e=1-Math.pow(1-k,3);state.drop=.04+(target-.04)*e;$('drop').value=state.drop*100;if(mechanism)refresh();if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);})();

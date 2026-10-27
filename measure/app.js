@@ -1,4 +1,4 @@
-// Tailored Light: customer measuring form (/measure/).
+// Hello Shade: customer measuring form (/measure/).
 // Intro → tape photos (instructions only; photos go in the text) → one width + one height per window → sent.
 // Reads #d=<base64url JSON> per /flow spec ({code, name, windows:[{id, room, label, style}]}) and submits by
 // opening a prefilled text to Dana. The last line (TLM1:...) is read by Dana's board; mount is left blank

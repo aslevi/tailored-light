@@ -1,4 +1,4 @@
-// Store behavior for Tailored Light: listing filters, product pages and swatch-kit picks.
+// Store behavior for Hello Shade: listing filters, product pages and swatch-kit picks.
 // Plain ES module, no build step. Dana's number comes from flow/config.js.
 import { DANA_SMS, SWATCH_KIT_URL, SWATCH_KIT_MAX, smsHref } from './config.js';
 import { parseInches, formatInches, quote, fromPrice, money, PRICE_HOLD_NOTE, OUT_OF_RANGE_NOTE } from './pricing.js';

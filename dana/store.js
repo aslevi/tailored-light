@@ -38,7 +38,7 @@ export async function exportAll() {
 // mode 'merge': add new leads, replace a lead only if the imported copy is newer. 'replace': wipe and load.
 export async function importAll(data, mode = 'merge') {
   const leads = Array.isArray(data) ? data : data && Array.isArray(data.leads) ? data.leads : null;
-  if (!leads || leads.some(l => !l || typeof l.id !== 'string')) throw new Error('Not a Tailored Light leads backup.');
+  if (!leads || leads.some(l => !l || typeof l.id !== 'string')) throw new Error('Not a Hello Shade leads backup.');
   load();
   let added = 0, updated = 0;
   if (mode === 'replace') { memory.leads = clone(leads); added = leads.length; }
