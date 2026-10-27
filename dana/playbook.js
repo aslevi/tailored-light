@@ -7,9 +7,9 @@ export const GROUPS = [
     ['After hours', "Hi! Dana here. Got your [room] design and I love it. I'm away from my phone right now, I'll text you back by [time]."],
   ] },
   { id: 'kit', title: 'Swatch kit', stages: ['new', 'swatches'], items: [
-    ['Kit: yes', "Yes! Love that you're leaning [fabric] in [color]. The kit is $9 and I credit it back when you order."],
+    ['Kit: yes', "Yes! Love that you're leaning [fabric] in [color]. Swatches are free, shipping too. Pick up to 5 and send me your address."],
     ['Kit: address', "I'll put in [color] plus 2–3 that I think would also work in a [room]. What's the best mailing address?"],
-    ['Kit offer', "Want to feel it first? I'll mail you swatches for $9 and credit it to your order. I'll include [color] plus a couple I think you'll like."],
+    ['Kit offer', "Want to feel it first? I'll mail you free swatches, up to 5 fabrics. I'll include [color] plus a couple I think you'll like."],
     ['Ready buyer', "You can skip swatches if you're happy with [color]. Or I can send them and we measure while they're in the mail, no time lost."],
     ['Kit shipped', "Your swatches are on the way! Tip: tape them to the window and look at them morning and evening. While you wait, want to measure? Takes about 10 minutes and I'll walk you through it."],
   ] },
@@ -44,7 +44,7 @@ export const GROUPS = [
     ['Re-measure one', 'One quick check: [window] came out a bit wider than [other window]. Mind re-measuring the width on that one? Want to make sure it\'s perfect.'],
     ['Missing photo', 'Got the numbers, thank you! Can you send a close-up of a top corner with the tape showing the depth? That\'s the one I need for your fit guarantee.'],
     ['Did you deduct?', 'Did you take anything off these numbers? I just need the exact opening, wall to wall. I make the adjustments.'],
-    ['All good', "Your measurements look great. I've checked them, so you're covered by our fit guarantee: if it doesn't fit, we remake it. Putting your quote together now."],
+    ['All good', "Your measurements look great. I've checked them, so you're covered: measure wrong and we remake it free (one remake per shade, within 30 days of delivery). Putting your quote together now."],
   ] },
   { id: 'quote', title: 'Quote & price', stages: ['ready_to_quote', 'quoted'], items: [
     ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked, so the fit guarantee applies. Want me to lock it in?"],
@@ -74,7 +74,7 @@ export const GROUPS = [
     ['Do you install?', "We don't install, but it's easy: two brackets, a few screws, a drill. Most people do it in 15–20 min a shade, and any handyman can too. I'll send you a how-to when they arrive."],
     ['Scared to measure', "Totally normal, and it's exactly why I'm here. I walk you through it one step at a time, then I check every number and photo. If I've checked it and it doesn't fit, we remake it."],
     ['Spouse needs to see', 'Of course! Here\'s your design to forward to whoever gets a vote: [look link]'],
-    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements: if I've checked them and it doesn't fit, we remake it free."],
+    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements: and if you measured wrong, we remake it free (one remake per shade, within 30 days of delivery). Defects and shipping damage are covered too."],
     ['Just looking', "No rush at all. Want me to mail swatches so you have them when you're ready? Otherwise I'll be here."],
   ] },
 ];
