@@ -1,6 +1,7 @@
 // Store behavior for Tailored Light: listing filters, product pages and swatch-kit picks.
 // Plain ES module, no build step. Dana's number comes from flow/config.js.
-import { DANA_SMS, SWATCH_KIT_URL, smsHref } from './config.js';
+import { DANA_SMS, SWATCH_KIT_URL, SWATCH_KIT_MAX, smsHref } from './config.js';
+import { parseInches, formatInches, priceFor, money, PRICE_HOLD_NOTE } from './pricing.js';
 import { designCode } from './code.js';
 
 const root = document.querySelector('meta[name="tl-root"]')?.content || './';
@@ -42,19 +43,7 @@ if (dataEl) {
     fold: 'flat', lining: '', mount: 'Inside', shot: 'room',
   };
   const shotSrc = () => root + ({ room: st.color.room, win: st.color.win, swatch: st.color.swatch, alt: P.alt }[st.shot]);
-  const fmt = v => {
-    // Accepts 34, 34.5, 34 3/8, 34-3/8, 34 3/8" ; returns a tidy string to the nearest 1/8 or '' if unreadable.
-    const s = String(v).trim().replace(/["”″]|in(ches)?\.?$/gi, '').trim();
-    if (!s) return '';
-    let n = NaN;
-    const m = s.match(/^(\d+(?:\.\d+)?)(?:[\s-]+(\d+)\/(\d+))?$/) || s.match(/^()(\d+)\/(\d+)$/);
-    if (m) n = (m[1] ? parseFloat(m[1]) : 0) + (m[2] ? +m[2] / +m[3] : 0);
-    if (!isFinite(n) || n <= 0 || n > 400) return null;
-    const eighths = Math.round(n * 8), whole = Math.floor(eighths / 8), rem = eighths % 8;
-    if (!rem) return `${whole}"`;
-    const g = rem % 4 === 0 ? 4 : rem % 2 === 0 ? 2 : 1;
-    return `${whole} ${rem / g}/${8 / g}"`;
-  };
+  const fmt = v => { const n = parseInches(v); return n === '' ? '' : n === null ? null : formatInches(n); };
   const look = () => {
     const q = new URLSearchParams({ room: P.room, s: P.style, f: P.family, c: st.color.name });
     if (P.style === 'roman' && document.querySelector('[data-fold]')) q.set('r', st.fold);
@@ -80,10 +69,17 @@ if (dataEl) {
     if (document.querySelector('[data-fold]') && st.fold !== 'flat') opts.push(`${st.fold} fold`);
     if (st.lining) opts.push('room-darkening lining');
     const size = w && h ? `${w} wide x ${h} high` : w ? `${w} wide (height not measured yet)` : h ? `${h} high (width not measured yet)` : "I haven't measured yet";
+    const wn = parseInches($('[data-size="w"]').value), hn = parseInches($('[data-size="h"]').value);
+    const price = wn && hn ? priceFor({ style: P.style, family: P.family, width: wn, height: hn }) : null;
+    const out = $('[data-price-out]');
+    if (price) out.innerHTML = `<b>${money(price)}</b> <span>${PRICE_HOLD_NOTE}</span>`;
+    else if (bad) out.textContent = 'Check the size: use inches, like 34 3/8.';
+    else out.textContent = w && h ? `${w} x ${h}: your exact price in minutes by text.` : 'Your exact price in minutes by text.';
     const q = look();
     const link = new URL(root + 'studio/?' + q, location.href).href;
-    const body = `Hi Dana! I'd like my exact price for the ${P.name} in ${st.color.name}${opts.length ? ', ' + opts.join(', ') : ''} (${designCode(q)}). ${st.mount} mount, ${size}. ${link}`;
+    const body = `Hi Dana! I'd like ${price ? 'to order' : 'my exact price for'} the ${P.name} in ${st.color.name}${opts.length ? ', ' + opts.join(', ') : ''} (${designCode(q)}). ${st.mount} mount, ${size}.${price ? ` Shown price ${money(price)}.` : ''} ${link}`;
     $('[data-price-cta]').href = smsHref(DANA_SMS, body);
+    $('[data-price-cta]').lastChild.textContent = price ? 'Text Dana to order' : 'Get my exact price';
     $('[data-studio]').href = root + 'studio/?' + q;
     $('[data-kit-add]').href = root + 'swatch-kit/?' + new URLSearchParams({ add: `${P.family}|${st.color.name}` });
     const url = new URL(location.href); url.searchParams.set('c', st.color.name);
@@ -97,7 +93,7 @@ if (dataEl) {
     const s = e.target.closest('[data-shot]'); if (s) { st.shot = s.dataset.shot; render(); }
     if (e.target.closest('[data-kit-add]')) {
       const list = readPicks(); const key = `${P.family}|${st.color.name}`;
-      if (!list.includes(key)) { list.push(key); writePicks(list); }
+      if (!list.includes(key) && list.length < SWATCH_KIT_MAX) { list.push(key); writePicks(list); }
     }
   });
   document.querySelectorAll('[data-size]').forEach(i => i.addEventListener('input', render));
@@ -111,7 +107,8 @@ if (catEl) {
   const valid = k => { const [f, c] = k.split('|'); return CAT[f]?.colors[c]; };
   let list = readPicks().filter(valid);
   const add = new URLSearchParams(location.search).get('add');
-  if (add && valid(add) && !list.includes(add)) { list.push(add); writePicks(list); }
+  const full = document.querySelector('[data-picks-full]');
+  if (add && valid(add) && !list.includes(add)) { if (list.length < SWATCH_KIT_MAX) { list.push(add); writePicks(list); } else if (full) full.hidden = false; }
   const ul = document.querySelector('[data-picks]');
   const kit = document.querySelector('[data-swatch-kit]');
   const draw = () => {
@@ -121,8 +118,11 @@ if (catEl) {
     }).join('');
     document.querySelector('[data-picks-empty]').hidden = list.length > 0;
     const picks = list.map(k => { const [f, c] = k.split('|'); return `${f} in ${c}`; }).join(', ');
-    const body = list.length ? `Hi Dana! I'd like the $9 swatch kit with: ${picks}.` : kit.dataset.body;
-    if (!SWATCH_KIT_URL) kit.href = smsHref(DANA_SMS, body);
+    const body = list.length ? `Hi Dana! I'd like free swatches of: ${picks}.` : kit.dataset.body;
+    if (SWATCH_KIT_URL) { const u = new URL(SWATCH_KIT_URL, location.href); if (list.length) u.searchParams.set('fabrics', list.join(',')); kit.href = u.href; }
+    else kit.href = smsHref(DANA_SMS, body);
+    const cnt = document.querySelector('[data-picks-count]'); if (cnt) cnt.textContent = list.length ? `(${list.length} of ${SWATCH_KIT_MAX})` : '';
+    if (full && list.length < SWATCH_KIT_MAX) full.hidden = true;
   };
   ul.addEventListener('click', e => {
     const b = e.target.closest('[data-remove]'); if (!b) return;

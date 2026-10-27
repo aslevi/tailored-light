@@ -1,7 +1,7 @@
 // Shared behavior for the Tailored Light site pages. Reads flow/config.js so Dana's number,
 // the contact email and the swatch-kit payment link are set in one place.
 // The HTML keeps working static fallbacks (sms: links) for visitors without JavaScript.
-import { DANA_SMS, CONTACT_EMAIL, SWATCH_KIT_URL, smsHref } from './config.js';
+import { DANA_SMS, CONTACT_EMAIL, SWATCH_KIT_URL, LEAD_FORM_URL, REPLY_PROMISE, smsHref } from './config.js';
 
 const pretty = n => {
   const d = String(n).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
@@ -17,13 +17,13 @@ document.querySelectorAll('[data-dana]').forEach(a => {
 });
 document.querySelectorAll('[data-dana-text]').forEach(el => { el.textContent = pretty(DANA_SMS); });
 
-// Swatch kit: Stripe payment link when SWATCH_KIT_URL is set, otherwise a text to Dana.
+// Free swatch kit: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
 document.querySelectorAll('[data-swatch-kit]').forEach(a => {
   if (SWATCH_KIT_URL) {
     a.href = SWATCH_KIT_URL;
     a.removeAttribute('data-text-sheet');
     const label = a.querySelector('[data-kit-label]');
-    if (label) label.textContent = label.dataset.kitLabel || 'Order the $9 swatch kit';
+    if (label) label.textContent = label.dataset.kitLabel || 'Order free swatches';
     const note = document.querySelector(a.dataset.kitNote || '#kit-optin');
     if (note) note.hidden = true;
   } else {
@@ -69,6 +69,7 @@ function openSheet(body) {
       <h2 id="sheet-title">Text Dana</h2>
       <p>Dana is Tailored Light's AI design assistant. Send a photo of your window, your design, or a question, and a person on our team reviews every reply.</p>
       <a class="btn" data-sheet-go href="#"><span class="avatar" aria-hidden="true">D</span>Open Messages</a>
+      <p class="reply-time">${REPLY_PROMISE}</p>
       <p class="optin">Opens a text to Dana, Tailored Light's AI design assistant; a person on our team reviews every reply. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. We never share your number for marketing. <a href="${root}privacy.html">Privacy</a> · <a href="${root}sms.html">Texting terms</a></p>
     </div>`;
     document.body.append(sheet);
@@ -100,3 +101,28 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') menus.forEac
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   document.querySelectorAll('[data-hero-video]').forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.currentTime = 0; v.load(); });
 }
+
+// Reply-time promise, from config.js.
+document.querySelectorAll('[data-reply]').forEach(el => { el.textContent = REPLY_PROMISE; });
+
+// "Prefer we text you?" forms: hidden until LEAD_FORM_URL is set in config.js.
+document.querySelectorAll('form[data-lead]').forEach(form => {
+  if (!LEAD_FORM_URL) { form.hidden = true; return; }
+  form.hidden = false;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const status = form.querySelector('[data-lead-status]');
+    const phone = form.phone.value.replace(/[^\d+]/g, '');
+    if (phone.replace(/\D/g, '').length < 10) { status.textContent = 'Please enter a 10-digit mobile number.'; form.phone.focus(); return; }
+    if (!form.consent.checked) { status.textContent = 'Please check the box so we can text you.'; return; }
+    const consentText = form.querySelector('[data-consent-text]').textContent.trim();
+    status.textContent = 'Sending…';
+    try {
+      const r = await fetch(LEAD_FORM_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, consent: true, consentText, context: form.dataset.context || '', page: location.href, ts: new Date().toISOString() }) });
+      if (!r.ok) throw new Error(r.status);
+      status.textContent = "Thanks! We'll text you shortly.";
+      form.querySelector('button').disabled = true;
+    } catch { status.textContent = "That didn't go through. Please text Dana instead."; }
+  });
+});
