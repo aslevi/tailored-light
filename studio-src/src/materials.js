@@ -12,7 +12,8 @@ export function seedRandom(seed=17) { let n=seed; return () => { n=(Math.imul(16
 function canvas(size=256) {const c=document.createElement('canvas');c.width=size;c.height=size;return c;}
 function texture(key, painter, size=256){
   if(cache.has(key))return cache.get(key);
-  const c=canvas(size),ctx=c.getContext('2d');painter(ctx,size);
+  // willReadFrequently keeps the canvas on the CPU, so normalFromHeight's getImageData is a plain copy, not a GPU readback.
+  const c=canvas(size),ctx=c.getContext('2d',{willReadFrequently:true});painter(ctx,size);
   const t=new THREE.CanvasTexture(c);t.name=key;t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.userData.mimeType='image/jpeg';cache.set(key,t);return t;
 }
 export function clothTexture(kind='linen') {
@@ -65,9 +66,12 @@ export function exteriorTexture(){return texture('ordinary-neighborhood',(ctx,s)
 export function material(name,color,roughness=.8,extra={}) {const Material=extra.sheen?THREE.MeshPhysicalMaterial:THREE.MeshStandardMaterial;const m=new Material({color,roughness,...extra});m.name=name;return m;}
 export function normalFromHeight(source){
   const key=source.name+'-normal';if(cache.has(key))return cache.get(key);
-  const image=source.image,s=image.width,c=canvas(s),ctx=c.getContext('2d'),src=image.getContext('2d').getImageData(0,0,s,s).data,out=ctx.createImageData(s,s);
-  const h=(x,y)=>src[(((y+s)%s)*s+(x+s)%s)*4]/255;
-  for(let y=0;y<s;y++)for(let x=0;x<s;x++){let nx=(h(x-1,y)-h(x+1,y))*.9,ny=(h(x,y-1)-h(x,y+1))*.9,nz=1;const len=Math.hypot(nx,ny,nz),i=(y*s+x)*4;out.data[i]=(nx/len*.5+.5)*255;out.data[i+1]=(ny/len*.5+.5)*255;out.data[i+2]=(nz/len*.5+.5)*255;out.data[i+3]=255;}
+  const image=source.image,s=image.width,c=canvas(s),ctx=c.getContext('2d'),src=image.getContext('2d',{willReadFrequently:true}).getImageData(0,0,s,s).data,out=ctx.createImageData(s,s),o=out.data;
+  // Height = red channel. Tight typed-array loop (no closures or Math.hypot): this runs once per fabric on first load.
+  const hgt=new Float32Array(s*s);for(let i=0;i<s*s;i++)hgt[i]=src[i*4]/255;
+  for(let y=0;y<s;y++){const up=((y-1+s)%s)*s,dn=((y+1)%s)*s,row=y*s;
+    for(let x=0;x<s;x++){const l=(x-1+s)%s,r=(x+1)%s,nx=(hgt[row+l]-hgt[row+r])*.9,ny=(hgt[up+x]-hgt[dn+x])*.9,inv=1/Math.sqrt(nx*nx+ny*ny+1),i=(row+x)*4;
+      o[i]=(nx*inv*.5+.5)*255;o[i+1]=(ny*inv*.5+.5)*255;o[i+2]=(inv*.5+.5)*255;o[i+3]=255;}}
   ctx.putImageData(out,0,0);const t=new THREE.CanvasTexture(c);t.name=key;t.colorSpace=THREE.NoColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.copy(source.repeat);cache.set(key,t);return t;
 }
 export function buildMaterials(){

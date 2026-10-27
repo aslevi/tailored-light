@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { configureTextureImages } from './materials.js';
+import { configureTextureImages, clothTexture, normalFromHeight } from './materials.js';
 import { CATALOG, FOLDS } from './tl-catalog.js';
 import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
@@ -160,6 +160,25 @@ document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',(
  if(ROOMS.some(r=>r.id===q.get('room')))state.room=q.get('room');
  syncFamily();renderOptions();}
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));
+// Compile and first-use one material's shader program at a time, yielding between them, so a tap
+// can be handled while the 3D scene warms up (one long compile per frame instead of one giant task).
+async function warmShaders(){
+ // Where the browser compiles shaders off-thread (KHR_parallel_shader_compile), let it finish without blocking.
+ try{if(renderer.extensions.has('KHR_parallel_shader_compile'))await renderer.compileAsync(scene,camera);}catch{}
+ const meshes=[];scene.traverse(o=>{if(o.isMesh||o.isLine||o.isPoints)meshes.push(o);});
+ const vis=new Map(meshes.map(m=>[m,m.visible])),groups=new Map();
+ for(const m of meshes){if(!vis.get(m))continue;const mats=Array.isArray(m.material)?m.material:[m.material];const k=mats.map(x=>x.type+(x.map?'m':'')+(x.normalMap?'n':'')+(x.transparent?'t':'')+(x.side)).join('|');if(!groups.has(k))groups.set(k,[]);groups.get(k).push(m);}
+ // Warm-up draws go to a 1x1 viewport with the shadow pass skipped: they only need to compile and
+ // first-use each program, not paint, so they cost almost no GPU time.
+ const shadow=renderer.shadowMap.autoUpdate,vp=renderer.getViewport(new THREE.Vector4()),sc=renderer.getScissorTest();
+ renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=false;renderer.setViewport(0,0,1,1);
+ for(const group of groups.values()){
+  for(const m of meshes)m.visible=false;for(const m of group)m.visible=true;
+  try{renderer.render(scene,camera);}catch(e){}
+  await yieldUI();
+ }
+ for(const m of meshes)m.visible=vis.get(m);renderer.setViewport(vp);renderer.setScissorTest(sc);renderer.shadowMap.autoUpdate=shadow;renderer.shadowMap.needsUpdate=true;
+}
 async function start3D(){try{
  await yieldUI();
  configureTextureImages(Object.fromEntries(await Promise.all(['linen'].map(loadImage))));
@@ -179,7 +198,17 @@ async function start3D(){try{
  fill=new THREE.PointLight('#ffe3be',5.8,0,2);fill.castShadow=true;fill.shadow.mapSize.set(1024,1024);fill.shadow.camera.near=.1;fill.shadow.camera.far=8;fill.shadow.normalBias=.01;fill.shadow.bias=-.0004;scene.add(fill);
  ceilingLight=new THREE.PointLight('#fff0d8',0,0,2);ceilingLight.position.set(0,.75,1.1);scene.add(ceilingLight);
  await yieldUI();
- rebuild();try{if(renderer.compileAsync)await renderer.compileAsync(scene,camera);}catch{}
+ // Build the fabric texture and its normal map in their own task, then the shade geometry in the next.
+ {const tex=clothTexture(state.fabric==='reed'?'reed':state.fabric);normalFromHeight(tex);}
+ await yieldUI();
+ // First build, split across tasks (rebuild() does the same steps in one go for later changes).
+ mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66,height:1.30});
+ await yieldUI();
+ mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();
+ await yieldUI();
+ lighting();
+ await yieldUI();
+ await warmShaders();
  await yieldUI();
  const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
 }catch(error){$('loading').textContent='The shade viewer could not load. Please refresh or try a current browser.';console.error(error);}}

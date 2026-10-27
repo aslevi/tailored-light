@@ -5,6 +5,33 @@ import {roomLightingLevels} from './room-response.js';
 // Runtime relighting: retain base-image geometry; use blurred ratios from the
 // generated on/off plates. This prevents furniture-edge jumps between plates.
 // It is illustrative compositing, not physical path tracing.
+// Room artwork is fetched, decoded and flipped in a Web Worker and arrives as raw pixels (DataTexture).
+// The main thread then only does a plain texture upload, so loading a room never blocks taps on decoding
+// or on the browser's image-to-texture copy path. Falls back to TextureLoader where workers can't decode.
+const fallbackLoader=new THREE.TextureLoader();
+const WORKER_SRC=`self.onmessage=async e=>{const {id,url}=e.data;try{const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);
+const bmp=await createImageBitmap(await r.blob());const c=new OffscreenCanvas(bmp.width,bmp.height),x=c.getContext('2d');
+x.translate(0,bmp.height);x.scale(1,-1);x.drawImage(bmp,0,0);const d=x.getImageData(0,0,bmp.width,bmp.height);
+self.postMessage({id,w:bmp.width,h:bmp.height,buf:d.data.buffer},[d.data.buffer]);}catch(err){self.postMessage({id,error:String(err)});}};`;
+let worker=null,jobs=new Map(),nextJob=0;
+function plateWorker(){
+ if(worker!==null)return worker;
+ try{
+  if(typeof Worker!=='function'||typeof OffscreenCanvas!=='function'||typeof createImageBitmap!=='function')throw 0;
+  worker=new Worker(URL.createObjectURL(new Blob([WORKER_SRC],{type:'text/javascript'})));
+  worker.onmessage=e=>{const j=jobs.get(e.data.id);if(!j)return;jobs.delete(e.data.id);e.data.error?j.reject(new Error(e.data.error)):j.resolve(e.data);};
+  worker.onerror=()=>{worker=false;for(const j of jobs.values())j.reject(new Error('worker failed'));jobs.clear();};
+ }catch{worker=false;}
+ return worker;
+}
+async function loadPlate(url){
+ const w=plateWorker();
+ if(!w)return fallbackLoader.loadAsync(url);
+ try{
+  const d=await new Promise((resolve,reject)=>{const id=++nextJob;jobs.set(id,{resolve,reject});w.postMessage({id,url});});
+  const t=new THREE.DataTexture(new Uint8Array(d.buf),d.w,d.h,THREE.RGBAFormat);t.flipY=false;t.needsUpdate=true;return t;
+ }catch{return fallbackLoader.loadAsync(url);}
+}
 export function createRoomPlateRenderer(host){
  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:false});
  renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -89,8 +116,8 @@ export function createRoomPlateRenderer(host){
  let textures=[],generation=0,ready=false;
  return {
   async load(room){
-   const ticket=++generation,loader=new THREE.TextureLoader();
-   const result=await Promise.allSettled(['day','ceiling','lamp'].map(kind=>loader.loadAsync(new URL(roomAsset(room.id,kind),document.baseURI).href)));
+   const ticket=++generation;
+   const result=await Promise.allSettled(['day','ceiling','lamp'].map(kind=>loadPlate(new URL(roomAsset(room.id,kind),document.baseURI).href)));
    const loaded=result.filter(x=>x.status==='fulfilled').map(x=>x.value);
    if(ticket!==generation||result.some(x=>x.status==='rejected')){loaded.forEach(t=>t.dispose());if(ticket===generation)throw new Error('Room artwork failed to load');return false;}
    loaded.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;});
