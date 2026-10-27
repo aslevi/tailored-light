@@ -65,7 +65,7 @@ export function parseText(raw) {
   const code = designCode(q);
   const typed = codeIn(text);
   const refM = /\(via ([\w.-]{1,30})\)/.exec(text) || [null, q.get('ref')];
-  const kit = /swatch kit/i.test(text);
+  const kit = /swatch kit|free samples?/i.test(text);
   const lookUrl = look.url.split('?')[0] + '?' + canonical + (refM[1] ? '&ref=' + encodeURIComponent(refM[1]) : '');
   return { kind: 'lead', lead: { ...lead, code, ref: refM[1] || '', lookUrl }, kit, typedCode: typed, codeMismatch: !!typed && typed !== code, message: text };
 }

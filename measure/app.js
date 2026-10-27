@@ -13,6 +13,8 @@ const FRACS = ['', '1/8', '1/4', '3/8', '1/2', '5/8', '3/4', '7/8'];
 const ROOMS = [['living-room', 'Living room'], ['bedroom', 'Bedroom'], ['nursery', 'Nursery'], ['kitchen', 'Kitchen'],
   ['bathroom', 'Bathroom'], ['home-office', 'Home office'], ['dining-room', 'Dining room'], ['other', 'Other']];
 const roomLabel = id => (ROOMS.find(r => r[0] === id) || [, ''])[1];
+// Links from Dana's board carry room labels ("Bedroom"); older links carry ids ("bedroom"). Accept both.
+const roomId = v => { if (!v) return ''; const k = String(v).trim().toLowerCase(); const r = ROOMS.find(([id, l]) => id === k || l.toLowerCase() === k || id === k.replace(/\s+/g, '-')); return r ? r[0] : 'other'; };
 const W_RANGE = [12, 96], H_RANGE = [12, 120];
 
 // ---------- link + state ----------
@@ -24,7 +26,7 @@ function readLink() {
 let seq = 0;
 const newWindow = (src = {}) => ({
   id: String(src.id || `w${Date.now().toString(36)}${(seq++).toString(36)}`),
-  room: ROOMS.some(r => r[0] === src.room) ? src.room : (src.room ? 'other' : ''),
+  room: roomId(src.room),
   label: src.label || '', style: src.style || '', w: { i: '', f: 0 }, h: { i: '', f: 0 }
 });
 const link = readLink();
@@ -46,7 +48,7 @@ const nameOf = (w, i = state.windows.indexOf(w)) => (w.label || '').trim() || ro
 function problem(m, [lo, hi], word) {
   const v = val(m);
   if (v == null) return `Add the ${word}.`;
-  if (!Number.isFinite(v) || v < lo || v > hi) return `We make ${word}s from ${lo}" to ${hi}". Text Dana and she'll help.`;
+  if (!Number.isFinite(v) || v < lo || v > hi) return `We make ${word}s from ${lo}" to ${hi}". Text a designer and we'll help.`;
   return '';
 }
 const complete = w => !problem(w.w, W_RANGE, 'width') && !problem(w.h, H_RANGE, 'height');
@@ -106,7 +108,7 @@ function show(view) {
   if (view) state.view = view;
   save();
   $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + state.view; });
-  $$('.win-chip-slot').forEach(s => { s.innerHTML = state.windows.length > 1 || cur().label || cur().room ? chip() : ''; });
+  $$('.win-chip-slot').forEach(s => { s.innerHTML = s.dataset.chip = state.windows.length > 1 || cur().label || cur().room ? chip() : ''; });
   if (state.view === 'size') renderSize();
   if (state.view === 'sent') renderSent();
   window.scrollTo(0, 0);
@@ -159,7 +161,9 @@ function init() {
     if ($('#w-i').value !== w.w.i) $('#w-i').value = w.w.i;
     if ($('#h-i').value !== w.h.i) $('#h-i').value = w.h.i;
     save(); updatePrimary();
-    $$('.win-chip-slot').forEach(s => { s.innerHTML = chip(); });
+    // Only re-render the chip when its text changes: replacing it on the blur-time 'change' event
+    // would swallow a tap on the chip itself.
+    const c = chip(); $$('.win-chip-slot').forEach(s => { if (s.dataset.chip !== c) { s.innerHTML = c; s.dataset.chip = c; } });
   };
   ['#room', '#w-i', '#w-f', '#h-i', '#h-f'].forEach(s => { $(s).addEventListener('input', onInput); $(s).addEventListener('change', onInput); });
   ['#w-i', '#h-i'].forEach(s => $(s).addEventListener('blur', () => validate(false)));
