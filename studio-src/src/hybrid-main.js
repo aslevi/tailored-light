@@ -398,4 +398,7 @@ $('play-day').addEventListener('click',()=>{if(dayAnim)return;const from=(state.
   if(k<1)dayAnim=requestAnimationFrame(step);else{dayAnim=null;$('play-day').classList.remove('playing');$('play-day').querySelector('b').textContent=to===2?'↺ Night to day':'▶ Day to night';}};
  dayAnim=requestAnimationFrame(step);});
 setTimeout(()=>document.body.classList.add('settled'),7000);
+/* Real height of the controls under the room, so the CSS can give the room what is left of the visible viewport. */
+{const pick=document.querySelector('.pick'),foot=document.querySelector('.panel-foot'),set=()=>document.documentElement.style.setProperty('--panel-h',Math.ceil((pick?.offsetHeight||0)+(foot?.offsetHeight||0))+'px');
+ set();if(window.ResizeObserver){const ro=new ResizeObserver(set);pick&&ro.observe(pick);foot&&ro.observe(foot);}addEventListener('resize',set);}
 window.__tl={setTod,setDrop:d=>{state.drop=d;state.playing=false;$('drop').value=d*100;refresh();}};
