@@ -89,7 +89,7 @@ function renderSize() {
 function updatePrimary() {
   const last = state.cur === state.windows.length - 1, p = $('#primary'), nl = $('#next-line');
   if (last) {
-    p.textContent = state.windows.length > 1 ? `Send ${state.windows.length} windows to Dana` : 'Send to Dana';
+    p.textContent = state.windows.length > 1 ? `Send ${state.windows.length} windows to your designer` : 'Send to your designer';
     p.href = state.windows.every(complete) ? smsHref(DANA_SMS, smsBody()) : '#';
     nl.hidden = true;
   } else {

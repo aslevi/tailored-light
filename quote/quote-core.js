@@ -36,16 +36,14 @@ export function parseQuote(hash) {
 // taxRate may be a fraction (0.06625) or a percent (6.625).
 export const taxFraction = r => { const n = num(r); if (!Number.isFinite(n) || n <= 0) return 0; return n > 1 ? n / 100 : n; };
 
-// All money in integer cents. Tax applies to (subtotal - swatch credit + shipping):
-// NJ taxes delivery charges on taxable goods, and the credit works as a discount.
+// All money in integer cents. Tax applies to (subtotal + shipping): NJ taxes delivery charges on taxable goods.
 export function totals(q) {
   const subtotal = q.lines.reduce((s, l) => s + cents(l.price), 0);
-  const credit = Math.min(Math.max(0, cents(q.swatchCredit) || 0), subtotal);
   const shipping = Math.max(0, cents(q.shipping) || 0);
   const rate = taxFraction(q.taxRate);
-  const taxable = subtotal - credit + shipping;
+  const taxable = subtotal + shipping;
   const tax = Math.round(taxable * rate);
-  return { subtotal, credit, shipping, rate, taxable, tax, total: taxable + tax };
+  return { subtotal, shipping, rate, taxable, tax, total: taxable + tax };
 }
 
 export const money = c => (c < 0 ? '−' : '') + '$' + (Math.abs(c) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

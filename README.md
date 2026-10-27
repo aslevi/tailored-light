@@ -11,7 +11,7 @@ Live at https://aslevi.github.io/tailored-light/ (GitHub Pages, branch `main`, n
   Build: `npm run build` in the source folder, then copy `dist/index.html` and `dist/assets/` into `studio/`.
   The studio loads `rooms/`, `swatches/`, `textures/` and `images/` from the site root via `<meta name="tl-site-root" content="../">`.
 - `measure/`, `quote/`, `dana/` — customer measuring form, quote page, Dana's board.
-- `try.html`, `rooms.html`, `inbox.html` — older tools, left as is.
+- `try.html`, `rooms.html` — old tools, now redirects to `studio/` (query kept). `inbox.html` — older tool, left as is (noindex).
 
 ## Shared files
 - `flow/config.js` — Dana's number (`DANA_SMS`), `CONTACT_EMAIL` ('' hides the email line), `SWATCH_KIT_URL` (free-samples order form; '' texts a designer), `LEAD_FORM_URL`, `DESIGNER_NAME` / `DESIGNER_PHOTO` (designer card; monogram while empty), `PEOPLE_PHOTOS` (lifestyle photo slots; hidden while empty).

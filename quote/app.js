@@ -75,7 +75,6 @@ function renderTotals(q, t) {
   const dl = $('totals');
   const row = (k, v, cls) => { const d = el('div', cls); d.append(el('dt', null, k), el('dd', null, v)); dl.append(d); };
   row(`Subtotal (${q.lines.length} ${q.lines.length === 1 ? 'shade' : 'shades'})`, money(t.subtotal));
-  if (t.credit) row('Swatch kit credit', money(-t.credit), 'credit');
   row('Shipping', t.shipping ? money(t.shipping) : 'Free', t.shipping ? '' : 'free');
   row(t.rate ? `Sales tax (${pct(t.rate)})` : 'Sales tax', money(t.tax));
   row('Total', money(t.total), 'grand');

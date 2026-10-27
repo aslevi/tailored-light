@@ -29,8 +29,11 @@ const fam=()=>CATALOG[state.style].families.find(f=>f.name===state.family)||CATA
 const col=()=>fam().colors.find(c=>c.name===state.colorName)||fam().colors[0];
 const hex=()=>col().hex;
 const foldsApply=()=>state.style==='roman'&&!fam().weave;
+// Room-darkening lining: Roman fabrics only, not the sheer, the blackout or the woven (same rule as flow/pricing.js).
+const liningOK=()=>state.style==='roman'&&!fam().weave&&!fam().blackout&&!/Sheer/.test(fam().name);
 function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weave?'reed':/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
- if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';}
+ if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';
+ if(!f.blackout&&!liningOK())state.opacity='filtering';}
 function renderOptions(){
  
  $('families').innerHTML=CATALOG[state.style].families.map(f=>`<div class="card tex-${f.tex}${f.weave?' tex-reed':''}" data-card="${f.name}" aria-current="${f.name===state.family}">
@@ -48,7 +51,7 @@ function refresh(){
  $('fabric-name').textContent=state.family+' · '+state.colorName;$('fold-set').hidden=state.style!=='roman';$('fold-set').classList.toggle('locked',!foldsApply());$('fold-name').textContent=FOLDS[state.fold].label;$('fold-note').textContent=foldsApply()?FOLD_SHORT[state.fold]:'Woven comes in a classic flat fold';
  $('price').textContent=SITE.fromPrice(state.style,state.family)?'From '+SITE.money(SITE.fromPrice(state.style,state.family)):'';
  $('drop-value').textContent=Math.round(state.drop*100)+'% down';const band=mechanism?.state.bandAlignment??state.openness;if(state.style==='zebra'&&document.activeElement!==$('alignment'))$('alignment').value=band*100;$('alignment-value').textContent=band>.8?'Sheer':band<.2?'Privacy':'Partly open';
- $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!(state.style==='roman'&&!fam().weave&&!fam().blackout);
+ $('zebra-controls').hidden=state.style!=='zebra';$('opacity-options').hidden=!liningOK();
  $('mechanism-description').textContent=descriptions[state.style];$('selection').textContent=summary();if($('swatch-row'))updatePrice();
  $('lamp-toggle').textContent='Lamp';$('lamp-toggle').setAttribute('aria-pressed',String(state.lamp));$('lamp-hotspot').setAttribute('aria-label',state.lamp?'Turn lamp off':'Turn lamp on');$('lamp-hotspot').setAttribute('aria-pressed',String(state.lamp));$('ceiling-hotspot').setAttribute('aria-pressed',String(state.ceiling));$('ceiling-hotspot').setAttribute('aria-label',state.ceiling?'Turn ceiling light off':'Turn ceiling light on');
  $('inspect-toggle').textContent=state.inspect?'Back to room':'3D';$('inspect-toggle').setAttribute('aria-pressed',String(state.inspect));
@@ -130,13 +133,13 @@ function frameLoop(now){
  if(Math.abs(actualDrop-mechanism.state.drop)>.00001||Math.abs(actualOpen-mechanism.state.openness)>.00001){mechanism.update({drop:actualDrop,openness:actualOpen,time:now/1000});lighting();}
  installation.update({...state,time:now/1000});placeHandle();if(state.inspect)controls.update();renderer.render(scene,camera);frame=requestAnimationFrame(frameLoop);
 }
-function summary(){const st=fam().weave?'Woven':CATALOG[state.style].label,fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(state.style==='roman'&&!fam().weave&&!fam().blackout&&state.opacity==='blackout'?' with room-darkening lining':'');}
+function summary(){const st=fam().weave?'Woven':CATALOG[state.style].label,fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(liningOK()&&state.opacity==='blackout'?' with room-darkening lining':'');}
 function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
 function lookURL(){return location.origin+location.pathname+'?'+lookQuery();}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 let mount='Inside';
 function sizeInfo(){const w=SITE.parseInches($('size-w').value),h=SITE.parseInches($('size-h').value);const ok=!!(w&&h);
- const q=ok?SITE.quote({style:state.style,family:state.family,width:w,height:h,lining:state.style==='roman'&&state.opacity==='blackout'&&!fam().blackout&&!fam().weave}):{price:null};
+ const q=ok?SITE.quote({style:state.style,family:state.family,width:w,height:h,lining:liningOK()&&state.opacity==='blackout'}):{price:null};
  return{w,h,ok,bad:w===null||h===null,price:q.price,estimate:!!q.estimate,outOfRange:!!q.outOfRange,text:ok?`${SITE.formatInches(w)} wide x ${SITE.formatInches(h)} high`:''};}
 function updatePrice(){const out=$('price-out');const z=sizeInfo();
  if(out){if(z.price)out.innerHTML=`<b>${SITE.money(z.price)}</b>${z.estimate?' <span class="est">estimate</span>':''} <span>${SITE.PRICE_HOLD_NOTE||''}</span>`;

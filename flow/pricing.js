@@ -4,7 +4,8 @@
 //
 //   sqft = W * H / 144
 //   roller     cost = 90 + 1.0 * max(0, sqft - 8) + 1.2 * max(0, W - 40)
-//   roman      cost = max(110, 9.25 * sqft)          (+10% with a room-darkening lining; folds don't change it)
+//   roman      cost = max(110, 9.25 * sqft)          (+10% with a room-darkening lining; folds don't change it;
+//              no lining for Sheer Voile, Blackout Linen or Natural Reed)
 //   woven wood cost = max(115, 60 + 7.5 * sqft)       (Natural Reed, made as a Roman)
 //   zebra      cost = 1.15 * roller cost              (shown as an estimate until confirmed by text)
 //
@@ -24,6 +25,9 @@ export const OUT_OF_RANGE_NOTE = 'For this size, text a designer for your price.
 const WOVEN = new Set(['Natural Reed']);
 // The pricing line for a product: roller, roman, woven or zebra.
 export const priceLine = (style, family) => (style === 'roman' && WOVEN.has(family)) ? 'woven' : style;
+// Room-darkening lining: Roman fabrics only, not the sheer, the blackout or the woven.
+const NO_LINING = new Set(['Sheer Voile', 'Blackout Linen', 'Natural Reed']);
+export const liningAvailable = (style, family) => style === 'roman' && !NO_LINING.has(family);
 
 const rollerCost = (w, h) => { const sq = w * h / 144; return 90 + 1.0 * Math.max(0, sq - 8) + 1.2 * Math.max(0, w - 40); };
 
@@ -31,7 +35,7 @@ export function costFor({ style, family, width, height, lining = false }) {
   const w = +width, h = +height, sq = w * h / 144, line = priceLine(style, family);
   let c;
   if (line === 'roller') c = rollerCost(w, h);
-  else if (line === 'roman') c = Math.max(110, 9.25 * sq) * (lining ? 1.1 : 1);
+  else if (line === 'roman') c = Math.max(110, 9.25 * sq) * (lining && liningAvailable(style, family) ? 1.1 : 1);
   else if (line === 'woven') c = Math.max(115, 60 + 7.5 * sq);
   else if (line === 'zebra') c = 1.15 * rollerCost(w, h);
   else return null;

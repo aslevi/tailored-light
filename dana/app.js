@@ -3,9 +3,10 @@ import * as store from './store.js';
 import {
   STAGES, STAGE_LABEL, stageIndex, ROOMS, STYLES, FOLDS, roomLabel, roomSlug, uid, now, designSummary, parseText,
   parseInches, fmtIn, normalizeWindow, orderSize, isGuaranteed, windowName, windowFlags, CHECKLIST,
-  measureLink, quoteLinkFor, quoteTotals, quoteHash, money, matchApproval, lastActivity, daysAgo, firstName,
+  measureLink, quoteLinkFor, quoteTotals, quoteHash, money, matchApproval, lastActivity, daysAgo, firstName, designCode,
 } from './core.js';
 import { GROUPS, fill } from './playbook.js';
+import { quote as priceQuote, liningAvailable } from '../flow/pricing.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -117,7 +118,7 @@ function renderPreview() {
     const l = p.lead, dupes = leads.filter(x => x.code === l.code);
     el.innerHTML = `
       <div class="card">
-        <h2>New lead${p.kit ? ' · swatch kit request' : ''}</h2>
+        <h2>New lead${p.kit ? ' · free samples request' : ''}</h2>
         <div class="recog">
           <img src="${thumb(l.room)}" alt="">
           <dl>
@@ -142,9 +143,50 @@ function renderPreview() {
     $('save-lead').onclick = async () => {
       const lead = newLead({ ...l, name: $('new-name').value.trim(), phone: $('new-phone').value.trim() });
       if (p.kit) { lead.stage = 'swatches'; lead.swatchKit = { requestedAt: now() }; }
-      logEvent(lead, 'created', p.kit ? 'Swatch kit request texted in' : 'Design texted in');
+      logEvent(lead, 'created', p.kit ? 'Free samples request texted in' : 'Design texted in');
       logEvent(lead, 'message', p.message);
       const s = await save(lead); pending = null; toast('Lead saved'); location.hash = 'lead/' + s.id;
+    };
+    return;
+  }
+  if (p.kind === 'samples') {
+    const digits = v => phoneDigits(v).replace(/\D/g, '').slice(-10);
+    const picksText = p.picks.map(x => `${x.family} in ${x.color}`).join(', ');
+    el.innerHTML = `
+      <div class="card">
+        <h2>Free samples request</h2>
+        ${p.picks.length ? `<ul class="mini-windows">${p.picks.map(x => `<li><b>${esc(x.family)}</b> · ${esc(x.color)}</li>`).join('')}</ul>` : '<p class="warn-line">No fabrics picked yet: they asked for help choosing.</p>'}
+        <div class="grid2">
+          <label><span class="lbl">Name (optional)</span><input id="s-name" autocomplete="off" placeholder="Jamie"></label>
+          <label><span class="lbl">Phone (optional)</span><input id="s-phone" type="tel" inputmode="tel" placeholder="(201) 555-0123"></label>
+        </div>
+        <label class="lbl" for="s-lead">Save to</label>
+        <select id="s-lead"><option value="">New lead</option>${leads.map(l => `<option value="${esc(l.id)}">${esc(l.name || 'No name')} · ${esc(l.code)}${l.phone ? ' · ' + esc(l.phone) : ''}</option>`).join('')}</select>
+        <p class="fine" id="s-match"></p>
+        <button class="btn primary wide" type="button" id="save-samples">Save samples request</button>
+      </div>`;
+    $('s-phone').addEventListener('input', () => {
+      const d = digits($('s-phone').value), hit = d.length === 10 && leads.find(l => digits(l.phone) === d);
+      if (hit) { $('s-lead').value = hit.id; $('s-match').textContent = `Phone matches ${hit.name || hit.code}: the request goes on that lead.`; }
+      else { $('s-match').textContent = ''; }
+    });
+    $('save-samples').onclick = async () => {
+      const name = $('s-name').value.trim(), phone = $('s-phone').value.trim();
+      let lead = $('s-lead').value ? leadById($('s-lead').value) : null;
+      if (!lead) {
+        const lk = p.look, code = p.code || designCode({ room: 'samples', c: String(Date.now()) });
+        lead = newLead({ code, name, phone, ...(lk ? { style: lk.style, family: lk.family, color: lk.color, lookUrl: new URL('../studio/?' + lk.query, BASE).href } : {}) });
+        logEvent(lead, 'created', 'Free samples request texted in');
+      } else {
+        if (name && !lead.name) lead.name = name;
+        if (phone && !lead.phone) lead.phone = phone;
+      }
+      lead.swatchKit = { ...(lead.swatchKit || {}), requestedAt: now() };
+      if (stageIndex(lead.stage) < stageIndex('swatches')) lead.stage = 'swatches';
+      if (picksText) lead.notes = (lead.notes ? lead.notes + '\n' : '') + `Free samples: ${picksText}`;
+      lead.needsReply = true;
+      logEvent(lead, 'message', p.message);
+      const s = await save(lead); pending = null; toast('Samples request saved'); location.hash = 'lead/' + s.id;
     };
     return;
   }
@@ -209,7 +251,7 @@ function quoteText(q) {
   const t = quoteTotals(q);
   const lines = q.lines.map(x => `${x.label || x.room}: ${designSummary(x).replace(/^./, c => c.toUpperCase())}, ${fmtIn(x.w)}" x ${fmtIn(x.h)}" ${x.mount || ''}: ${money(Math.round(+x.price * 100))}`.replace(/\s+:/, ':'));
   return [`Here's your quote${q.name ? ', ' + q.name : ''}:`, ...lines,
-    `Subtotal ${money(t.subtotal)}${t.credit ? ` · swatch credit -${money(t.credit)}` : ''} · shipping ${t.shipping ? money(t.shipping) : 'free'} · tax ${money(t.tax)}`,
+    `Subtotal ${money(t.subtotal)} · shipping ${t.shipping ? money(t.shipping) : 'free'} · tax ${money(t.tax)}`,
     `Total ${money(t.total)}, ships in 2–4 weeks. Measurements checked, so the fit guarantee applies.`].join('\n');
 }
 function readback(l) {
@@ -376,7 +418,18 @@ function defaultDraft(l) {
   const base = { style: l.style, family: l.family, color: l.color, fold: l.style === 'roman' ? l.fold : '', lining: l.lining ? 'room-darkening' : '' };
   const lines = l.windows.length ? l.windows.map((w, i) => { const o = orderSize(w); return { winId: w.id, room: roomLabel(w.room) || w.room || roomLabel(l.room), label: windowName(w, i), ...base, style: w.style || l.style, mount: w.mount || 'inside', w: o ? o.w : '', h: o ? o.h : '', price: '' }; })
     : [{ room: roomLabel(l.room), label: roomLabel(l.room) + ' 1', ...base, mount: 'inside', w: '', h: '', price: '' }];
-  return { lines, swatchCredit: l.swatchKit?.paidAt ? 9 : 0, shipping: 0, taxRate: TAX_NJ, notes: '', validDays: 14 };
+  lines.forEach(autoPrice);
+  return { lines, shipping: 0, taxRate: TAX_NJ, notes: '', validDays: 14, auto: 1 };
+}
+// The site's price for a quote line (flow/pricing.js), so the quote matches the price the customer saw.
+function sitePrice(x) {
+  const q = priceQuote({ style: x.style, family: x.family, width: parseInches(x.w), height: parseInches(x.h), lining: !!x.lining && liningAvailable(x.style, x.family) });
+  return q.price ? { price: q.price, estimate: q.estimate } : null;
+}
+// Fill the price from the site formula unless Dana typed her own.
+function autoPrice(x) {
+  if (x.priceManual) return;
+  const p = sitePrice(x); x.price = p ? String(p.price) : '';
 }
 function buildQuoteJSON(l, d) {
   const lines = d.lines.map(x => {
@@ -389,16 +442,18 @@ function buildQuoteJSON(l, d) {
     return o;
   });
   const d8 = new Date(), date = `${d8.getFullYear()}-${String(d8.getMonth() + 1).padStart(2, '0')}-${String(d8.getDate()).padStart(2, '0')}`;
-  return { v: 1, code: l.code, name: firstName(l.name), date, lines, swatchCredit: d.swatchCredit ? 9 : 0, shipping: Number(d.shipping) || 0, taxRate: Number(d.taxRate) || 0, notes: d.notes || '', validDays: Number(d.validDays) || 14 };
+  return { v: 1, code: l.code, name: firstName(l.name), date, lines, shipping: Number(d.shipping) || 0, taxRate: Number(d.taxRate) || 0, notes: d.notes || '', validDays: Number(d.validDays) || 14 };
 }
 function renderQuote(l) {
   const box = $('quote-card');
   const d = l.quoteDraft || defaultDraft(l);
+  // Drafts saved before prices filled in automatically: keep the prices Dana typed.
+  if (!d.auto) { d.lines.forEach(x => { if (String(x.price ?? '').trim()) x.priceManual = true; else autoPrice(x); }); d.auto = 1; delete d.swatchCredit; }
   const t = quoteTotals({ ...d, lines: d.lines.map(x => ({ price: x.price })) });
   const famOpts = (style, cur) => { const set = { roller: ['Daylight Weave', 'Morning Haze', 'Deep Sleep', 'Clear View'], roman: ['Raw Linen', 'Soft Cotton', 'Ticking Stripe', 'Sheer Voile', 'Blackout Linen', 'Natural Reed'], zebra: ['Twin Light', 'Sand Stripe', 'Twin Shade'] }[style] || []; if (cur && !set.includes(cur)) set.unshift(cur); return set.map(f => `<option ${f === cur ? 'selected' : ''}>${esc(f)}</option>`).join(''); };
   box.innerHTML = `
     <h3>Quote</h3>
-    <p class="fine">Type each price. Pricing grid isn't final, so nothing is filled in for you.</p>
+    <p class="fine">Prices fill in from the site's price formula for each size and option. Type over one to set your own.</p>
     ${d.lines.map((x, i) => `
       <fieldset class="qline">
         <legend><input data-q="label" data-i="${i}" value="${esc(x.label)}" aria-label="Line label"></legend>
@@ -408,23 +463,22 @@ function renderQuote(l) {
           <label><span class="lbl">Fabric</span><select data-q="family" data-i="${i}">${famOpts(x.style, x.family)}</select></label>
           <label><span class="lbl">Color</span><input data-q="color" data-i="${i}" value="${esc(x.color)}"></label>
           ${x.style === 'roman' ? `<label><span class="lbl">Fold</span><select data-q="fold" data-i="${i}">${Object.entries(FOLDS).map(([k, v]) => `<option value="${k}" ${x.fold === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
-          <label><span class="lbl">Lining</span><select data-q="lining" data-i="${i}"><option value="">None</option><option value="room-darkening" ${x.lining ? 'selected' : ''}>Room-darkening</option></select></label>` : ''}
+          ${liningAvailable(x.style, x.family) ? `<label><span class="lbl">Lining</span><select data-q="lining" data-i="${i}"><option value="">None</option><option value="room-darkening" ${x.lining ? 'selected' : ''}>Room-darkening</option></select></label>` : ''}` : ''}
           <label><span class="lbl">Mount</span><select data-q="mount" data-i="${i}"><option value="inside" ${x.mount === 'inside' ? 'selected' : ''}>Inside</option><option value="outside" ${x.mount === 'outside' ? 'selected' : ''}>Outside</option></select></label>
           <label><span class="lbl">W (in)</span><input data-q="w" data-i="${i}" inputmode="decimal" value="${esc(fmtIn(x.w))}"></label>
           <label><span class="lbl">H (in)</span><input data-q="h" data-i="${i}" inputmode="decimal" value="${esc(fmtIn(x.h))}"></label>
-          <label class="price"><span class="lbl">Price $</span><input data-q="price" data-i="${i}" inputmode="decimal" value="${esc(x.price)}" placeholder="0"></label>
+          <label class="price"><span class="lbl">Price $${(() => { const sp = sitePrice(x); return sp ? ` <small>${x.priceManual && String(sp.price) !== String(x.price) ? `site $${sp.price}` : 'site price'}${sp.estimate ? ', estimate' : ''}</small>` : x.w && x.h ? ' <small>no site price for this size</small>' : ''; })()}</span><input data-q="price" data-i="${i}" inputmode="decimal" value="${esc(x.price)}" placeholder="0"></label>
         </div>
         ${d.lines.length > 1 ? `<button type="button" class="linkish danger-text" data-qdel="${i}">Remove line</button>` : ''}
       </fieldset>`).join('')}
     <button class="btn ghost sm" type="button" id="q-add">+ Line</button>
     <div class="qgrid totals-in">
-      <label class="toggle"><input type="checkbox" data-qt="swatchCredit" ${d.swatchCredit ? 'checked' : ''}> <span>$9 swatch credit</span></label>
       <label><span class="lbl">Shipping $</span><input data-qt="shipping" inputmode="decimal" value="${esc(d.shipping)}"></label>
       <label><span class="lbl">Tax %</span><input data-qt="taxRate" inputmode="decimal" value="${esc(+(d.taxRate * 100).toFixed(4))}"></label>
       <label><span class="lbl">Valid days</span><input data-qt="validDays" inputmode="numeric" value="${esc(d.validDays)}"></label>
     </div>
-    <label><span class="lbl">Notes for the customer</span><textarea data-qt="notes" rows="2" placeholder="e.g. Natural Reed is woven by hand; that's what puts it above $95.">${esc(d.notes)}</textarea></label>
-    <p class="totals">Subtotal ${money(t.subtotal)}${t.credit ? ` · credit −${money(t.credit)}` : ''} · ship ${money(t.shipping)} · tax ${money(t.tax)} · <b>Total ${money(t.total)}</b></p>
+    <label><span class="lbl">Notes for the customer</span><textarea data-qt="notes" rows="2" placeholder="e.g. Natural Reed is woven by hand; that's why it costs a little more.">${esc(d.notes)}</textarea></label>
+    <p class="totals">Subtotal ${money(t.subtotal)} · ship ${money(t.shipping)} · tax ${money(t.tax)} · <b>Total ${money(t.total)}</b></p>
     <div class="btn-row">
       <button class="btn primary" type="button" id="q-build">Save quote &amp; copy link</button>
       <button class="btn ghost sm" type="button" id="q-reset">Reset from windows</button>
@@ -441,15 +495,18 @@ function renderQuote(l) {
     const x = d.lines[+inp.dataset.i], k = inp.dataset.q;
     x[k] = k === 'w' || k === 'h' ? (parseInches(inp.value) ?? '') : inp.value;
     if (k === 'style') { x.family = famOpts(x.style).match(/<option[^>]*>([^<]*)/)?.[1]?.replace(/&amp;/g, '&') || ''; if (x.style !== 'roman') { x.fold = ''; x.lining = ''; } else x.fold ||= 'flat'; }
-    persist(['style', 'price'].includes(k));
+    if (!liningAvailable(x.style, x.family)) x.lining = '';
+    if (k === 'price') x.priceManual = String(x.price).trim() !== '';
+    else autoPrice(x);
+    persist(['style', 'family', 'price', 'w', 'h', 'lining'].includes(k));
   }));
   box.querySelectorAll('[data-qt]').forEach(inp => inp.addEventListener('change', () => {
     const k = inp.dataset.qt;
-    d[k] = k === 'swatchCredit' ? (inp.checked ? 9 : 0) : k === 'taxRate' ? (Number(inp.value) || 0) / 100 : k === 'notes' ? inp.value : Number(inp.value) || 0;
+    d[k] = k === 'taxRate' ? (Number(inp.value) || 0) / 100 : k === 'notes' ? inp.value : Number(inp.value) || 0;
     persist(k !== 'notes');
   }));
   box.querySelectorAll('[data-qdel]').forEach(b => b.onclick = () => { d.lines.splice(+b.dataset.qdel, 1); persist(); });
-  $('q-add').onclick = () => { const last = d.lines[d.lines.length - 1]; d.lines.push({ ...last, winId: undefined, label: `${last.room} ${d.lines.length + 1}`, w: '', h: '', price: '' }); persist(); };
+  $('q-add').onclick = () => { const last = d.lines[d.lines.length - 1]; d.lines.push({ ...last, winId: undefined, label: `${last.room} ${d.lines.length + 1}`, w: '', h: '', price: '', priceManual: false }); persist(); };
   $('q-reset').onclick = () => { if (!confirm('Replace the draft with lines from the windows?')) return; l.quoteDraft = defaultDraft(l); save(l).then(() => renderQuote(l)); };
   $('q-build').onclick = async () => {
     const bad = d.lines.findIndex(x => !(Number(x.price) > 0) || !(parseInches(x.w) > 0) || !(parseInches(x.h) > 0));

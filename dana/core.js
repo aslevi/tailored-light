@@ -1,6 +1,7 @@
 // Pure logic for Dana's board (no DOM, no storage): parsing pasted texts, building links, quote math.
 import { b64urlEncode, b64urlDecode } from '../flow/config.js';
 import { designCode, canonicalLook } from '../flow/code.js';
+import { LIMITS } from '../flow/pricing.js';
 
 export { designCode, canonicalLook };
 
@@ -54,6 +55,7 @@ export function parseText(raw) {
     return { kind: 'quote', code: codeIn(text), hash: tlq ? tlq[1] : '', total: total ? Number(total[1].replace(/,/g, '')) : null };
   }
   const look = (text.match(URL_RE) || []).map(lookFromURL).find(Boolean);
+  if (!look && /free samples?/i.test(text)) return parseSamples(text);
   if (!look) return { kind: null, error: "Didn't find a design link, a TLM1 measurement line or a TLQ1 approval in that text." };
   const q = look.q;
   const style = STYLES[q.get('s')] ? q.get('s') : '';
@@ -68,6 +70,18 @@ export function parseText(raw) {
   const kit = /swatch kit|free samples?/i.test(text);
   const lookUrl = look.url.split('?')[0] + '?' + canonical + (refM[1] ? '&ref=' + encodeURIComponent(refM[1]) : '');
   return { kind: 'lead', lead: { ...lead, code, ref: refM[1] || '', lookUrl }, kit, typedCode: typed, codeMismatch: !!typed && typed !== code, message: text };
+}
+// Free samples text from /swatch-kit/: "Hi Dana! I'd like free samples of: Raw Linen in Flax, Soft Cotton in Sage."
+// No design link: the lead gets the first pick as its design, so it still has a code and a look link.
+export const FAMILY_STYLE = { 'Daylight Weave': 'roller', 'Morning Haze': 'roller', 'Deep Sleep': 'roller', 'Clear View': 'roller',
+  'Raw Linen': 'roman', 'Soft Cotton': 'roman', 'Ticking Stripe': 'roman', 'Sheer Voile': 'roman', 'Blackout Linen': 'roman', 'Natural Reed': 'roman',
+  'Twin Light': 'zebra', 'Sand Stripe': 'zebra', 'Twin Shade': 'zebra' };
+export function parseSamples(text) {
+  const m = /free samples? of:\s*([^\n]+)/i.exec(text);
+  const picks = m ? m[1].replace(/[.\s]+$/, '').split(/\s*,\s*(?:and\s+)?|\s+and\s+/).map(s => { const k = /^(.+?)\s+in\s+(.+)$/.exec(s.trim()); return k ? { family: k[1], color: k[2] } : null; }).filter(p => p && FAMILY_STYLE[p.family]) : [];
+  const first = picks[0];
+  const q = first ? new URLSearchParams({ s: FAMILY_STYLE[first.family], f: first.family, c: first.color }) : null;
+  return { kind: 'samples', picks, code: q ? designCode(q) : '', look: q ? { style: FAMILY_STYLE[first.family], family: first.family, color: first.color, query: q.toString() } : null, message: text };
 }
 const codeIn = t => (/\bTL-[0-9A-Z]{4}\b/.exec(t) || [''])[0];
 
@@ -121,8 +135,9 @@ export function windowFlags(w) {
   const spread = a => a.length > 1 ? Math.max(...a) - Math.min(...a) : 0;
   if (spread(ws) > 0.5 || spread(hs) > 0.5) f.push('Spread over 1/2": ask for diagonals');
   else if (spread(ws) > 0.25) f.push('Widths spread over 1/4": slightly bigger gap');
-  if (ws.some(n => n < 12 || n > 84)) f.push('Width outside 12–84"');
-  if (hs.some(n => n < 18 || n > 96)) f.push('Height outside 18–96"');
+  // Same limits as the site's instant prices (flow/pricing.js).
+  if (ws.some(n => n < LIMITS.minW || n > LIMITS.maxW)) f.push(`Width outside ${LIMITS.minW}–${LIMITS.maxW}"`);
+  if (hs.some(n => n < LIMITS.minH || n > LIMITS.maxH)) f.push(`Height outside ${LIMITS.minH}–${LIMITS.maxH}"`);
   if (ws.length && ws.some(n => !Number.isInteger(n * 8))) f.push('Not to 1/8": width rounds down');
   if (w.mount === 'outside' && w.clear === false) f.push('Under 3" flat wall: check clearance');
   if (w.obs && w.obs.length) f.push('In the way: ' + w.obs.join(', '));
@@ -138,7 +153,7 @@ export const CHECKLIST = [
   ['photos', 'Photos match the numbers', 'Metal tape, hooked, read right (3/8 vs 5/8, 1" off, feet vs inches). Same window. Frame, not glass.'],
   ['reference', 'Cross-checked a known size', 'Estimate one width from the photo (tape, paper, outlet, door). Within ~10%.'],
   ['obstructions', 'Obstructions noted', 'Cranks, locks, alarm sensors, tile, molding. French door / arch / bay → flag to Arieh, don\'t approve.'],
-  ['sanity', 'Sanity ranges OK', 'Width 12–84", height 18–96", within 1" of matching neighbors, W/H not swapped.'],
+  ['sanity', 'Sanity ranges OK', 'Width 12–96", height 12–120", within 1" of matching neighbors, W/H not swapped.'],
   ['mount', 'Mount makes sense', 'Dark bedroom/nursery → outside. Shallow or out of square → outside. Outside overlap 2½–3" sides, 3–4" above.'],
   ['readback', 'Read back, customer said YES', 'Final order sizes texted back and a "YES" in writing.'],
 ];
