@@ -142,3 +142,6 @@ dd small{display:block;font-weight:400;color:var(--muted);font-size:13px}
 .ten-steps b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:14px}
 .ten-help{margin:12px 0 0;font-size:14.5px;color:var(--muted)}
 .ten-help a{color:var(--sage);font-weight:600}
+
+/* Design codes stay inside the text, never on screen. */
+#code{display:none!important}

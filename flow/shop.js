@@ -1,7 +1,7 @@
 // Store behavior for Tailored Light: listing filters, product pages and swatch-kit picks.
 // Plain ES module, no build step. Dana's number comes from flow/config.js.
 import { DANA_SMS, SWATCH_KIT_URL, SWATCH_KIT_MAX, smsHref } from './config.js';
-import { parseInches, formatInches, priceFor, money, PRICE_HOLD_NOTE } from './pricing.js';
+import { parseInches, formatInches, quote, fromPrice, money, PRICE_HOLD_NOTE, OUT_OF_RANGE_NOTE } from './pricing.js';
 import { designCode } from './code.js';
 
 const root = document.querySelector('meta[name="tl-root"]')?.content || './';
@@ -64,22 +64,25 @@ if (dataEl) {
     // Texts and links
     const w = fmt($('[data-size="w"]').value), h = fmt($('[data-size="h"]').value);
     const bad = w === null || h === null;
-    $('[data-size-hint]').classList.toggle('warn', bad);
+    document.querySelector('[data-size-hint]')?.classList.toggle('warn', bad);
     const opts = [];
     if (document.querySelector('[data-fold]') && st.fold !== 'flat') opts.push(`${st.fold} fold`);
     if (st.lining) opts.push('room-darkening lining');
     const size = w && h ? `${w} wide x ${h} high` : w ? `${w} wide (height not measured yet)` : h ? `${h} high (width not measured yet)` : "I haven't measured yet";
     const wn = parseInches($('[data-size="w"]').value), hn = parseInches($('[data-size="h"]').value);
-    const price = wn && hn ? priceFor({ style: P.style, family: P.family, width: wn, height: hn }) : null;
+    const qt = wn && hn ? quote({ style: P.style, family: P.family, width: wn, height: hn, lining: !!st.lining }) : { price: null };
+    const price = qt.price;
     const out = $('[data-price-out]');
-    if (price) out.innerHTML = `<b>${money(price)}</b> <span>${PRICE_HOLD_NOTE}</span>`;
+    if (price) out.innerHTML = `<b>${money(price)}</b>${qt.estimate ? ' <span class="est">estimate</span>' : ''}`;
     else if (bad) out.textContent = 'Check the size: use inches, like 34 3/8.';
-    else out.textContent = w && h ? `${w} x ${h}: your exact price in minutes by text.` : 'Your exact price in minutes by text.';
+    else if (qt.outOfRange) out.textContent = 'For this size, text a designer for your price.';
+    else out.textContent = 'Add your window size to see your price.';
+    const note = document.querySelector('[data-price-note]'); if (note) note.hidden = !price;
     const q = look();
     const link = new URL(root + 'studio/?' + q, location.href).href;
-    const body = `Hi Dana! I'd like ${price ? 'to order' : 'my exact price for'} the ${P.name} in ${st.color.name}${opts.length ? ', ' + opts.join(', ') : ''} (${designCode(q)}). ${st.mount} mount, ${size}.${price ? ` Shown price ${money(price)}.` : ''} ${link}`;
+    const body = `Hi Dana! I'd like to order the ${P.name} in ${st.color.name}${opts.length ? ', ' + opts.join(', ') : ''} (${designCode(q)}). ${st.mount} mount, ${size}.${price ? ` Shown price ${money(price)}${qt.estimate ? ' (estimate)' : ''}.` : ''} ${link}`;
     $('[data-price-cta]').href = smsHref(DANA_SMS, body);
-    $('[data-price-cta]').lastChild.textContent = price ? 'Text Dana to order' : 'Get my exact price';
+
     $('[data-studio]').href = root + 'studio/?' + q;
     $('[data-kit-add]').href = root + 'swatch-kit/?' + new URLSearchParams({ add: `${P.family}|${st.color.name}` });
     const url = new URL(location.href); url.searchParams.set('c', st.color.name);
@@ -100,7 +103,7 @@ if (dataEl) {
   render();
 }
 
-/* ---------- Swatch kit picks ---------- */
+/* ---------- Free samples picks ---------- */
 const catEl = document.getElementById('catalog-data');
 if (catEl) {
   const CAT = JSON.parse(catEl.textContent);
@@ -118,7 +121,7 @@ if (catEl) {
     }).join('');
     document.querySelector('[data-picks-empty]').hidden = list.length > 0;
     const picks = list.map(k => { const [f, c] = k.split('|'); return `${f} in ${c}`; }).join(', ');
-    const body = list.length ? `Hi Dana! I'd like free swatches of: ${picks}.` : kit.dataset.body;
+    const body = list.length ? `Hi Dana! I'd like free samples of: ${picks}.` : kit.dataset.body;
     if (SWATCH_KIT_URL) { const u = new URL(SWATCH_KIT_URL, location.href); if (list.length) u.searchParams.set('fabrics', list.join(',')); kit.href = u.href; }
     else kit.href = smsHref(DANA_SMS, body);
     const cnt = document.querySelector('[data-picks-count]'); if (cnt) cnt.textContent = list.length ? `(${list.length} of ${SWATCH_KIT_MAX})` : '';

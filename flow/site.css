@@ -599,3 +599,32 @@ a:not(.btn):not(.pcard):not(.tile):not(.brand):not(.mega-feature){text-decoratio
 .m3 span{font-size:14.5px;color:var(--muted)}
 @media (min-width:700px){.m3{grid-template-columns:repeat(3,1fr)}.m3 li{grid-template-columns:1fr}.m3 svg{grid-row:auto;margin-bottom:8px}}
 .m-help{margin:16px 0 0;font-size:15px}
+.pcard .price .est,.est{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-left:4px}
+
+/* ---------- Round 3: designer card, people photos, three steps ---------- */
+.designer{display:flex;align-items:center;gap:12px;margin:16px 0 4px}
+.d-avatar{flex:none;width:48px;height:48px;border-radius:50%;background:var(--gold) center/cover no-repeat;color:#2B2420;display:grid;place-items:center;font:400 24px/1 var(--serif)}
+.d-avatar.photo{color:transparent}
+.designer b{display:block;font-size:16px;color:var(--ink-2)}
+.designer span{display:block;font-size:13.5px;color:var(--muted)}
+.cta-stack .designer{margin:0 0 6px}
+.sheet-card .designer{margin:6px 0 10px}
+figure.people{margin:0}
+figure.people img{width:100%;height:100%;object-fit:cover;border-radius:var(--radius)}
+.hero-media{position:relative}
+.hero-media.has-people .studio-stage{display:none}
+.hero-media .hero-photo img{aspect-ratio:4/3;border-radius:6px}
+.feature-media.has-people .fallback{display:none}
+.feature-media figure.people img{aspect-ratio:4/3}
+.step-list.three{grid-template-columns:minmax(0,1fr)}
+.step-list.three .step-photo img{aspect-ratio:3/2;margin-bottom:12px}
+@media (min-width:860px){.step-list.three{grid-template-columns:repeat(3,1fr);gap:18px}}
+.fit-line{margin:24px 0 0;font-size:16px}
+.tiles.four{grid-auto-columns:46%}
+@media (min-width:760px){.tiles.four{grid-template-columns:repeat(4,1fr)}}
+.sub-h{font-size:clamp(22px,4vw,28px);margin:44px 0 16px}
+.room-photo img{aspect-ratio:21/9;margin:16px 0 0}
+.samples-photo img{aspect-ratio:4/3;margin-bottom:12px}
+.mount-seg{margin-top:10px}
+.studio-copy h1{max-width:14ch}
+.designer .d-avatar{display:grid;font-size:24px;color:#2B2420}.designer .d-avatar.photo{color:transparent}

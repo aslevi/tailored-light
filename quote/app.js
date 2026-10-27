@@ -66,7 +66,7 @@ function lineCard(line, i) {
   const w = inches(line.w), h = inches(line.h);
   if (w || h) add('Finished size', `${w || '—'}″ W × ${h || '—'}″ H`, 'wide');
   body.append(specs);
-  if (line.checked) body.append(el('p', 'checked', 'Measurements checked by Dana'));
+  if (line.checked) body.append(el('p', 'checked', 'Measurements checked by our team'));
   li.append(body);
   return li;
 }
@@ -103,7 +103,7 @@ function render(q) {
   $('q-date').textContent = fmtDate(date) || '—';
   $('q-valid').textContent = fmtDate(until) || '—';
   $('q-count').textContent = String(q.lines.length);
-  if (expired) { $('q-expired').hidden = false; $('q-expired').textContent = `This quote expired on ${fmtDate(until)}. Text Dana and she'll refresh it.`; }
+  if (expired) { $('q-expired').hidden = false; $('q-expired').textContent = `This quote expired on ${fmtDate(until)}. Text us and we'll refresh it.`; }
 
   const ol = $('lines');
   q.lines.forEach((l, i) => ol.append(lineCard(l, i)));

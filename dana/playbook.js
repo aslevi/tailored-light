@@ -25,7 +25,7 @@ export const GROUPS = [
     ['Rec: living, polish', 'For the [room], a Roman feels the most finished. [Fabric] in [color] looks great with [what\'s in their photo].'],
     ['Rec: zebra', 'If you want to fine-tune light during the day, a zebra is great. Two layers slide to go from open view to privacy without raising it.'],
     ['Rec: bathroom', 'For a bathroom you want privacy without making it dark. A semi-opaque fabric like [Daylight Weave roller] does exactly that.'],
-    ['Ballpark heads-up', 'Heads up so there are no surprises: $95 is our smallest roller. A [type] for a window your size usually runs about [$X–$Y — TBD]. I\'ll give you the exact price once we measure.'],
+    ['Ballpark heads-up', 'Heads up so there are no surprises: $209 is our smallest roller (24 × 24). A [type] for a window your size is about $[price from the site]. I\'ll confirm it once we check your measurements.'],
   ] },
   { id: 'measure', title: 'Measuring', stages: ['swatches', 'measuring'], items: [
     ['Send the form', "Here's a quick guide that walks you through measuring your [room] window, one step at a time: [measure link] When you hit send it comes right back to me, and I'll check every number."],
@@ -49,7 +49,7 @@ export const GROUPS = [
   { id: 'quote', title: 'Quote & price', stages: ['ready_to_quote', 'quoted'], items: [
     ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked, so the fit guarantee applies. Want me to lock it in?"],
     ['Quote as text', '[quote text]'],
-    ['Why not $95?', "Fair question! $95 is our smallest standard roller. Yours is a [size] [type] in [fabric], and the size and [fabric/lining/fold] are what bring it to $[ ]. Every shade is cut to your exact window."],
+    ['Why not $209?', "Fair question! $209 is our smallest roller (24 × 24). Yours is a [size] [type] in [fabric], and the size and [fabric/lining/fold] are what bring it to $[ ]. Every shade is cut to your exact window."],
     ['More than expected', 'Totally get it. Thanks for telling me. Want me to show you a couple of ways to bring it down? Same look, different trade-offs.'],
     ['Can you do better?', "I keep prices the same for everyone, so I can't knock it down. But I can get you to a lower number: [lever]. That brings it to $[ ]."],
     ['Amazon is cheaper', "For stock sizes they can be, and for a rental that might be the right call, honestly. Ours are cut to your exact window, and I check your measurements myself so the fit is guaranteed. If it doesn't fit, we remake it. Stock shades usually leave gaps or need trimming."],

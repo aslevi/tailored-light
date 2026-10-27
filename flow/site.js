@@ -1,7 +1,7 @@
 // Shared behavior for the Tailored Light site pages. Reads flow/config.js so Dana's number,
 // the contact email and the swatch-kit payment link are set in one place.
 // The HTML keeps working static fallbacks (sms: links) for visitors without JavaScript.
-import { DANA_SMS, CONTACT_EMAIL, SWATCH_KIT_URL, LEAD_FORM_URL, REPLY_PROMISE, smsHref } from './config.js';
+import { DANA_SMS, CONTACT_EMAIL, SWATCH_KIT_URL, LEAD_FORM_URL, DESIGNER_NAME, DESIGNER_PHOTO, PEOPLE_PHOTOS, smsHref } from './config.js';
 
 const pretty = n => {
   const d = String(n).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
@@ -10,20 +10,20 @@ const pretty = n => {
 const DEFAULT_BODY = "Hi Dana! I'd like some help choosing shades.";
 const danaHref = body => smsHref(DANA_SMS, body || DEFAULT_BODY);
 
-// Every "text Dana" link: number and prefilled message come from config.js.
+// Every "Text a designer" link: number and prefilled message come from config.js.
 document.querySelectorAll('[data-dana]').forEach(a => {
   a.href = a.dataset.body ? danaHref(a.dataset.body) : `sms:${DANA_SMS}`;
   if (a.hasAttribute('data-dana-number')) a.textContent = pretty(DANA_SMS);
 });
 document.querySelectorAll('[data-dana-text]').forEach(el => { el.textContent = pretty(DANA_SMS); });
 
-// Free swatch kit: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
+// Free samples: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
 document.querySelectorAll('[data-swatch-kit]').forEach(a => {
   if (SWATCH_KIT_URL) {
     a.href = SWATCH_KIT_URL;
     a.removeAttribute('data-text-sheet');
     const label = a.querySelector('[data-kit-label]');
-    if (label) label.textContent = label.dataset.kitLabel || 'Order free swatches';
+    if (label) label.textContent = label.dataset.kitLabel || 'Order free samples';
     const note = document.querySelector(a.dataset.kitNote || '#kit-optin');
     if (note) note.hidden = true;
   } else {
@@ -66,12 +66,12 @@ function openSheet(body) {
     sheet.className = 'sheet';
     sheet.innerHTML = `<div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <button class="sheet-close" type="button" aria-label="Close">&times;</button>
-      <h2 id="sheet-title">Text Dana</h2>
-      <p>Dana is Tailored Light's AI design assistant. Send a photo of your window, your design, or a question, and a person on our team reviews every reply.</p>
-      <a class="btn" data-sheet-go href="#"><span class="avatar" aria-hidden="true">D</span>Open Messages</a>
-      <p class="reply-time">${REPLY_PROMISE}</p>
-      <p class="optin">Opens a text to Dana, Tailored Light's AI design assistant; a person on our team reviews every reply. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. We never share your number for marketing. <a href="${root}privacy.html">Privacy</a> · <a href="${root}sms.html">Texting terms</a></p>
+      <h2 id="sheet-title">Text a designer</h2>
+      <div class="designer" data-designer><span class="d-avatar" data-designer-avatar aria-hidden="true">D</span><div><b data-designer-name>Dana</b><span>Your designer · usually replies within minutes</span></div></div>
+      <p>Send a photo of your window or a look you like. We'll help you pick, measure and order.</p>
+      <a class="btn gold" data-sheet-go href="#">Open Messages</a>
     </div>`;
+    fillDesigners(sheet);
     document.body.append(sheet);
     sheet.addEventListener('click', e => { if (e.target === sheet || e.target.closest('.sheet-close')) closeSheet(); });
   }
@@ -102,8 +102,26 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   document.querySelectorAll('[data-hero-video]').forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.currentTime = 0; v.load(); });
 }
 
-// Reply-time promise, from config.js.
-document.querySelectorAll('[data-reply]').forEach(el => { el.textContent = REPLY_PROMISE; });
+// Designer card: name and photo from config.js; a monogram until a real team photo is set.
+function fillDesigners(scope = document) {
+  scope.querySelectorAll('[data-designer]').forEach(card => {
+    card.querySelectorAll('[data-designer-name]').forEach(n => { n.textContent = DESIGNER_NAME; });
+    const av = card.querySelector('[data-designer-avatar]');
+    if (!av) return;
+    if (DESIGNER_PHOTO) { av.textContent = ''; av.style.backgroundImage = `url("${new URL(DESIGNER_PHOTO, new URL(root, location.href)).href}")`; av.classList.add('photo'); }
+    else av.textContent = (DESIGNER_NAME || 'D').trim().charAt(0).toUpperCase();
+  });
+}
+fillDesigners();
+
+// Lifestyle photo slots: filled from PEOPLE_PHOTOS in config.js, hidden while empty.
+document.querySelectorAll('figure[data-people]').forEach(fig => {
+  const ph = PEOPLE_PHOTOS && PEOPLE_PHOTOS[fig.dataset.people];
+  if (!ph || !ph.src) return;
+  const im = fig.querySelector('img');
+  im.src = new URL(ph.src, new URL(root, location.href)).href; im.alt = ph.alt || '';
+  fig.hidden = false; fig.parentElement?.classList.add('has-people');
+});
 
 // "Prefer we text you?" forms: hidden until LEAD_FORM_URL is set in config.js.
 document.querySelectorAll('form[data-lead]').forEach(form => {
@@ -123,6 +141,6 @@ document.querySelectorAll('form[data-lead]').forEach(form => {
       if (!r.ok) throw new Error(r.status);
       status.textContent = "Thanks! We'll text you shortly.";
       form.querySelector('button').disabled = true;
-    } catch { status.textContent = "That didn't go through. Please text Dana instead."; }
+    } catch { status.textContent = "That didn't go through. Please text a designer instead."; }
   });
 });

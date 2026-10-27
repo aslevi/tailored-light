@@ -133,7 +133,7 @@ function cardHTML(w, n, total) {
         <legend>Anything in the way?</legend>
         ${OBS.map(([v, t]) => `<label class="check"><input type="checkbox" value="${v}" data-k="obs" ${w.obs.includes(v) ? 'checked' : ''}><span>${t}</span></label>`).join('')}
       </fieldset>
-      <label class="field" for="__ID__-notes">Notes for Dana <span class="opt-l">(optional)</span></label>
+      <label class="field" for="__ID__-notes">Notes for your designer <span class="opt-l">(optional)</span></label>
       <textarea id="__ID__-notes" data-k="notes" rows="2" placeholder="e.g. faucet sticks up, curtain rod above">${esc(w.notes)}</textarea>
     </div>
 
