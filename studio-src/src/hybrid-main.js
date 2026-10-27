@@ -7,6 +7,8 @@ import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
 import { designCode } from './design-code.js';
 import { site } from './site-root.js';
+let SITE={DANA_SMS,LEAD_FORM_URL:'',REPLY_PROMISE:'',priceFor:()=>null,parseInches:v=>{const n=parseFloat(v);return v===''?'':isFinite(n)&&n>0?n:null;},formatInches:n=>n+'"',money:n=>'$'+n,PRICE_HOLD_NOTE:''};
+const siteReady=Promise.all([import(/* @vite-ignore */ site('flow/config.js')),import(/* @vite-ignore */ site('flow/pricing.js'))]).then(([c,pr])=>{SITE={...SITE,...c,...pr};setupLead();updatePrice();if(c.REPLY_PROMISE){const el=document.getElementById('reply-promise');if(el)el.textContent=c.REPLY_PROMISE.replace(/\.$/,'');}}).catch(()=>{});
 const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${site('swatches/'+SWATCH[f+'|'+c]+'.webp')})`:'none';
 import { createMechanism } from './shade-mechanisms.js';
 import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
@@ -57,6 +59,7 @@ function positionModel(){
  mechanism.root.position.set(0,0,0);mechanism.root.scale.setScalar(1);mechanism.root.rotation.set(0,0,0);
 }
 function rebuild(){
+ if(!installation){refresh();return;}
  if(mechanism){scene.remove(mechanism.root);mechanism.dispose();}
  mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66,height:1.30});
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();lighting();
@@ -130,12 +133,24 @@ function summary(){const st=CATALOG[state.style].label.toLowerCase(),fold=foldsA
 function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
 function lookURL(){return location.origin+location.pathname+'?'+lookQuery();}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
+function sizeInfo(){const w=SITE.parseInches($('size-w').value),h=SITE.parseInches($('size-h').value);const ok=w&&h;const price=ok?SITE.priceFor({style:state.style,family:state.family,width:w,height:h}):null;return{w,h,ok,bad:w===null||h===null,price,text:ok?`${SITE.formatInches(w)} wide x ${SITE.formatInches(h)} high`:''};}
+function updatePrice(){const out=$('price-out');if(!out)return;const z=sizeInfo();
+ if(z.price)out.innerHTML=`<b>${SITE.money(z.price)}</b> <span>${SITE.PRICE_HOLD_NOTE}</span>`;
+ else if(z.bad)out.textContent='Check the size: use inches, like 34 3/8.';
+ else out.textContent=z.ok?`${z.text}: your exact price in minutes by text.`:'Your exact price in minutes by text.';}
+function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)return;form.hidden=false;
+ form.addEventListener('submit',async e=>{e.preventDefault();const st=$('lead-status'),phone=form.phone.value.replace(/[^\d+]/g,'');
+  if(phone.replace(/\D/g,'').length<10){st.textContent='Please enter a 10-digit mobile number.';return;}
+  if(!form.consent.checked){st.textContent='Please check the box so we can text you.';return;}
+  st.textContent='Sending…';
+  try{const r=await fetch(SITE.LEAD_FORM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,consent:true,consentText:$('lead-consent-text').textContent.trim(),context:'studio:'+designCode(lookQuery())+' '+summary()+(sizeInfo().ok?' '+sizeInfo().text:''),page:lookURL(),ts:new Date().toISOString()})});if(!r.ok)throw 0;st.textContent="Thanks! We'll text you shortly.";}catch{st.textContent="That didn't go through. Please text Dana instead.";}});}
+for(const id of['size-w','size-h'])$(id).addEventListener('input',updatePrice);
 function textDana(kind){
- const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';
+ const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}.`+(z.price?` Shown price ${SITE.money(z.price)}.`:''):'';
  if(kind==='self'){location.href=smsHref('',`My Tailored Light design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
- const body=kind==='kit'?`Hi Dana! Can I get the $9 swatch kit? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}). Can you help me measure and price it? ${lookURL()}`;
- location.href=smsHref(DANA_SMS,body+tag);
+ const body=kind==='kit'?`Hi Dana! Can I get free swatches? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} Can you help me measure and price it? ${lookURL()}`;
+ location.href=smsHref(SITE.DANA_SMS||DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));
 {const q=new URLSearchParams(location.search);
@@ -144,35 +159,45 @@ document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',(
  if(q.get('c'))state.colorName=q.get('c');if(FOLDS[q.get('r')])state.fold=q.get('r');if(q.get('l')==='dark')state.opacity='blackout';
  if(ROOMS.some(r=>r.id===q.get('room')))state.room=q.get('room');
  syncFamily();renderOptions();}
-try{
+const yieldUI=()=>new Promise(r=>setTimeout(r,0));
+async function start3D(){try{
+ await yieldUI();
  configureTextureImages(Object.fromEntries(await Promise.all(['linen'].map(loadImage))));
  scene=new THREE.Scene();renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  $('shade-canvas').append(renderer.domElement);renderer.domElement.setAttribute('aria-label','Moving three-dimensional shade');
+ await yieldUI();
  roomPlate=createRoomPlateRenderer($('room-plate'));
  const startRoom=ROOMS.find(r=>r.id===state.room);const firstTexture=await roomPlate.load(startRoom);
+ await yieldUI();
  installation=await createRoomInstallation(firstTexture);scene.add(installation.group);roomCamera=installation.camera;camera=roomCamera;
  inspectCamera=new THREE.PerspectiveCamera(39,1,.01,40);controls=new OrbitControls(inspectCamera,renderer.domElement);controls.enableDamping=true;controls.enablePan=false;controls.minDistance=1.4;controls.maxDistance=5;controls.enabled=false;
+ await yieldUI();
  const pmrem=new THREE.PMREMGenerator(renderer);environment=pmrem.fromScene(new RoomEnvironment(),.04);scene.environment=environment.texture;pmrem.dispose();
+ await yieldUI();
  ambient=new THREE.HemisphereLight('#fff2d9','#8f7659',.85);scene.add(ambient);
  key=new THREE.DirectionalLight('#ffe6bf',2.8);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.00003;scene.add(key,key.target);
  fill=new THREE.PointLight('#ffe3be',5.8,0,2);fill.castShadow=true;fill.shadow.mapSize.set(1024,1024);fill.shadow.camera.near=.1;fill.shadow.camera.far=8;fill.shadow.normalBias=.01;fill.shadow.bias=-.0004;scene.add(fill);
  ceilingLight=new THREE.PointLight('#fff0d8',0,0,2);ceilingLight.position.set(0,.75,1.1);scene.add(ceilingLight);
- rebuild();const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
-}catch(error){$('loading').textContent='The shade viewer could not load. Please refresh or try a current browser.';console.error(error);}
+ await yieldUI();
+ rebuild();try{if(renderer.compileAsync)await renderer.compileAsync(scene,camera);}catch{}
+ await yieldUI();
+ const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
+}catch(error){$('loading').textContent='The shade viewer could not load. Please refresh or try a current browser.';console.error(error);}}
+start3D();
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-style],[data-family],[data-pick],[data-fold],[data-mood],[data-opacity]');if(!b||!mechanism)return;
+ const b=e.target.closest('[data-style],[data-family],[data-pick],[data-fold],[data-mood],[data-opacity]');if(!b)return;
  const d=b.dataset;
  if(d.style){state.style=d.style;state.family=CATALOG[d.style].families[0].name;syncFamily(true);renderOptions();rebuild();}
  else if(d.family){const ch=d.family!==state.family;state.family=d.family;syncFamily(ch);renderOptions();rebuild();}
- else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed){rebuild();}else mechanism.update({color:hex()});}
+ else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed){rebuild();}else mechanism?.update({color:hex()});}
  else if(d.fold){state.fold=d.fold;rebuild();}
  else if(d.mood)state.mood=d.mood;
  else if(d.opacity)state.opacity=d.opacity;
  lighting();refresh();
 });
 
-$('drop').addEventListener('input',e=>{state.drop=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;mechanism.update({drop:actualDrop});lighting();refresh();});
-$('alignment').addEventListener('input',e=>{state.openness=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;actualOpen=state.openness;mechanism.update({drop:actualDrop,openness:actualOpen,align:true});lighting();refresh();});
+$('drop').addEventListener('input',e=>{state.drop=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;mechanism?.update({drop:actualDrop});lighting();refresh();});
+$('alignment').addEventListener('input',e=>{state.openness=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;actualOpen=state.openness;mechanism?.update({drop:actualDrop,openness:actualOpen,align:true});lighting();refresh();});
 for(const id of['lamp-toggle','lamp-hotspot'])$(id).addEventListener('click',()=>{state.lamp=!state.lamp;engaged('lamp');lighting();refresh();});
 $('outside-toggle').addEventListener('click',()=>{state.breeze=!state.breeze;refresh();});
 for(const id of['ceiling-toggle','ceiling-hotspot'])$(id).addEventListener('click',()=>{state.ceiling=!state.ceiling;engaged('ceiling');lighting();refresh();});
@@ -185,7 +210,7 @@ requestAnimationFrame(()=>document.querySelector('.rooms [aria-pressed=true]')?.
 for(const room of ROOMS){
  const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(${site('rooms/frontal-v2/'+room.id+'.webp')})"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
  b.addEventListener('click',async()=>{
-  if(!roomPlate||!installation)return;
+  if(!roomPlate||!installation){state.room=room.id;const l=$('loading');if(l)l.style.backgroundImage=`url(${site('rooms/frontal-v2/'+room.id+'.webp')})`;refresh();return;}
   const ticket=++roomRequest;$('room-status').textContent='Opening '+room.label.toLowerCase()+'…';$('viewport').setAttribute('aria-busy','true');
   try{
    const texture=await roomPlate.load(room);if(ticket!==roomRequest||!texture)return;
@@ -241,7 +266,7 @@ function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classLi
 function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
-  `<strong>Dana</strong> · Want to feel it first? I'll mail you swatches for $9, credited to your order.`];
+  `<strong>Dana</strong> · Want to feel it first? I'll mail you free swatches, up to 5 fabrics.`];
  const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
