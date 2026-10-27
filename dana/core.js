@@ -111,7 +111,7 @@ export const windowName = (w, i) => w.label || [roomLabel(w.room) || w.room, i +
 // Automatic flags from dana-check.md (steps 3, 4, 8). Dana still does the real check.
 export function windowFlags(w) {
   const f = [], ws = (w.w || []).filter(n => n > 0), hs = (w.h || []).filter(n => n > 0);
-  if (!w.mount) f.push('Mount not set');
+  if (!w.mount) { f.push('Pick mount from photos'); if (!ws.length || !hs.length) f.push('Needs width and height'); }
   if (w.mount === 'inside') {
     if (ws.length < 3) f.push('Needs 3 widths');
     if (hs.length < 3) f.push('Needs 3 heights');

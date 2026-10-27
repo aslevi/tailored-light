@@ -103,33 +103,69 @@ if (dataEl) {
   render();
 }
 
-/* ---------- Free samples picks ---------- */
+/* ---------- Free samples picks: Dana's picks, 1 Type, 2 Light, 3 Fabric, tray of up to 5 ---------- */
 const catEl = document.getElementById('catalog-data');
 if (catEl) {
   const CAT = JSON.parse(catEl.textContent);
+  const TYPE_LABEL = { roller: 'Roller', roman: 'Roman', zebra: 'Zebra', woven: 'Woven' };
   const valid = k => { const [f, c] = k.split('|'); return CAT[f]?.colors[c]; };
   let list = readPicks().filter(valid);
-  const add = new URLSearchParams(location.search).get('add');
   const full = document.querySelector('[data-picks-full]');
-  if (add && valid(add) && !list.includes(add)) { if (list.length < SWATCH_KIT_MAX) { list.push(add); writePicks(list); } else if (full) full.hidden = false; }
-  const ul = document.querySelector('[data-picks]');
+  const add = new URLSearchParams(location.search).get('add');
+  let type = 'roman', light = 'filtering';
+  if (add && valid(add)) {
+    const f = add.split('|')[0]; type = CAT[f].type; light = CAT[f].blackout ? 'blackout' : 'filtering';
+    if (!list.includes(add)) { if (list.length < SWATCH_KIT_MAX) { list.push(add); writePicks(list); } else if (full) full.hidden = false; }
+  }
+  const grid = document.querySelector('[data-fab-grid]');
+  const tray = document.querySelector('[data-picks]');
   const kit = document.querySelector('[data-swatch-kit]');
-  const draw = () => {
-    ul.innerHTML = list.map((k, i) => {
-      const [f, c] = k.split('|'); const info = CAT[f].colors[c];
-      return `<li><span class="dot" style="--c:${info.hex};background-image:url(${root}${info.swatch})"></span><div><b>${f}</b><span>${c} · ${CAT[f].name}</span></div><button type="button" data-remove="${i}" aria-label="Remove ${f} in ${c}">&times;</button></li>`;
+  const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  const tile = (f, c) => `<button type="button" class="stile" data-sample="${esc(f)}|${esc(c)}" aria-pressed="false" aria-label="${esc(f)} in ${esc(c)}"><span class="sw"><img src="${root}${CAT[f].colors[c].swatch}" alt="" width="240" height="240" loading="lazy"><i aria-hidden="true"></i></span><span class="nm">${esc(f)} · ${esc(c)}</span></button>`;
+  const fams = (t, l) => Object.keys(CAT).filter(f => CAT[f].type === t && (l == null || (l === 'blackout') === !!CAT[f].blackout));
+  const drawGrid = () => {
+    const hasBO = fams(type, 'blackout').length > 0;
+    if (!hasBO) light = 'filtering';
+    document.querySelectorAll('[data-stype]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.stype === type)));
+    document.querySelectorAll('[data-slight]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.slight === light)); if (b.dataset.slight === 'blackout') b.hidden = !hasBO; });
+    const keys = fams(type, light).flatMap(f => Object.keys(CAT[f].colors).map(c => [f, c]));
+    grid.innerHTML = keys.map(([f, c]) => tile(f, c)).join('');
+    const cnt = document.querySelector('[data-fab-count]');
+    if (cnt) cnt.textContent = `${keys.length} ${light === 'blackout' ? 'blackout ' : ''}${TYPE_LABEL[type]} fabrics`;
+    mark();
+  };
+  const mark = () => {
+    document.querySelectorAll('[data-sample]').forEach(b => {
+      const on = list.includes(b.dataset.sample);
+      b.setAttribute('aria-pressed', String(on));
+      const [f, c] = b.dataset.sample.split('|');
+      b.setAttribute('aria-label', `${f} in ${c}${on ? ', picked' : ', add to samples'}`);
+    });
+  };
+  const drawTray = () => {
+    tray.innerHTML = Array.from({ length: SWATCH_KIT_MAX }, (_, i) => {
+      const k = list[i]; if (!k) return '<span class="slot"></span>';
+      const [f, c] = k.split('|');
+      return `<button type="button" class="slot on" data-remove="${i}" aria-label="Remove ${esc(f)} in ${esc(c)}"><img src="${root}${CAT[f].colors[c].swatch}" alt=""><i aria-hidden="true">&times;</i></button>`;
     }).join('');
-    document.querySelector('[data-picks-empty]').hidden = list.length > 0;
     const picks = list.map(k => { const [f, c] = k.split('|'); return `${f} in ${c}`; }).join(', ');
     const body = list.length ? `Hi Dana! I'd like free samples of: ${picks}.` : kit.dataset.body;
     if (SWATCH_KIT_URL) { const u = new URL(SWATCH_KIT_URL, location.href); if (list.length) u.searchParams.set('fabrics', list.join(',')); kit.href = u.href; }
     else kit.href = smsHref(DANA_SMS, body);
-    const cnt = document.querySelector('[data-picks-count]'); if (cnt) cnt.textContent = list.length ? `(${list.length} of ${SWATCH_KIT_MAX})` : '';
+    const cnt = document.querySelector('[data-picks-count]'); if (cnt) cnt.textContent = `${list.length} of ${SWATCH_KIT_MAX}`;
     if (full && list.length < SWATCH_KIT_MAX) full.hidden = true;
+    mark();
   };
-  ul.addEventListener('click', e => {
-    const b = e.target.closest('[data-remove]'); if (!b) return;
-    list.splice(+b.dataset.remove, 1); writePicks(list); draw();
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-stype]'); if (t) { type = t.dataset.stype; drawGrid(); return; }
+    const l = e.target.closest('[data-slight]'); if (l) { light = l.dataset.slight; drawGrid(); return; }
+    const r = e.target.closest('[data-remove]'); if (r) { list.splice(+r.dataset.remove, 1); writePicks(list); drawTray(); return; }
+    const s = e.target.closest('[data-sample]'); if (!s) return;
+    const k = s.dataset.sample, i = list.indexOf(k);
+    if (i >= 0) list.splice(i, 1);
+    else if (list.length >= SWATCH_KIT_MAX) { if (full) full.hidden = false; return; }
+    else list.push(k);
+    writePicks(list); drawTray();
   });
-  draw();
+  drawGrid(); drawTray();
 }

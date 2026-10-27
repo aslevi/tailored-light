@@ -66,30 +66,40 @@
 </header>
 <main id="main">
 
-<section class="list-hero">
- <div class="container">
-  <h1>Free samples</h1>
-  <p>Pick up to 5 fabrics. We'll mail them free.</p>
+<div class="samples-top"><figure class="people samples-hero"><img src="../images/people/samples.webp" width="928" height="1152" alt="Holding fabric samples up to a window" fetchpriority="high" decoding="async"></figure></div>
+<section class="section samples-page" style="padding-top:24px">
+ <div class="container narrow">
+  <h1 class="s-h1">Free samples</h1>
+  <p class="lede" style="margin-top:6px">Pick up to 5. We mail them free.</p>
+
+  <div class="s-block">
+   <h2 class="s-head"><img class="dana-av" src="../images/people/dana-avatar.webp" width="32" height="32" alt=""> Dana's picks</h2>
+   <div class="sgrid"><button type="button" class="stile" data-sample="Raw Linen|Flax" aria-pressed="false" aria-label="Raw Linen in Flax"><span class="sw"><img src="../swatches/raw-linen-flax.webp" alt="" width="240" height="240" loading="lazy"><i aria-hidden="true"></i></span><span class="nm">Raw Linen · Flax</span></button><button type="button" class="stile" data-sample="Soft Cotton|Sage" aria-pressed="false" aria-label="Soft Cotton in Sage"><span class="sw"><img src="../swatches/soft-cotton-sage.webp" alt="" width="240" height="240" loading="lazy"><i aria-hidden="true"></i></span><span class="nm">Soft Cotton · Sage</span></button><button type="button" class="stile" data-sample="Natural Reed|Honey" aria-pressed="false" aria-label="Natural Reed in Honey"><span class="sw"><img src="../images/p/natural-reed-honey-swatch.webp" alt="" width="240" height="240" loading="lazy"><i aria-hidden="true"></i></span><span class="nm">Natural Reed · Honey</span></button></div>
+  </div>
+
+  <div class="s-block">
+   <h3 class="s-step"><span><span>1</span> Type</span></h3>
+   <div class="type-chips" role="group" aria-label="Type"><button type="button" data-stype="roller" aria-pressed="false">Roller</button><button type="button" data-stype="roman" aria-pressed="true">Roman</button><button type="button" data-stype="zebra" aria-pressed="false">Zebra</button><button type="button" data-stype="woven" aria-pressed="false">Woven</button></div>
+  </div>
+  <div class="s-block tight">
+   <h3 class="s-step"><span><span>2</span> Light</span></h3>
+   <div class="seg" role="group" aria-label="Light"><button type="button" data-slight="filtering" aria-pressed="true">Light filtering</button><button type="button" data-slight="blackout" aria-pressed="false">Blackout</button></div>
+  </div>
+  <div class="s-block tight">
+   <h3 class="s-step"><span><span>3</span> Fabric</span><em data-fab-count></em></h3>
+   <div class="sgrid" data-fab-grid></div>
+  </div>
+
+  <div class="tray" id="picks">
+   <div class="tray-head"><b>Your picks</b><span data-picks-count>0 of 5</span></div>
+   <div class="tray-slots" data-picks><span class="slot"></span><span class="slot"></span><span class="slot"></span><span class="slot"></span><span class="slot"></span></div>
+   <p class="hint" data-picks-full hidden>That's 5, the most we send. Remove one to add another.</p>
+   <a class="btn gold block" data-swatch-kit data-kit-note="#kit-optin" data-body="Hi Dana! I&#x27;d like free samples. Can you help me pick?" href="sms:+12017453300?body=Hi%20Dana%21%20I%27d%20like%20free%20samples.%20Can%20you%20help%20me%20pick%3F"><span data-kit-label data-kit-label="Order free samples">Text a designer</span></a>
+   <p class="small tray-note" id="kit-optin">Your picks go in the text. We'll ask where to mail them.</p>
+  </div>
  </div>
 </section>
-<section class="section tight">
- <div class="container"><div class="pdp" style="padding-top:0">
-  <div class="gallery"><figure class="people samples-photo" data-people="samples" hidden><img alt="" loading="lazy" decoding="async"></figure><div class="main"><img src="../images/p/soft-cotton-sage-win.webp" width="720" height="528" alt="Close-up of a Soft Cotton Roman shade in Sage" fetchpriority=high decoding="async"></div></div>
-  <div class="pinfo">
-   <h2 style="margin-top:0">Your picks <span class="muted" data-picks-count style="font:400 16px var(--sans)"></span></h2>
-   <p class="sub" data-picks-empty>Nothing picked yet. Tap "Add to free samples" on any shade, or ask us to pick for you.</p>
-   <ul class="picks" data-picks></ul>
-   <p class="hint" data-picks-full hidden>That's 5, the most we send. Remove one to add another.</p>
-   <div class="cta-stack" style="margin-top:18px">
-    <a class="btn gold" data-swatch-kit data-kit-note="#kit-optin" data-body="Hi Dana! I&#x27;d like free samples. Can you help me pick?" href="sms:+12017453300?body=Hi%20Dana%21%20I%27d%20like%20free%20samples.%20Can%20you%20help%20me%20pick%3F"><span data-kit-label data-kit-label="Order free samples">Text a designer</span></a>
-    <div id="kit-optin"><p class="small" style="margin-top:4px">Your picks go in the text. We'll ask where to mail them.</p></div>
-    <a class="btn ghost" href="../fabrics/">See all fabrics</a>
-   </div>
-   <p class="small" style="margin-top:18px">Hold each one up to the window at different times of day.</p>
-  </div>
- </div></div>
-</section>
-<script type="application/json" id="catalog-data">{"Daylight Weave": {"name": "Daylight Weave Roller", "colors": {"White": {"swatch": "swatches/daylight-weave-white.webp", "hex": "#E1E0DF"}, "Oat": {"swatch": "swatches/daylight-weave-oat.webp", "hex": "#E1D1C4"}, "Mocha": {"swatch": "swatches/daylight-weave-mocha.webp", "hex": "#B1A696"}}}, "Morning Haze": {"name": "Morning Haze Roller", "colors": {"Cream": {"swatch": "swatches/morning-haze-cream.webp", "hex": "#DCD8D5"}, "Oat": {"swatch": "swatches/morning-haze-oat.webp", "hex": "#C9C9CB"}, "Harbor Blue": {"swatch": "swatches/morning-haze-harbor-blue.webp", "hex": "#5978A1"}}}, "Deep Sleep": {"name": "Deep Sleep Roller", "colors": {"White": {"swatch": "swatches/deep-sleep-white.webp", "hex": "#E7E7E7"}, "Oat": {"swatch": "swatches/deep-sleep-oat.webp", "hex": "#CEC0A9"}, "Latte": {"swatch": "swatches/deep-sleep-latte.webp", "hex": "#AEA79B"}, "Fog": {"swatch": "swatches/deep-sleep-fog.webp", "hex": "#727581"}}}, "Clear View": {"name": "Clear View Roller", "colors": {"White": {"swatch": "swatches/clear-view-white.webp", "hex": "#D9D7DE"}, "Mist": {"swatch": "swatches/clear-view-mist.webp", "hex": "#DCDBDF"}, "Slate": {"swatch": "swatches/clear-view-slate.webp", "hex": "#979B9A"}}}, "Raw Linen": {"name": "Raw Linen Roman", "colors": {"Flax": {"swatch": "swatches/raw-linen-flax.webp", "hex": "#D9D8CA"}, "Cream": {"swatch": "swatches/raw-linen-cream.webp", "hex": "#C9C9BB"}}}, "Soft Cotton": {"name": "Soft Cotton Roman", "colors": {"Sand": {"swatch": "swatches/soft-cotton-sand.webp", "hex": "#B1AA97"}, "Mist": {"swatch": "swatches/soft-cotton-mist.webp", "hex": "#AEAAA1"}, "Sage": {"swatch": "swatches/soft-cotton-sage.webp", "hex": "#ACB49F"}, "Slate": {"swatch": "swatches/soft-cotton-slate.webp", "hex": "#858E94"}}}, "Ticking Stripe": {"name": "Ticking Stripe Roman", "colors": {"Cream & Fog": {"swatch": "swatches/ticking-stripe-cream-fog.webp", "hex": "#BEBCBA"}}}, "Sheer Voile": {"name": "Sheer Voile Roman", "colors": {"Harbor": {"swatch": "swatches/sheer-voile-harbor.webp", "hex": "#6B738C"}}}, "Blackout Linen": {"name": "Blackout Linen Roman", "colors": {"Cream": {"swatch": "swatches/blackout-linen-cream.webp", "hex": "#D4D4C4"}}}, "Natural Reed": {"name": "Natural Reed Woven", "colors": {"Natural": {"swatch": "images/p/natural-reed-natural-swatch.webp", "hex": "#C9A877"}, "Honey": {"swatch": "images/p/natural-reed-honey-swatch.webp", "hex": "#A9783F"}, "Driftwood": {"swatch": "images/p/natural-reed-driftwood-swatch.webp", "hex": "#9C968A"}}}, "Twin Light": {"name": "Twin Light Zebra", "colors": {"White": {"swatch": "swatches/twin-light-white.webp", "hex": "#E9ECF4"}, "Oat": {"swatch": "swatches/twin-light-oat.webp", "hex": "#F3F0E6"}, "Mist": {"swatch": "swatches/twin-light-mist.webp", "hex": "#C1C3CD"}, "Slate": {"swatch": "swatches/twin-light-slate.webp", "hex": "#A9AFBC"}}}, "Sand Stripe": {"name": "Sand Stripe Zebra", "colors": {"Oat": {"swatch": "swatches/sand-stripe-oat.webp", "hex": "#DDDBD8"}, "Walnut": {"swatch": "swatches/sand-stripe-walnut.webp", "hex": "#ACA49A"}}}, "Twin Shade": {"name": "Twin Shade Zebra", "colors": {"Mist": {"swatch": "swatches/twin-shade-mist.webp", "hex": "#E2E4EB"}, "Sand": {"swatch": "swatches/twin-shade-sand.webp", "hex": "#DFDCD6"}}}}</script>
+<script type="application/json" id="catalog-data">{"Daylight Weave": {"name": "Daylight Weave Roller", "type": "roller", "blackout": false, "colors": {"White": {"swatch": "swatches/daylight-weave-white.webp", "hex": "#E1E0DF"}, "Oat": {"swatch": "swatches/daylight-weave-oat.webp", "hex": "#E1D1C4"}, "Mocha": {"swatch": "swatches/daylight-weave-mocha.webp", "hex": "#B1A696"}}}, "Morning Haze": {"name": "Morning Haze Roller", "type": "roller", "blackout": false, "colors": {"Cream": {"swatch": "swatches/morning-haze-cream.webp", "hex": "#DCD8D5"}, "Oat": {"swatch": "swatches/morning-haze-oat.webp", "hex": "#C9C9CB"}, "Harbor Blue": {"swatch": "swatches/morning-haze-harbor-blue.webp", "hex": "#5978A1"}}}, "Deep Sleep": {"name": "Deep Sleep Roller", "type": "roller", "blackout": true, "colors": {"White": {"swatch": "swatches/deep-sleep-white.webp", "hex": "#E7E7E7"}, "Oat": {"swatch": "swatches/deep-sleep-oat.webp", "hex": "#CEC0A9"}, "Latte": {"swatch": "swatches/deep-sleep-latte.webp", "hex": "#AEA79B"}, "Fog": {"swatch": "swatches/deep-sleep-fog.webp", "hex": "#727581"}}}, "Clear View": {"name": "Clear View Roller", "type": "roller", "blackout": false, "colors": {"White": {"swatch": "swatches/clear-view-white.webp", "hex": "#D9D7DE"}, "Mist": {"swatch": "swatches/clear-view-mist.webp", "hex": "#DCDBDF"}, "Slate": {"swatch": "swatches/clear-view-slate.webp", "hex": "#979B9A"}}}, "Raw Linen": {"name": "Raw Linen Roman", "type": "roman", "blackout": false, "colors": {"Flax": {"swatch": "swatches/raw-linen-flax.webp", "hex": "#D9D8CA"}, "Cream": {"swatch": "swatches/raw-linen-cream.webp", "hex": "#C9C9BB"}}}, "Soft Cotton": {"name": "Soft Cotton Roman", "type": "roman", "blackout": false, "colors": {"Sand": {"swatch": "swatches/soft-cotton-sand.webp", "hex": "#B1AA97"}, "Mist": {"swatch": "swatches/soft-cotton-mist.webp", "hex": "#AEAAA1"}, "Sage": {"swatch": "swatches/soft-cotton-sage.webp", "hex": "#ACB49F"}, "Slate": {"swatch": "swatches/soft-cotton-slate.webp", "hex": "#858E94"}}}, "Ticking Stripe": {"name": "Ticking Stripe Roman", "type": "roman", "blackout": false, "colors": {"Cream & Fog": {"swatch": "swatches/ticking-stripe-cream-fog.webp", "hex": "#BEBCBA"}}}, "Sheer Voile": {"name": "Sheer Voile Roman", "type": "roman", "blackout": false, "colors": {"Harbor": {"swatch": "swatches/sheer-voile-harbor.webp", "hex": "#6B738C"}}}, "Blackout Linen": {"name": "Blackout Linen Roman", "type": "roman", "blackout": true, "colors": {"Cream": {"swatch": "swatches/blackout-linen-cream.webp", "hex": "#D4D4C4"}}}, "Natural Reed": {"name": "Natural Reed Woven", "type": "woven", "blackout": false, "colors": {"Natural": {"swatch": "images/p/natural-reed-natural-swatch.webp", "hex": "#C9A877"}, "Honey": {"swatch": "images/p/natural-reed-honey-swatch.webp", "hex": "#A9783F"}, "Driftwood": {"swatch": "images/p/natural-reed-driftwood-swatch.webp", "hex": "#9C968A"}}}, "Twin Light": {"name": "Twin Light Zebra", "type": "zebra", "blackout": false, "colors": {"White": {"swatch": "swatches/twin-light-white.webp", "hex": "#E9ECF4"}, "Oat": {"swatch": "swatches/twin-light-oat.webp", "hex": "#F3F0E6"}, "Mist": {"swatch": "swatches/twin-light-mist.webp", "hex": "#C1C3CD"}, "Slate": {"swatch": "swatches/twin-light-slate.webp", "hex": "#A9AFBC"}}}, "Sand Stripe": {"name": "Sand Stripe Zebra", "type": "zebra", "blackout": false, "colors": {"Oat": {"swatch": "swatches/sand-stripe-oat.webp", "hex": "#DDDBD8"}, "Walnut": {"swatch": "swatches/sand-stripe-walnut.webp", "hex": "#ACA49A"}}}, "Twin Shade": {"name": "Twin Shade Zebra", "type": "zebra", "blackout": false, "colors": {"Mist": {"swatch": "swatches/twin-shade-mist.webp", "hex": "#E2E4EB"}, "Sand": {"swatch": "swatches/twin-shade-sand.webp", "hex": "#DFDCD6"}}}}</script>
 
 </main>
 <footer class="site-foot">

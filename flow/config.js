@@ -15,11 +15,19 @@ export const REPLY_PROMISE = 'We usually reply within minutes.';
 // The designer card next to "Text a designer". DESIGNER_PHOTO: path or URL of a real team photo.
 // Leave '' to show a monogram (gold circle, first initial).
 export const DESIGNER_NAME = 'Dana';
-export const DESIGNER_PHOTO = '';
+export const DESIGNER_PHOTO = 'images/people/dana-avatar.webp';
 // Lifestyle photos for the page slots below. Each value: { src, alt }. Empty slots stay hidden.
 // Slots: home-hero, step-1, step-2, step-3, text-designer, samples, rooms, about.
-// Use photos licensed for commercial use with no attribution (Unsplash or Pexels license), saved in images/people/.
-export const PEOPLE_PHOTOS = {};
+// Our own photos, saved in images/people/.
+export const PEOPLE_PHOTOS = {
+  'home-hero': { src: 'images/people/hero-couple.webp', alt: 'A couple relaxing on a linen sofa under a Roman shade' },
+  'step-1': { src: 'images/people/coffee-window.webp', alt: 'Morning coffee in the kitchen under a woven shade' },
+  'step-2': { src: 'images/people/measuring.webp', alt: 'Measuring a window with a metal tape' },
+  'text-designer': { src: 'images/people/texting.webp', alt: 'A woman texting her designer from the sofa' },
+  'samples': { src: 'images/people/samples.webp', alt: 'Holding fabric samples up to a window' },
+  'rooms': { src: 'images/people/bedroom.webp', alt: 'A quiet bedroom with a blackout roller shade' },
+  'about': { src: 'images/people/about.webp', alt: 'Looking through fabric samples at a desk' },
+};
 export const BRAND = { walnut:'#2B2420', linen:'#F6F0E6', paper:'#FFFCF7', gold:'#E3A33F', sage:'#56624A', oat:'#D9CBB4', driftwood:'#6E6258' };
 export const isIOS = () => /iPhone|iPad|Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document || /iPhone|iPad/i.test(navigator.userAgent);
 export const smsHref = (num, body) => `sms:${num}${isIOS() ? '&' : '?'}body=${encodeURIComponent(body)}`;

@@ -38,12 +38,12 @@ export function createRoomPlateRenderer(host){
  renderer.setPixelRatio(1);renderer.setSize(1536,1024,false);
  renderer.domElement.setAttribute('aria-hidden','true');host.append(renderer.domElement);
  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-1,1,1,-1,0,2);
- const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},dusk:{value:0},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3}};
+ const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},sunElev:{value:.6},sunAz:{value:.3},sunWarm:{value:.3},dusk:{value:0},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3}};
  const material=new THREE.ShaderMaterial({toneMapped:false,uniforms:u,vertexShader:'varying vec2 st;void main(){st=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
  varying vec2 st;
  uniform sampler2D base,ceilingMap,lampMap;
  uniform float dayLevel,ceilingLevel,lampLevel,night,warm;
- uniform vec4 fixture;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans,dusk;
+ uniform vec4 fixture;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans,dusk,sunElev,sunAz,sunWarm;
  vec3 blurred(sampler2D tex,vec2 uv){
   vec2 d=vec2(14./1536.,14./1024.);
   return (texture2D(tex,uv).rgb*4.+texture2D(tex,uv+d).rgb+texture2D(tex,uv-d).rgb+texture2D(tex,uv+vec2(d.x,-d.y)).rgb+texture2D(tex,uv+vec2(-d.x,d.y)).rgb)/8.;
@@ -69,45 +69,48 @@ export function createRoomPlateRenderer(host){
   float lampMask=(1.-smoothstep(.75,1.1,length((p-lampPosition)/vec2(60.,48.))))*(1.-outside);
   color=mix(color,max(color,texture2D(ceilingMap,st).rgb),fixtureMask*ceilingLevel);
   color=mix(color,max(color,texture2D(lampMap,st).rgb),lampMask*lampLevel);
-  // Golden-hour sun, traced with simple perspective. Wall plane = image plane (px).
-  // Camera distance D, eye line E. Sun: elevation tan TE, sideways drift TA per px of depth.
-  float D=1800.,E=300.,TE=.52,TA=.62,cx=772.;
+  // Sunlight through the window, traced with simple perspective. Wall plane = image plane (px).
+  // Camera distance D, eye line E. Sun elevation tan sunElev, sideways drift sunAz per px of depth.
+  // Sharp light only through the open part of the window; the shade blocks it, a light-filtering
+  // fabric lets a soft glow through (trans), blackout lets nothing through (trans = 0).
+  float D=1800.,E=300.,TE=sunElev,TA=sunAz,cx=772.;
   float top=max(shadeBottom,182.);
   float openFrac=clamp((508.-top)/326.,0.,1.);
-  float sunIn=0.;
-  if(sunAmt>0.){
-   // floor patch
-   if(p.y>floorY+1.){
-    float k=(p.y-E)/(floorY-E),Z=D*(1.-1./k);
-    float yw=floorY-TE*Z,xw=cx+(p.x-cx)/k-TA*Z;
-    float soft=2.+Z*.012;
-    float inX=smoothstep(536.-soft,536.+soft,xw)*(1.-smoothstep(1008.-soft,1008.+soft,xw));
-    float inOpen=smoothstep(top-soft,top+soft,yw)*(1.-smoothstep(508.-soft,508.+soft,yw));
-    float inCloth=smoothstep(182.-soft,182.+soft,yw)*(1.-smoothstep(top-soft,top+soft,yw));
-    sunIn=inX*(inOpen+inCloth*trans*.18);
-    float lum=dot(b,vec3(.299,.587,.114));
-    color+=b*sunIn*sunAmt*vec3(1.,.64,.28)*2.0*(.65+.35*smoothstep(.15,.6,lum));
-   }
-   // sun shafts: sample the view ray at several depths, light where the ray crosses a beam
-   if(outside<.5&&openFrac>0.&&p.y>top){
-    float acc=0.;
-    for(int i=0;i<12;i++){
-     float Z=(float(i)+.5)/12.*1100.,k=D/(D-Z);
-     float Y=E+(p.y-E)/k;if(Y>floorY)continue;
-     float X=(p.x-cx)/k;
-     float yw=Y-TE*Z,xw=cx+X-TA*Z;
-     acc+=step(538.,xw)*step(xw,1006.)*step(top,yw)*step(yw,506.)*smoothstep(160.,420.,Z);
-    }
-    color+=vec3(1.,.74,.42)*(acc/12.)*sunAmt*.34;
-   }
+  vec3 sunCol=mix(vec3(1.,.93,.80),vec3(1.,.74,.46),sunWarm);
+  float lum=dot(b,vec3(.299,.587,.114));
+  if(sunAmt>0.&&p.y>floorY+1.){
+   float k=(p.y-E)/(floorY-E),Z=D*(1.-1./k);
+   float yw=floorY-TE*Z,xw=cx+(p.x-cx)/k-TA*Z;
+   float soft=3.+Z*.018;
+   float inX=smoothstep(536.-soft,536.+soft,xw)*(1.-smoothstep(1008.-soft,1008.+soft,xw));
+   float inOpen=smoothstep(top-soft,top+soft,yw)*(1.-smoothstep(508.-soft,508.+soft,yw));
+   // light through the fabric: same footprint, much softer and dimmer
+   float sx=soft*7.;
+   float inXs=smoothstep(536.-sx,536.+sx,xw)*(1.-smoothstep(1008.-sx,1008.+sx,xw));
+   float inCloth=smoothstep(182.-sx,182.+sx,yw)*(1.-smoothstep(top-sx,top+sx,yw));
+   float fade=1.-smoothstep(700.,1700.,Z);
+   float lit=(inX*inOpen+inXs*inCloth*trans*.35)*fade;
+   // light adds in proportion to the surface it lands on (rugs and wood brighten, shadows stay)
+   color+=b*lit*sunAmt*sunCol*(.6+.3*smoothstep(.1,.5,lum));
   }
-  // golden-hour grade: warmer, and a touch darker away from the sun so the light reads
+  // Soft shafts in the air: sample the view ray at several depths, glow where it crosses the beam.
+  if(sunAmt>0.&&outside<.5&&openFrac>0.&&p.y>top){
+   float acc=0.;
+   for(int i=0;i<14;i++){
+    float Z=(float(i)+.5)/14.*1200.,k=D/(D-Z);
+    float Y=E+(p.y-E)/k;if(Y>floorY)continue;
+    float X=(p.x-cx)/k;
+    float yw=Y-TE*Z,xw=cx+X-TA*Z;
+    float e=8.+Z*.02;
+    acc+=smoothstep(538.-e,538.+e,xw)*(1.-smoothstep(1006.-e,1006.+e,xw))*smoothstep(top-e,top+e,yw)*(1.-smoothstep(506.-e,506.+e,yw))*smoothstep(80.,380.,Z)*(1.-smoothstep(700.,1200.,Z));
+   }
+   color+=sunCol*(acc/14.)*sunAmt*.11*(.6+.4*lum);
+  }
+  // a little bounce light around the window when the sun is in
   if(sunAmt>0.){
-   vec3 graded=color*vec3(1.04,.97,.86)*mix(.80,1.,clamp(sunIn,0.,1.));
-   color=mix(color,graded,sunAmt*(1.-outside));
    vec2 wc=vec2(772.,(top+508.)*.5);
-   float halo=(1.-smoothstep(120.,480.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
-   color+=b*halo*sunAmt*(.12*openFrac+.05*trans)*vec3(1.,.78,.45);
+   float halo=(1.-smoothstep(140.,520.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
+   color+=b*halo*sunAmt*(.07*openFrac+.03*trans)*sunCol;
   }
   gl_FragColor=vec4(color,1.);
   #include <colorspace_fragment>
@@ -130,7 +133,14 @@ export function createRoomPlateRenderer(host){
    u.night.value=night;u.warm.value=Math.min(1,tod)*(1-night);
    const levels=roomLightingLevels({...state,mood:'afternoon'},response);const dusk=Math.max(0,1-Math.abs(tod-1.45)*2.2);u.dusk.value=dusk;
    const curve=tod<1?.78+.22*tod:1-.25*Math.min(1,(tod-1)*2);levels.day=levels.day*curve*(1-night)+.065*night;
-   u.sunAmt.value=0;u.shadeBottom.value=state.shadeBottom??535;
+   // Sun by time of day (tod 0 morning, 1 midday-afternoon, 1.5 evening, 2 night).
+   const sunAmt=tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3);
+   u.sunAmt.value=sunAmt*(1-night);
+   u.sunElev.value=tod<1?.62+.33*tod:.95-.45*Math.min(1,tod-1);
+   u.sunAz.value=tod<1?.32-.24*tod:.08-.38*Math.min(1,tod-1);
+   u.sunWarm.value=tod<1?.6-.4*tod:.2+.8*Math.min(1,(tod-1)/.6);
+   u.trans.value=state.clothTrans??.3;
+   u.shadeBottom.value=state.shadeBottom??535;
    u.dayLevel.value=levels.day;u.ceilingLevel.value=levels.ceiling;u.lampLevel.value=levels.lamp;
    if(ready)renderer.render(scene,camera);
   }

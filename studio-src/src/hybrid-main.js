@@ -18,7 +18,7 @@ import { ROOMS } from './room-catalog.js';
 import { createRoomPlateRenderer } from './room-plate-renderer.js';
 
 const $=id=>document.getElementById(id),cap=s=>s[0].toUpperCase()+s.slice(1),W=1536,H=1024;
-const state={room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
+const state={tod:.5,room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
 let roomPlate,ceilingLight,roomRequest=0;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 state.breeze=!reduced;
@@ -69,7 +69,8 @@ function lighting(){
  const even=state.mood==='evening',afternoon=state.mood==='afternoon',alignment=mechanism.state.bandAlignment??1;
  const response=roomResponse({...state,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- const by=mechanism.state.bottomY??-1.3;roomPlate?.update({...state,shadeBottom:154+(.07-by)/1.38*381},response);
+ const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4:.3;
+ roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:154+(.07-by)/1.38*381},response);
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
  ambient.intensity=response.ambient;key.intensity=response.bounce;fill.intensity=response.lampIntensity;
@@ -145,39 +146,64 @@ function updatePrice(){const out=$('price-out');const z=sizeInfo();
  updatePick();}
 /* ---------- Simple picker: style chips, one row of swatches, one action ---------- */
 const chipOf=()=>state.style==='roman'&&fam().weave?'woven':state.style;
+const lightOf=()=>fam().blackout?'blackout':'filtering';
+const typeFams=(chip,light)=>{const style=chip==='woven'?'roman':chip;return CATALOG[style].families.filter(x=>(chip==='woven'?x.weave:!x.weave)&&(light==null||(light==='blackout')===!!x.blackout));};
+const slugify=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):/Reed/.test(f)?site('images/p/natural-reed-'+slugify(c)+'-swatch.webp'):'';
+// Dana's pick for each room: type, light, fabric, color.
+const RECS={'living-room':{text:'a <b>Roman in Raw Linen</b> for living rooms',chip:'roman',f:'Raw Linen',c:'Flax'},
+ bedroom:{text:'a <b>blackout Roller</b> for bedrooms',chip:'roller',f:'Deep Sleep',c:'Oat'},
+ nursery:{text:'a <b>blackout Roller</b> for nurseries',chip:'roller',f:'Deep Sleep',c:'Oat'},
+ kitchen:{text:'a <b>Woven</b> shade for kitchens',chip:'woven',f:'Natural Reed',c:'Honey'},
+ 'home-office':{text:'a <b>light-filtering Roller or Zebra</b> for home offices',chip:'roller',f:'Clear View',c:'White'},
+ bathroom:{text:'a <b>Daylight Weave Roller</b> for bathrooms',chip:'roller',f:'Daylight Weave',c:'Oat'},
+ 'dining-room':{text:'a <b>Roman</b> for dining rooms',chip:'roman',f:'Raw Linen',c:'Cream'}};
+function setLook(chip,family,color){const style=chip==='woven'?'roman':chip;state.style=style;state.family=family;state.colorName=color;syncFamily(true);renderOptions();rebuild();lighting();refresh();document.body.classList.add('designed');}
 function updatePick(){
- const f=fam(),c=col(),chip=chipOf();
+ const f=fam(),c=col(),chip=chipOf(),light=lightOf();
  document.querySelectorAll('[data-chip]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chip===chip)));
+ const hasBo=typeFams(chip,'blackout').length>0;
+ document.querySelectorAll('[data-light]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.light===light));if(b.dataset.light==='blackout')b.hidden=!hasBo;});
  $('pick-fabric').textContent=f.name;$('pick-color').textContent=c.name;
- const bo=$('bo-chip'),hasBo=chip!=='woven'&&CATALOG[state.style].families.some(x=>x.blackout);bo.hidden=!hasBo;bo.setAttribute('aria-pressed',String(!!f.blackout));
- const row=$('swatch-row'),fams=CATALOG[state.style].families.filter(x=>chip==='woven'?x.weave:!x.weave);
- const key=chip+'|'+fams.map(x=>x.name).join();
- if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>`<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="--swatch:${cc.hex};--img:${swatchURL(x.name,cc.name)}"></button>`).join('')).join('<i class="sep" aria-hidden="true"></i>');}
+ const row=$('swatch-row'),fams=typeFams(chip,light),key=chip+'|'+light;
+ if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>{const u=tileURL(x.name,cc.name);return `<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="background-color:${cc.hex}">${u?`<img src="${u}" alt="" loading="lazy" decoding="async">`:''}</button>`;}).join('')).join('');}
  row.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===f.name+'|'+c.name)));
- const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label;
+ const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label,name=`${f.name} ${label} in ${c.name}`;
  const from=SITE.fromPrice(state.style,f.name);
- $('cta-sub').textContent=`${f.name} ${label} in ${c.name}`+(z.price?` · ${SITE.money(z.price)}${z.estimate?' est.':''}`:from?` · from ${SITE.money(from)}`:'');
- $('size-open').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','')}, ${mount.toLowerCase()} mount · edit`:'Add your window size';
+ $('cta-sub').textContent=name+(z.price?` · ${SITE.money(z.price)}${z.estimate?' est.':''}`:from?` · from ${SITE.money(from)}`:'');
+ $('size-open').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','')} · ${SITE.money(z.price)} · edit size`:'Add your window size';
+ $('sz-prod').textContent=name;$('sz-dot').style.background=c.hex;
+ $('sz-price-num').textContent=z.price?SITE.money(z.price)+(z.estimate?'*':''):'—';
+ $('sz-cta-sub').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','').replace(/"/g,'')} · ${SITE.money(z.price)}`:'Add your size to see your price';
  const rn=ROOMS.find(r=>r.id===state.room);if(rn)$('room-name').textContent=rn.label;
+ const rec=RECS[state.room]||RECS['living-room'];$('rec-text').innerHTML=`Dana recommends ${rec.text}`;
+ const applied=chip===rec.chip&&f.name===rec.f;const ap=$('rec-apply');ap.setAttribute('aria-pressed',String(applied));ap.textContent=applied?'Applied':'Apply';
 }
 document.addEventListener('click',e=>{
- if(!e.target.closest('#bo-chip'))return;
- const fams=CATALOG[state.style].families,cur=fam(),target=cur.blackout?fams.find(x=>!x.blackout&&!x.weave):fams.find(x=>x.blackout);if(!target)return;
- state.family=target.name;state.colorName=target.colors[0].name;syncFamily(true);renderOptions();rebuild();lighting();refresh();engaged('pick:blackout');
+ const ch=e.target.closest('[data-chip]');
+ if(ch){const k=ch.dataset.chip,list=typeFams(k,lightOf()),fams=list.length?list:typeFams(k,'filtering');setLook(k,fams[0].name,fams[0].colors[0].name);engaged('pick:'+k);return;}
+ const li=e.target.closest('[data-light]');
+ if(li){const fams=typeFams(chipOf(),li.dataset.light);if(fams.length){setLook(chipOf(),fams[0].name,fams[0].colors[0].name);engaged('pick:'+li.dataset.light);}return;}
+ if(e.target.closest('#rec-apply')){const rec=RECS[state.room]||RECS['living-room'];setLook(rec.chip,rec.f,rec.c);engaged('pick:rec');return;}
 });
-document.addEventListener('click',e=>{
- const ch=e.target.closest('[data-chip]');if(!ch)return;
- const k=ch.dataset.chip,style=k==='woven'?'roman':k;
- const fams=CATALOG[style].families.filter(x=>k==='woven'?x.weave:!x.weave);
- state.style=style;state.family=fams[0].name;state.colorName=fams[0].colors[0].name;syncFamily(true);renderOptions();rebuild();lighting();refresh();engaged('pick:'+k);document.body.classList.add('designed');
-});
+/* Room menu on the room name */
+{const btn=$('room-btn'),menu=$('room-menu');
+ menu.innerHTML=ROOMS.map(r=>`<li><button type="button" role="option" data-room-pick="${r.id}">${r.label}</button></li>`).join('');
+ const setOpen=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',String(o));};
+ btn.addEventListener('click',e=>{e.stopPropagation();setOpen(menu.hidden);});
+ menu.addEventListener('click',e=>{const b=e.target.closest('[data-room-pick]');if(!b)return;setOpen(false);document.querySelector(`#room-choices [data-room="${b.dataset.roomPick}"]`)?.click();});
+ document.addEventListener('click',e=>{if(!menu.hidden&&!e.target.closest('.tb-left'))setOpen(false);});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});}
+/* Day to night slider: 0 = morning, 50 = midday-afternoon, 100 = night */
+$('dtn').addEventListener('input',e=>{setTod(Number(e.target.value)/50);engaged('day');});
 {const sheet=$('size-sheet');let last=null;
  const open=()=>{last=document.activeElement;sheet.hidden=false;$('size-w').focus();};
  const close=()=>{sheet.hidden=true;updatePick();last?.focus();};
- $('size-open').addEventListener('click',open);$('size-close').addEventListener('click',close);$('size-done').addEventListener('click',close);
+ $('size-open').addEventListener('click',open);$('size-close').addEventListener('click',close);
  sheet.addEventListener('click',e=>{if(e.target===sheet)close();});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)close();});
- sheet.addEventListener('click',e=>{const m=e.target.closest('[data-mount]');if(!m)return;mount=m.dataset.mount;sheet.querySelectorAll('[data-mount]').forEach(b=>b.setAttribute('aria-pressed',String(b===m)));updatePick();});}
+ sheet.addEventListener('click',e=>{const m=e.target.closest('[data-mount]');if(!m)return;mount=m.dataset.mount;sheet.querySelectorAll('[data-mount]').forEach(b=>b.setAttribute('aria-pressed',String(b===m)));updatePick();});
+ $('sz-help-link').addEventListener('click',e=>{e.preventDefault();location.href=smsHref(SITE.DANA_SMS||DANA_SMS,`Hi Dana! Can you walk me through measuring my window for the ${fam().name} ${chipOf()==='woven'?'Woven':CATALOG[state.style].label}?`);});}
 function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)return;form.hidden=false;
  form.addEventListener('submit',async e=>{e.preventDefault();const st=$('lead-status'),phone=form.phone.value.replace(/[^\d+]/g,'');
   if(phone.replace(/\D/g,'').length<10){st.textContent='Please enter a 10-digit mobile number.';return;}
@@ -369,4 +395,4 @@ $('play-day').addEventListener('click',()=>{if(dayAnim)return;const from=(state.
   if(k<1)dayAnim=requestAnimationFrame(step);else{dayAnim=null;$('play-day').classList.remove('playing');$('play-day').querySelector('b').textContent=to===2?'↺ Night to day':'▶ Day to night';}};
  dayAnim=requestAnimationFrame(step);});
 setTimeout(()=>document.body.classList.add('settled'),7000);
-window.__tl={setTod};
+window.__tl={setTod,setDrop:d=>{state.drop=d;state.playing=false;$('drop').value=d*100;refresh();}};
