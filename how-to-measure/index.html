@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>How to measure · Hello Shade</title>
+<meta name="description" content="Measure your window for custom shades in about 7 minutes with a regular tape. Step by step, and Dana checks every number.">
+<link rel="canonical" href="https://aslevi.github.io/tailored-light/how-to-measure/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="icon" href="../favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:title" content="How to measure · Hello Shade"><meta property="og:image" content="https://aslevi.github.io/tailored-light/og.jpg">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+</head>
+<body>
+<style>
+/* Layout: one step per screen, like a printed install card. Art panel on top, a short instruction, parts chips, then back / next.
+   Single light theme on purpose: the Hello Shade brand is light-only. */
+:root{
+  --cream:#FBF6F0; --surface:#FFFDFB; --blush:#F3DCD3; --blush-2:#F8EAE4;
+  --clay:#A9594A; --clay-dk:#8E4A3D; --honey:#E8AE45; --honey-soft:#F6DDA9;
+  --cocoa:#4A3530; --muted:#7A5F57; --line:#EAD7CE; --glass:#E6EEF0; --sky:#CFE0E6;
+  --display:"Fraunces", Georgia, "Times New Roman", serif;
+  --body:"DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--cream);color:var(--cocoa);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--honey);outline-offset:2px;border-radius:8px}
+
+.app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 20px}
+
+/* Top bar */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 10px}
+.mark{display:flex;align-items:baseline;gap:6px;font-family:var(--display);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:500;font-size:22px;letter-spacing:-.02em;text-decoration:none;color:var(--cocoa)}
+.mark svg{width:26px;height:16px;transform:translateY(1px)}
+.steps-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+.steps-btn svg{width:16px;height:16px}
+
+/* Guide switcher */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--blush-2);border-radius:999px;padding:4px;margin-bottom:12px}
+.tab{border:0;background:transparent;border-radius:999px;padding:9px 10px;font-weight:600;font-size:15px;cursor:pointer;color:var(--muted);min-height:40px}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--cocoa);box-shadow:0 1px 2px rgba(74,53,48,.12)}
+
+/* Progress */
+.prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.prog-track{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:var(--clay);border-radius:4px;transition:width .35s ease}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.art{background:linear-gradient(180deg,var(--blush-2),var(--cream));aspect-ratio:16/11;max-width:100%;display:grid;place-items:center;position:relative}
+.art svg{width:100%;height:100%}
+.copy{padding:18px 20px 6px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--clay)}
+h1{font-family:var(--display);font-variation-settings:"SOFT" 100,"WONK" 0;font-weight:500;font-size:clamp(24px,6vw,30px);line-height:1.15;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.copy p{margin:0;color:var(--cocoa);max-width:62ch}
+.tip{display:block;background:var(--honey-soft);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.45}
+.tip b{font-weight:700}
+.parts{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:6px 10px 6px 6px;font-size:14px;background:var(--cream)}
+.chip svg{width:30px;height:30px;flex:none}
+.chip .n{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;color:var(--clay)}
+
+/* Choices */
+.choices{display:grid;gap:10px}
+.choice{display:flex;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--cream);border-radius:16px;padding:12px;cursor:pointer;min-height:64px}
+.choice:hover{border-color:var(--clay)}
+.choice svg{width:64px;height:48px;flex:none}
+.choice b{display:block;font-size:16px}
+.choice span{font-size:14px;color:var(--muted)}
+
+/* Variant link (the "looks different?" detour) */
+.variant{border:1.5px solid var(--clay);color:var(--clay);background:transparent;border-radius:12px;padding:10px 12px;font-weight:600;font-size:14px;cursor:pointer;text-align:center;min-height:44px}
+.variant:hover{background:var(--blush-2)}
+.detour{font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px}
+
+/* Nav */
+.nav{display:grid;grid-template-columns:56px 1fr;gap:10px;padding:14px 20px 20px}
+.nav button{border:0;border-radius:14px;min-height:52px;cursor:pointer;font-weight:700;font-size:16px}
+.back{background:var(--blush-2);color:var(--cocoa)}
+.back:disabled{opacity:.4;cursor:default}
+.next{background:var(--clay);color:#fff}
+.next:hover{background:var(--clay-dk)}
+.back svg,.next svg{width:20px;height:20px;vertical-align:-4px}
+
+/* Measurement form */
+.form{display:grid;gap:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+.inch{display:grid;grid-template-columns:1fr 72px;gap:6px}
+input,select{font:inherit;color:var(--cocoa);background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;width:100%;min-width:0}
+input:focus,select:focus{border-color:var(--clay);outline:none}
+.msg{background:var(--cream);border:1px dashed var(--line);border-radius:14px;padding:12px;font-size:14px;white-space:pre-wrap;user-select:all}
+.send{display:grid;gap:8px}
+.honey{background:var(--honey);color:var(--cocoa);border:0;border-radius:14px;min-height:52px;font-weight:700;font-size:16px;cursor:pointer;text-decoration:none;display:grid;place-items:center}
+.ghost{background:transparent;border:1.5px solid var(--line);border-radius:14px;min-height:46px;font-weight:600;cursor:pointer}
+.small{font-size:13px;color:var(--muted)}
+.small b{color:var(--cocoa);user-select:all}
+
+/* Steps drawer */
+.scrim{position:fixed;inset:0;background:rgba(74,53,48,.28);z-index:20}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(340px,88vw);background:var(--surface);z-index:21;overflow:auto;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  box-shadow:8px 0 30px rgba(74,53,48,.15)}
+.drawer h2{font-family:var(--display);font-weight:500;font-variation-settings:"SOFT" 100;font-size:22px;margin:4px 0 12px}
+.drawer h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--clay);margin:16px 0 6px}
+.drawer ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:s}
+.drawer li button{width:100%;text-align:left;border:0;background:transparent;border-radius:10px;padding:9px 10px;cursor:pointer;display:flex;gap:10px;font-size:15px}
+.drawer li button:hover{background:var(--blush-2)}
+.drawer li button[aria-current="step"]{background:var(--blush);font-weight:700}
+.drawer .num{font-variant-numeric:tabular-nums;color:var(--muted);min-width:1.4em}
+.close{float:right;border:0;background:var(--blush-2);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:18px}
+
+/* Art animation */
+.draw{stroke-dasharray:var(--len,400);stroke-dashoffset:var(--len,400);animation:draw 1.1s .25s ease forwards}
+.pop{opacity:0;animation:pop .4s ease forwards}
+.d1{animation-delay:.35s}.d2{animation-delay:.8s}.d3{animation-delay:1.25s}.d4{animation-delay:1.7s}
+.bob{animation:bob 2.4s ease-in-out infinite}
+.slide-up{animation:slideup 2.8s ease-in-out infinite}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes slideup{0%,15%{transform:translateY(0)}55%,70%{transform:translateY(-38px)}100%{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.draw{stroke-dashoffset:0;animation:none}.pop{opacity:1;animation:none}.bob,.slide-up{animation:none}.prog-fill{transition:none}}
+.foot{text-align:center;font-size:13px;color:var(--muted);padding-top:14px}
+.foot button{border:0;background:none;color:var(--clay);font-weight:700;text-decoration:underline;cursor:pointer;font-size:13px}
+
+/* Dana presence */
+.dana{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:8px 8px 8px 10px;margin-bottom:10px}
+.ava{position:relative;flex:none;width:40px;height:40px}
+.ava img{width:40px;height:40px;border-radius:50%;object-fit:cover;display:block}
+.ava i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#4CAF6A;border:2px solid var(--surface)}
+.dana-txt{flex:1;min-width:0;font-size:14px;line-height:1.3}
+.dana-txt b{display:block}
+.dana-txt span{color:var(--muted);font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dana-btns{display:flex;gap:6px}
+.pill{border:0;border-radius:999px;padding:0 14px;min-height:40px;font-weight:700;font-size:14px;cursor:pointer}
+a.pill{display:inline-flex;align-items:center;text-decoration:none}
+.pill.chat{background:var(--honey);color:var(--cocoa)}
+.proto{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--blush);color:var(--clay-dk);border-radius:999px;padding:3px 8px}
+
+/* Dana's recommendation */
+.rec{border:1px solid var(--line);background:var(--blush-2);border-radius:16px;padding:12px 14px;display:grid;gap:8px}
+.rec-head{display:flex;align-items:center;gap:8px}
+.rec-head img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.rec p{margin:0;font-size:15px}
+.rec dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}
+.rec dt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--clay);padding-top:2px}
+.rec dd{margin:0;min-width:0}
+.rec ul{margin:0;padding-left:18px}
+.dots{display:flex;gap:6px;padding:4px 0}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--clay);opacity:.3;animation:dot 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+@keyframes dot{50%{opacity:1}}
+.sugg{font-style:normal;font-size:11px;font-weight:700;background:var(--honey);color:var(--cocoa);border-radius:999px;padding:2px 8px;margin-left:4px;vertical-align:2px}
+
+/* Case length + calculator */
+.cases{display:flex;flex-wrap:wrap;gap:8px}
+.casebtn{border:1.5px solid var(--line);background:var(--cream);border-radius:12px;min-height:44px;min-width:58px;padding:0 12px;font-weight:700;font-size:16px;cursor:pointer;font-family:var(--display)}
+.casebtn[aria-pressed="true"]{background:var(--clay);border-color:var(--clay);color:#fff}
+.caseother input{width:96px;min-height:44px}
+.calc{border:1px solid var(--line);border-radius:16px;padding:10px 12px;display:grid;gap:8px;background:var(--cream)}
+.chead{display:flex;justify-content:space-between;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.crow{display:grid;grid-template-columns:62px 1fr 70px 76px;gap:6px;align-items:center}
+.crow input,.crow select{min-height:44px;padding:8px 10px;background:var(--surface)}
+.clab{font-size:14px;font-weight:600}
+.cres{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;color:var(--clay);text-align:right;font-size:15px}
+.csum{font-size:15px;display:block}
+.csum:empty{display:none}
+.warn{display:block;background:var(--honey-soft);border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
+.final{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.final div{background:var(--blush-2);border-radius:14px;padding:10px;text-align:center;display:grid;gap:2px}
+.final span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.final b{font-family:var(--display);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+
+/* Photo checkpoint */
+.check{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--clay);border-radius:14px;padding:10px 12px;cursor:pointer;background:var(--cream)}
+.check input{position:absolute;opacity:0;width:1px;height:1px}
+.check svg{width:28px;height:28px;flex:none}
+.check b{display:block;font-size:15px}
+.check span{font-size:13px;color:var(--muted)}
+.check img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex:none}
+.check.done{border-style:solid;border-color:#9CCB9F;background:#F1F8F0}
+
+/* Sheets (chat, Dana's view) */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--surface);border-radius:22px 22px 0 0;max-height:82vh;display:flex;flex-direction:column;
+  box-shadow:0 -10px 40px rgba(74,53,48,.18);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.sheet-in{max-width:560px;width:100%;margin:0 auto;display:flex;flex-direction:column;min-height:0;flex:1}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:14px 0 10px;border-bottom:1px solid var(--line)}
+.sheet-head h2{font-family:var(--display);font-variation-settings:"SOFT" 100;font-weight:500;font-size:20px;margin:0;flex:1}
+.thread{flex:1;overflow:auto;padding:12px 0;display:flex;flex-direction:column;gap:8px;min-height:160px}
+.bub{max-width:82%;padding:9px 12px;border-radius:16px;font-size:15px;line-height:1.4}
+.bub.them{background:var(--blush-2);align-self:flex-start;border-bottom-left-radius:6px}
+.bub.me{background:var(--clay);color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+.bub.sys{align-self:center;background:transparent;color:var(--muted);font-size:12px;padding:2px}
+.bub img{display:block;max-width:180px;border-radius:10px}
+.compose{display:grid;grid-template-columns:1fr auto;gap:8px;padding-top:8px}
+.quick{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:6px}
+.quick button{border:1px solid var(--line);background:var(--cream);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.feed{list-style:none;margin:0;padding:12px 0;display:grid;gap:10px;overflow:auto}
+.feed li{display:grid;grid-template-columns:52px 1fr;gap:10px;font-size:14px;align-items:start}
+.feed time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;padding-top:2px}
+.feed img{width:80px;height:80px;object-fit:cover;border-radius:10px;display:block;margin-top:4px}
+.feed .now{font-weight:700}
+
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="mark" href="../" aria-label="Hello Shade home">hello shade
+      <svg viewBox="0 0 26 16" aria-hidden="true"><path d="M3 15h20" stroke="#4A3530" stroke-width="1.4" stroke-linecap="round"/><path d="M7 15a6 6 0 0 1 12 0z" fill="#E8AE45"/><g stroke="#E8AE45" stroke-width="1.6" stroke-linecap="round"><path d="M13 5.2V2.6"/><path d="M8.4 7.4 6.6 5.6"/><path d="M17.6 7.4l1.8-1.8"/><path d="M5.6 11.6H3.4"/><path d="M20.4 11.6h2.2"/></g></svg>
+    </a>
+    <button class="steps-btn" id="stepsBtn" aria-haspopup="dialog"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Steps</button>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Guide">
+    <button class="tab" role="tab" id="tab-measure" data-guide="measure">How to measure</button>
+    <button class="tab" role="tab" id="tab-install" data-guide="install">How to install</button>
+  </div>
+
+  <div class="prog" aria-live="polite"><span id="progText">Step 1 of 9</span><div class="prog-track"><div class="prog-fill" id="progFill"></div></div><span id="progTime"></span></div>
+
+  <div class="dana" id="dana">
+    <div class="ava"><img alt="Dana" src="data:image/jpeg;base64,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"><i aria-hidden="true"></i></div>
+    <div class="dana-txt"><b>Dana's here to help</b><span id="danaSees">Stuck? Text her a photo anytime</span></div>
+    <div class="dana-btns">
+      <a class="pill chat" id="chatBtn" href="sms:+12017453300">Text Dana</a>
+    </div>
+  </div>
+
+  <main class="card" id="card"></main>
+  <p class="foot">Questions? Text Dana at <b>(201) 745-3300</b> · <a href="../" style="color:var(--clay)">Back to Hello Shade</a></p>
+</div>
+
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="All steps" hidden></aside>
+
+<script>
+(() => {
+const DANA = "+12017453300";
+const C = {cocoa:"#4A3530",clay:"#A9594A",honey:"#E8AE45",muted:"#7A5F57",line:"#EAD7CE",glass:"#E6EEF0",sky:"#CFE0E6",frame:"#FFFDFB",wall:"#F8EAE4",shade:"#EFE4D6",shade2:"#E2D3C1"};
+
+/* ---------- Art helpers (SVG strings, 320x220 canvas) ---------- */
+const wall = `<rect width="320" height="220" fill="${C.wall}"/>`;
+// Front view of a window: outer frame (casing), inner opening, sill.
+function windowFront({x=90,y=34,w=140,h=136,casing=12,shade=0}={}) {
+  const ox=x-casing, oy=y-casing, ow=w+casing*2, oh=h+casing*2;
+  return `
+  <rect x="${ox}" y="${oy}" width="${ow}" height="${oh}" rx="3" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/>
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${C.sky}"/>
+  <path d="M${x} ${y+h*0.62} q${w*0.25} -18 ${w*0.5} -6 t${w*0.5} -8 V${y+h} H${x}z" fill="#BFD5C4" opacity=".8"/>
+  <line x1="${x+w/2}" y1="${y}" x2="${x+w/2}" y2="${y+h}" stroke="${C.frame}" stroke-width="5"/>
+  ${shade?`<rect x="${x+1}" y="${y+1}" width="${w-2}" height="${shade}" fill="${C.shade}"/><rect x="${x+1}" y="${y+shade-6}" width="${w-2}" height="6" fill="${C.shade2}"/>`:""}
+  <rect x="${ox-8}" y="${oy+oh-2}" width="${ow+16}" height="10" rx="2" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/>`;
+}
+// Measuring line with end ticks and a label; animated draw.
+function hline(x1,x2,y,label,cls="",color=C.clay){
+  const len=Math.abs(x2-x1);
+  return `<g class="${cls}"><line class="draw" style="--len:${len}" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+  <line x1="${x1}" y1="${y-7}" x2="${x1}" y2="${y+7}" stroke="${color}" stroke-width="2.5"/><line x1="${x2}" y1="${y-7}" x2="${x2}" y2="${y+7}" stroke="${color}" stroke-width="2.5"/>
+  ${label?`<g class="pop d2"><rect x="${(x1+x2)/2-24}" y="${y-22}" width="48" height="18" rx="9" fill="${color}"/><text x="${(x1+x2)/2}" y="${y-9}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="700" fill="#fff">${label}</text></g>`:""}</g>`;
+}
+function vline(x,y1,y2,label,cls="",color=C.clay){
+  const len=Math.abs(y2-y1);
+  return `<g class="${cls}"><line class="draw" style="--len:${len}" x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+  <line x1="${x-7}" y1="${y1}" x2="${x+7}" y2="${y1}" stroke="${color}" stroke-width="2.5"/><line x1="${x-7}" y1="${y2}" x2="${x+7}" y2="${y2}" stroke="${color}" stroke-width="2.5"/>
+  ${label?`<g class="pop d2"><rect x="${x-24}" y="${(y1+y2)/2-9}" width="48" height="18" rx="9" fill="${color}"/><text x="${x}" y="${(y1+y2)/2+4}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="700" fill="#fff">${label}</text></g>`:""}</g>`;
+}
+const svg = inner => `<svg viewBox="0 0 320 220" role="img" aria-hidden="true">${inner}</svg>`;
+const txt = (x,y,s,size=12,fill=C.cocoa,w=600,anchor="middle") => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="DM Sans, sans-serif" font-size="${size}" font-weight="${w}" fill="${fill}">${s}</text>`;
+
+// Small part icons for the chips (40x40)
+const ICON = {
+  tape:`<svg viewBox="0 0 40 40"><rect x="6" y="10" width="22" height="22" rx="6" fill="${C.honey}"/><circle cx="17" cy="21" r="5" fill="#fff"/><rect x="26" y="26" width="10" height="5" rx="1" fill="#C9C2B8"/></svg>`,
+  pencil:`<svg viewBox="0 0 40 40"><g transform="rotate(-35 20 20)"><rect x="6" y="17" width="24" height="6" fill="${C.honey}"/><path d="M30 17l6 3-6 3z" fill="#E8C9A0"/><rect x="4" y="17" width="3" height="6" fill="${C.clay}"/></g></svg>`,
+  phone:`<svg viewBox="0 0 40 40"><rect x="12" y="5" width="16" height="30" rx="4" fill="${C.cocoa}"/><rect x="14" y="9" width="12" height="20" rx="1" fill="${C.sky}"/></svg>`,
+  drill:`<svg viewBox="0 0 40 40"><rect x="6" y="12" width="20" height="10" rx="3" fill="${C.clay}"/><rect x="26" y="15.5" width="9" height="3" fill="#9A938A"/><path d="M12 22h7l-2 12h-5z" fill="${C.cocoa}"/></svg>`,
+  level:`<svg viewBox="0 0 40 40"><rect x="4" y="15" width="32" height="10" rx="2" fill="${C.honey}"/><rect x="16" y="17" width="8" height="6" rx="3" fill="#CDEBC3"/><circle cx="20" cy="20" r="1.6" fill="${C.cocoa}"/></svg>`,
+  screwdriver:`<svg viewBox="0 0 40 40"><g transform="rotate(-35 20 20)"><rect x="4" y="16" width="13" height="8" rx="3" fill="${C.clay}"/><rect x="17" y="18.5" width="17" height="3" fill="#9A938A"/></g></svg>`,
+  screw:`<svg viewBox="0 0 40 40"><path d="M10 17h6v6h-6z" fill="#8E877E"/><path d="M16 18.5h16l3 1.5-3 1.5H16z" fill="#B0A99F"/><path d="M19 18v4M22 18v4M25 18v4M28 18v4" stroke="#8E877E" stroke-width="1"/></svg>`,
+  bracket:`<svg viewBox="0 0 40 40"><path d="M10 9h16v6H16v16h-6z" fill="#D9D2C7" stroke="#9A938A" stroke-width="1.2"/><circle cx="21" cy="12" r="1.6" fill="#9A938A"/><circle cx="13" cy="25" r="1.6" fill="#9A938A"/></svg>`,
+  anchor:`<svg viewBox="0 0 40 40"><path d="M10 17h4l18 2v2l-18 2h-4z" fill="#F0E6C8" stroke="#C9B98E" stroke-width="1"/></svg>`,
+  shade:`<svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="6" rx="3" fill="${C.shade2}"/><rect x="7" y="14" width="26" height="18" fill="${C.shade}"/><rect x="7" y="30" width="26" height="3" fill="${C.shade2}"/></svg>`,
+  laser:`<svg viewBox="0 0 40 40"><rect x="6" y="12" width="18" height="16" rx="3" fill="${C.honey}"/><rect x="9" y="15" width="10" height="5" rx="1" fill="${C.cocoa}"/><path d="M24 20h12" stroke="#E0533D" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2"/></svg>`,
+  tensioner:`<svg viewBox="0 0 40 40"><rect x="14" y="20" width="12" height="14" rx="3" fill="#E6E0D6" stroke="#9A938A" stroke-width="1.2"/><path d="M17 6v18M23 6v18" stroke="${C.muted}" stroke-width="1.6" stroke-dasharray="2 2"/></svg>`,
+};
+
+/* ---------- Guides ---------- */
+// Each step: id, title, text, tip, parts [[icon,label,count]], art(), choices, variant {label,to}, detourOf
+const MEASURE = {
+  name:"How to measure", minutes:7,
+  start:["photo","case","width","height","depth","check"],
+  paths:{},
+  end:["send"],
+  steps:{
+    photo:{group:"Start here",title:"Start with a photo of your window",recommend:true,photo:["Take the window photo","Straight on, with a little wall around it"],text:"Stand back and take one straight-on photo of the whole window, with a little wall around it. You'll send it to Dana at the end, and she'll recommend a mount and a shade.",
+      art:()=>svg(wall+windowFront({})+`<g class="bob"><rect x="200" y="92" width="74" height="118" rx="12" fill="${C.cocoa}"/><rect x="206" y="104" width="62" height="88" rx="3" fill="${C.sky}"/><rect x="216" y="122" width="42" height="52" fill="${C.frame}"/><rect x="220" y="126" width="34" height="44" fill="${C.glass}"/><circle cx="237" cy="200" r="4" fill="#fff" opacity=".6"/></g>`)},
+    case:{group:"Your tape measure",title:"Find your tape's case length",caseInput:true,
+      text:"Turn your tape measure over. Most have a number printed on the bottom or back, like <b>3″</b>. That's the length of the case. Inside a window frame you'll measure with the case pressed against one side, so we add this number for you.",
+      variant:{label:"I can't find a number",to:"v-case"},
+      art:()=>svg(wall+`<g transform="translate(70 46)"><rect x="0" y="0" width="150" height="110" rx="26" fill="${C.honey}"/><rect x="14" y="14" width="122" height="82" rx="16" fill="#D9982F" opacity=".35"/><text x="75" y="66" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="34" font-weight="600" fill="${C.cocoa}">3″</text><rect x="150" y="84" width="40" height="12" rx="2" fill="#C9C2B8"/><rect x="186" y="80" width="6" height="20" rx="1" fill="#9A938A"/></g>`+hline(70,220,184,"case","pop d1")+txt(160,212,"Bottom of the tape measure",12,C.muted,600))},
+    "v-case":{detourOf:"case",group:"Your tape measure",title:"Measure the case yourself",caseInput:true,
+      text:"Set the tape on a table. Pull out a few inches of tape and bend it down along the side of the case. Read the tape from the <b>back</b> of the case to the spot where the tape comes out. That's your case length. Or snap a photo of the case and Dana will figure it out.",
+      photo:["Send Dana a photo of the case","Side view, with the tape pulled out a little"],
+      art:()=>svg(wall+`<g transform="translate(60 60)"><rect x="0" y="20" width="130" height="90" rx="22" fill="${C.honey}"/><path d="M130 96 H190 V40" fill="none" stroke="#C9C2B8" stroke-width="8"/></g>`+hline(60,190,196,"3¼″","pop d1"))},
+    width:{group:"Measure",title:"Width: case against one side",calc:"w",
+      text:"Press the <b>back of the case</b> flat against the left side of the frame. Pull the tape out until the metal hook touches the right side. Read the number <b>right where the tape comes out of the case</b>. Do it at the top, middle and bottom.",
+      photo:["Show Dana one reading","Photo of the tape where it leaves the case"],
+      variant:{label:"How do I read the little lines?",to:"v-read"},
+      art:()=>svg(wall+windowFront({x:40,y:34,w:240,h:136})+caseTape({x1:40,x2:280,y:108})+`<g class="pop d4">${hline(40,280,196,"","")}${txt(160,190,"",11)}<rect x="122" y="182" width="76" height="22" rx="11" fill="${C.cocoa}"/>${txt(160,197,"= width",12,"#fff",700)}</g>`)},
+    "v-read":{detourOf:"width",group:"Measure",title:"Reading the little lines",
+      text:"Each inch is split into 16 small lines. Count the lines past the last whole number: the tallest middle line is <b>½</b>, the next tallest are <b>¼</b> and <b>¾</b>, and the short ones in between are <b>eighths</b>. Pick the closest eighth below. If it's between two lines, pick the smaller one.",
+      tip:"Not sure? Snap a photo of the tape and Dana will read it for you.",
+      art:()=>svg(wall+readArt())},
+    height:{group:"Measure",title:"Height: case on the sill",calc:"h",
+      text:"Stand the case on the sill with its <b>back edge down</b>. Push the tape straight up until the hook touches the top of the opening. Read where the tape comes out of the case. Do it on the left, middle and right.",
+      photo:["Show Dana one reading","Photo of the tape where it leaves the case"],
+      art:()=>svg(wall+windowFront({x:90,y:20,w:140,h:156})+caseTapeV({x:160,y1:176,y2:20}))},
+    depth:{group:"Measure",title:"Check the depth",calc:"d",
+      text:"This one's quick, and you don't add the case. Touch the end of the tape to the glass at the top of the window and read the number at the front edge of the frame. Most shades need about <b>2″</b>; Roman and Woven need about <b>2½″</b>.",
+      variant:{label:"My frame isn't deep enough",to:"v-shallow"},
+      art:()=>svg(wall+`<rect x="70" y="40" width="40" height="150" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="110" y="40" width="120" height="16" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="214" y="56" width="10" height="134" fill="${C.sky}"/><rect x="110" y="182" width="130" height="10" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/>`+hline(118,214,74,"2\"","")+txt(170,212,"Side view: top of the frame",12,C.muted,600)+txt(232,70,"glass",11,C.muted,600,"start"))},
+    "v-shallow":{detourOf:"depth",group:"Measure",title:"Shallow frame? No problem",
+      text:"If you have less than 2 inches, the shade would stick out past the frame. Dana will set you up with an outside mount instead, which hangs above the window. Keep going; your measurements still work.",
+      art:()=>svg(wall+`<rect x="80" y="50" width="160" height="12" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="150" y="62" width="10" height="120" fill="${C.sky}"/><rect x="96" y="62" width="70" height="22" rx="4" fill="${C.shade2}"/><path d="M100 100l20-12M120 100l-20-12" stroke="${C.clay}" stroke-width="3" stroke-linecap="round" class="pop d1"/>`+txt(160,206,"Shade sticks out past the frame",12,C.muted,600))},
+    check:{group:"Measure",title:"Anything in the way?",
+      text:"Look along the top and sides for window cranks, handles, alarm sensors or locks that stick out. The shade has to clear them when it goes up and down.",
+      variant:{label:"I have a crank or handle in the way",to:"v-crank"},
+      art:()=>svg(wall+windowFront({})+`<g class="pop d1"><circle cx="196" cy="158" r="9" fill="${C.muted}"/><rect x="196" y="155" width="26" height="6" rx="3" fill="${C.muted}"/></g><g class="pop d2"><rect x="88" y="38" width="16" height="10" rx="2" fill="#fff" stroke="${C.muted}" stroke-width="1.5"/></g><circle cx="196" cy="158" r="20" fill="none" stroke="${C.honey}" stroke-width="3" class="pop d3"/>`)},
+    "v-crank":{detourOf:"check",group:"Measure",title:"Cranks and handles",
+      text:"Measure how far it sticks out from the glass. If it sticks out past where the shade hangs, Dana will suggest an outside mount or a crank extender (about $10 at a hardware store) that folds it out of the way.",
+      photo:["Show Dana the crank","A side view helps"],
+      art:()=>svg(wall+`<rect x="80" y="50" width="160" height="12" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="200" y="62" width="10" height="120" fill="${C.sky}"/><rect x="170" y="150" width="30" height="8" rx="4" fill="${C.muted}"/><circle cx="170" cy="154" r="7" fill="${C.muted}"/>`+hline(170,200,176,"1¼\"","")+txt(160,208,"Side view: crank sticks out from the glass",12,C.muted,600))},
+    send:{group:"Finish",title:"Send to Dana",form:true,
+      text:"We did the math. Check the window name, then send it. Attach your window photo and one tape photo, and Dana will confirm everything, usually within the hour.",
+      tip:"<b>Fit guarantee:</b> measure wrong and we'll remake it free, as long as Dana checked your numbers first.",
+      art:()=>svg(wall+`<rect x="80" y="30" width="160" height="170" rx="18" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="100" y="56" width="104" height="28" rx="14" fill="${C.line}"/><rect x="116" y="96" width="104" height="44" rx="14" fill="${C.clay}" class="pop d1"/>${txt(168,116,"Living room",11,"#fff",700)}${txt(168,131,"35⅝ × 59¾",11,"#fff",600)}<rect x="100" y="150" width="90" height="28" rx="14" fill="${C.line}" class="pop d3"/>${txt(145,168,"Looks good!",11,C.cocoa,700)}`)},
+  }
+};
+// Case-against-jamb width illustration
+function caseTape({x1,x2,y}){
+  const cw=34, cx=x1, bx=x1+cw;
+  return `<rect x="${cx}" y="${y-18}" width="${cw}" height="36" rx="9" fill="${C.honey}"/>
+  <line class="draw" style="--len:${x2-bx}" x1="${bx}" y1="${y+12}" x2="${x2-3}" y2="${y+12}" stroke="#D8D1C5" stroke-width="7"/>
+  <rect x="${x2-4}" y="${y+5}" width="4" height="14" fill="#9A938A" class="pop d2"/>
+  <g class="pop d2"><rect x="${cx-2}" y="${y-44}" width="${cw+4}" height="20" rx="10" fill="${C.honey}"/>${txt(cx+cw/2,y-30,"3″",11,C.cocoa,700)}</g>
+  <g class="pop d3"><rect x="${(bx+x2)/2-34}" y="${y-44}" width="68" height="20" rx="10" fill="${C.clay}"/>${txt((bx+x2)/2,y-30,"32½″",11,"#fff",700)}</g>
+  <circle cx="${bx+1}" cy="${y+12}" r="9" fill="none" stroke="${C.clay}" stroke-width="2.5" class="pop d3"/>`;
+}
+function caseTapeV({x,y1,y2}){
+  const ch=34, by=y1-ch;
+  return `<rect x="${x-18}" y="${by}" width="36" height="${ch}" rx="9" fill="${C.honey}"/>
+  <line class="draw" style="--len:${by-y2}" x1="${x+12}" y1="${by}" x2="${x+12}" y2="${y2+3}" stroke="#D8D1C5" stroke-width="7"/>
+  <rect x="${x+5}" y="${y2}" width="14" height="4" fill="#9A938A" class="pop d2"/>
+  <g class="pop d2"><rect x="${x-74}" y="${by+7}" width="44" height="20" rx="10" fill="${C.honey}"/>${txt(x-52,by+21,"3″",11,C.cocoa,700)}</g>
+  <g class="pop d3"><rect x="${x+28}" y="${(by+y2)/2-10}" width="62" height="20" rx="10" fill="${C.clay}"/>${txt(x+59,(by+y2)/2+4,"56¾″",11,"#fff",700)}</g>
+  <circle cx="${x+12}" cy="${by-1}" r="9" fill="none" stroke="${C.clay}" stroke-width="2.5" class="pop d3"/>`;
+}
+function readArt(){
+  let g=`<rect x="20" y="70" width="280" height="64" rx="4" fill="#F2E7C8" stroke="#D9C78F"/>`;
+  const x0=40, inch=240;
+  for(let i=0;i<=16;i++){ const x=x0+i*inch/16; const h=i%16===0?40:i%8===0?30:i%4===0?22:i%2===0?16:10;
+    g+=`<line x1="${x}" y1="70" x2="${x}" y2="${70+h}" stroke="${C.cocoa}" stroke-width="${i%16===0?2.4:1.4}"/>`; }
+  g+=txt(x0,128,"35",14,C.cocoa,700)+txt(x0+inch,128,"36",14,C.cocoa,700);
+  g+=`<g class="pop d1">${txt(x0+inch/2,60,"½",14,C.clay,700)}</g><g class="pop d2">${txt(x0+inch/4,60,"¼",13,C.clay,700)}${txt(x0+inch*3/4,60,"¾",13,C.clay,700)}</g>`;
+  const x58=x0+inch*10/16; g+=`<g class="pop d3"><line x1="${x58}" y1="40" x2="${x58}" y2="150" stroke="${C.clay}" stroke-width="2.5" stroke-dasharray="4 3"/><rect x="${x58-40}" y="156" width="80" height="22" rx="11" fill="${C.clay}"/>${txt(x58,171,"35⅝″",12,"#fff",700)}</g>`;
+  return g;
+}
+
+const INSTALL = {
+  name:"How to install", minutes:15, sub:"Roller shade · Inside mount",
+  start:["i-tools","i-parts","i-mark","i-drill","i-hang","i-test","i-tension","i-done"],
+  paths:{}, end:[],
+  steps:{
+    "i-tools":{group:"Before you start",title:"Tools you'll need",text:"Set aside about 15 minutes per window. Clear the sill so you can reach the top of the frame.",
+      parts:[["drill","Drill with a small bit",1],["screwdriver","Phillips screwdriver",1],["level","Level",1],["pencil","Pencil",1]],
+      art:()=>svg(wall+windowFront({})+`<g class="bob"><rect x="218" y="120" width="66" height="30" rx="8" fill="${C.clay}"/><rect x="284" y="131" width="26" height="8" fill="#9A938A"/><path d="M234 150h22l-6 46h-16z" fill="${C.cocoa}"/></g>`)},
+    "i-parts":{group:"Before you start",title:"Check the box",text:"Unpack everything and match it to this list. Keep the screws in a cup so none roll away.",
+      parts:[["shade","Roller shade",1],["bracket","Brackets",2],["screw","Bracket screws",4],["anchor","Wall anchors",4],["tensioner","Chain tensioner",1]],
+      tip:"Something missing? Text a designer and we'll ship it the same day.",
+      art:()=>svg(wall+`<rect x="40" y="70" width="240" height="26" rx="13" fill="${C.shade2}" class="pop d1"/><rect x="60" y="110" width="40" height="50" fill="#D9D2C7" stroke="#9A938A" class="pop d2"/><rect x="110" y="110" width="40" height="50" fill="#D9D2C7" stroke="#9A938A" class="pop d2"/>`+[0,1,2,3].map(i=>`<g class="pop d3"><rect x="${172+i*22}" y="118" width="6" height="30" rx="2" fill="#B0A99F"/><rect x="${169+i*22}" y="114" width="12" height="6" rx="2" fill="#8E877E"/></g>`).join("")+txt(160,196,"x1 shade · x2 brackets · x4 screws",12,C.muted,600))},
+    "i-mark":{group:"Install",title:"Mark the bracket spots",photo:["Show Dana your marks","She'll confirm before you drill"],text:"Hold a bracket inside the top of the frame, 2 inches in from the side, with its front edge lined up with the front of the frame. Mark the screw holes. Repeat on the other side.",
+      variant:{label:"My shade is wider than 50\"",to:"v-wide"},
+      parts:[["bracket","Brackets",2],["pencil","Pencil",1]],
+      art:()=>svg(wall+windowFront({})+`<g class="pop d1"><rect x="104" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/></g><g class="pop d2"><rect x="198" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/></g>`+hline(90,104,62,"2\"","d3")+hline(216,230,62,"2\"","d3"))},
+    "v-wide":{detourOf:"i-mark",group:"Install",title:"Wide shades get a center bracket",text:"If your box came with a third bracket, put it in the middle, lined up with the other two. It stops a wide shade from sagging.",
+      parts:[["bracket","Center bracket",1],["screw","Screws",2]],
+      art:()=>svg(wall+windowFront({x:50,w:220})+`<g class="pop d1"><rect x="64" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/><rect x="238" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/></g><g class="pop d2"><rect x="151" y="34" width="18" height="12" fill="${C.honey}" stroke="#9A938A"/></g>`)},
+    "i-drill":{group:"Install",title:"Drill and screw in the brackets",text:"Drill a small pilot hole at each mark. Screw the brackets in snug, but don't crank them so hard the wood splits.",
+      variant:{label:"I'm drilling into drywall, metal or tile",to:"v-wall"},
+      parts:[["screw","Bracket screws",4],["drill","Drill",1]],
+      art:()=>svg(wall+`<rect x="40" y="40" width="240" height="40" fill="${C.frame}" stroke="${C.line}" stroke-width="2"/><rect x="120" y="80" width="40" height="30" fill="#D9D2C7" stroke="#9A938A" class="pop d1"/><g class="slide-up"><rect x="132" y="150" width="6" height="40" fill="#9A938A"/><rect x="118" y="186" width="64" height="26" rx="6" fill="${C.clay}"/></g>`)},
+    "v-wall":{detourOf:"i-drill",group:"Install",title:"Drywall, metal or tile",text:"Drywall: drill, tap in a wall anchor, then screw into the anchor. Metal frames: use a metal drill bit and go slowly. Tile: use a tile bit and tape over the spot so the bit doesn't skate.",
+      parts:[["anchor","Wall anchors",4]],
+      tip:"Never sure what's behind the wall? Text a photo and we'll tell you what to use.",
+      art:()=>svg(wall+`<rect x="40" y="70" width="240" height="60" fill="#EFEAE3" stroke="${C.line}" stroke-width="2"/><g class="pop d1"><path d="M120 92h8l40 6v4l-40 6h-8z" fill="#F0E6C8" stroke="#C9B98E"/></g><g class="pop d2"><rect x="176" y="96" width="60" height="8" rx="2" fill="#B0A99F"/></g>`+txt(160,160,"Anchor first, then the screw",12,C.muted,600))},
+    "i-hang":{group:"Install",title:"Click the shade in",text:"Hook the back edge of the roller into both brackets, then push the front up until you hear a click. Tug down gently to make sure it's locked.",
+      parts:[["shade","Roller shade",1]],
+      art:()=>svg(wall+windowFront({})+`<rect x="104" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/><rect x="198" y="34" width="18" height="12" fill="#D9D2C7" stroke="#9A938A"/><g class="slide-up"><rect x="96" y="96" width="128" height="16" rx="8" fill="${C.shade2}"/></g>`+txt(160,198,"Back edge in, push up, click",12,C.muted,600))},
+    "i-test":{group:"Install",title:"Test it",photo:["Show Dana a quick photo","Shade halfway down"],text:"Pull the shade all the way down and let it roll back up a few times. It should roll straight and stop where you leave it.",
+      variant:{label:"It rolls crooked",to:"v-crooked"},
+      art:()=>svg(wall+windowFront({shade:110})+`<g class="bob"><path d="M160 150v24" stroke="${C.muted}" stroke-width="2" stroke-dasharray="3 3"/></g>`)},
+    "v-crooked":{detourOf:"i-test",group:"Install",title:"Fix a crooked roll",text:"Check both brackets with your level. If one is lower, loosen its screws, raise it slightly and tighten. Then roll the shade all the way up and down twice to let the fabric settle.",
+      parts:[["level","Level",1]],
+      art:()=>svg(wall+windowFront({})+`<rect x="96" y="40" width="128" height="10" rx="5" fill="${C.honey}" class="pop d1"/><rect x="146" y="42" width="28" height="6" rx="3" fill="#CDEBC3" class="pop d1"/>`)},
+    "i-tension":{group:"Install",title:"Install the chain tensioner",text:"This keeps the chain tight so it isn't a loop children can get caught in. Pull the chain straight down, slide the tensioner onto it, and screw the tensioner to the frame where the chain is taut.",
+      tip:"<b>Don't skip this step.</b> A loose chain loop is a strangulation risk for young children and pets.",
+      variant:{label:"My shade is cordless",to:"v-cordless"},
+      parts:[["tensioner","Chain tensioner",1],["screw","Small screws",2]],
+      art:()=>svg(wall+windowFront({shade:60})+`<path d="M222 40v128" stroke="${C.muted}" stroke-width="3" stroke-dasharray="3 3"/><path d="M232 40v128" stroke="${C.muted}" stroke-width="3" stroke-dasharray="3 3"/><rect x="216" y="160" width="22" height="24" rx="4" fill="#E6E0D6" stroke="#9A938A" class="pop d2"/>`)},
+    "v-cordless":{detourOf:"i-tension",group:"Install",title:"Cordless shades",text:"No chain, no tensioner. Pull the bottom bar down to lower it and give it a short tug to let it roll back up.",
+      art:()=>svg(wall+windowFront({shade:90})+`<g class="bob"><rect x="140" y="118" width="40" height="8" rx="4" fill="${C.cocoa}"/></g>`)},
+    "i-done":{group:"Finish",title:"You did it",photo:["Send the finished window","We love seeing these"],text:"Send your designer a photo of the finished window. We love seeing them, and we'll flag anything that looks off.",
+      art:()=>svg(wall+windowFront({shade:70})+`<g class="pop d1"><circle cx="262" cy="52" r="22" fill="${C.honey}"/><path d="M252 52l7 7 13-14" stroke="${C.cocoa}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`)},
+  }
+};
+const GUIDES = {measure:MEASURE, install:INSTALL};
+
+/* ---------- State ---------- */
+let guideKey = "measure";
+let mount = null;           // measure path choice
+let tool = null;            // tape or laser
+const rec = {status:"idle", data:null};
+const pickVal = s => s.choiceKey==="tool" ? tool : mount;
+let path = [];              // ids of the main path
+let idx = 0;                // position in path
+let detour = null;          // id of a variant step being shown
+const blank = () => [["",0],["",0],["",0]];
+const form = {room:"Living room", caseLen:"", w:blank(), h:blank(), d:[["",0]]};
+
+function buildPath(){
+  const g = GUIDES[guideKey];
+  path = [...g.start, ...(mount && g.paths[mount] ? g.paths[mount] : []), ...g.end];
+}
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem("hs-guide2")||"{}"); if(s.form && Array.isArray(s.form.w)) Object.assign(form,s.form);}catch(e){}
+}
+function save(){ try{ localStorage.setItem("hs-guide2",JSON.stringify({form})); }catch(e){} }
+
+/* ---------- Render ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function stepTotal(){ // count steps including the not-yet-chosen branch (use inside length as estimate)
+  const g = GUIDES[guideKey];
+  const branch = mount ? (g.paths[mount]||[]).length : (g.paths.inside? g.paths.inside.length:0);
+  return g.start.length + branch + g.end.length;
+}
+function render(){
+  const g = GUIDES[guideKey];
+  const id = detour || path[idx];
+  const s = g.steps[id];
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.guide===guideKey));
+  const total = stepTotal();
+  $("#progText").textContent = detour ? "Extra step" : `Step ${idx+1} of ${total}`;
+  $("#progFill").style.width = `${Math.round(((idx+1)/total)*100)}%`;
+  $("#progTime").textContent = `about ${g.minutes} min`;
+
+  let body = "";
+  if (detour) body += `<div class="detour">↳ For your window</div>`;
+  body += `<div class="eyebrow">${esc(s.group)}${g.sub && !detour ? " · "+esc(g.sub):""}</div><h1 tabindex="-1" id="stepTitle">${esc(s.title)}</h1><p>${(tool==="laser"&&s.laser)||s.text}</p>`;
+  if (s.parts) body += `<div class="parts" aria-label="What you need for this step">${s.parts.map(([ic,l,n])=>`<span class="chip">${ICON[ic]}<span>${esc(l)}</span><span class="n">×${n}</span></span>`).join("")}</div>`;
+  if (s.caseInput) body += caseHTML();
+  if (s.calc) body += calcHTML(s.calc);
+  if (s.tip) body += `<div class="tip">${s.tip}</div>`;
+  if (s.choices) body += `<div class="choices">${s.choices.map(([k,t,d])=>`<button class="choice" data-pick="${s.choiceKey}" data-val="${k}" ${(s.choiceKey==="mount"?mount:tool)===k?'style="border-color:var(--clay);background:var(--blush-2)"':""}>${k==="laser"?ICON.laser.replace('viewBox','width="64" height="48" viewBox'):k==="tape"?ICON.tape.replace('viewBox','width="64" height="48" viewBox'):k==="inside"
+      ?`<svg viewBox="0 0 64 48"><rect x="6" y="4" width="52" height="40" fill="#FFFDFB" stroke="${C.line}" stroke-width="2"/><rect x="12" y="10" width="40" height="30" fill="${C.sky}"/><rect x="12" y="10" width="40" height="16" fill="${C.shade}"/></svg>`
+      :`<svg viewBox="0 0 64 48"><rect x="10" y="8" width="44" height="36" fill="#FFFDFB" stroke="${C.line}" stroke-width="2"/><rect x="15" y="13" width="34" height="27" fill="${C.sky}"/><rect x="4" y="2" width="56" height="22" fill="${C.shade}"/></svg>`}<span><b>${t}${s.choiceKey==="mount"&&rec.data&&rec.data.mount===k?' <em class="sugg">Dana suggests</em>':""}</b><span>${d}</span></span></button>`).join("")}</div>`;
+  if (s.variant && !detour) body += `<button class="variant" data-variant="${s.variant.to}">${esc(s.variant.label)}</button>`;
+  if (s.switchTo) body += `<button class="variant" data-switch="${s.switchTo}">Switch to outside mount</button>`;
+  if (s.photo){ const ph = photos[id];
+    body += `<label class="check${ph?" done":""}" for="ph-${id}"><input type="file" accept="image/*" capture="environment" id="ph-${id}" data-photo="${id}">${ph?`<img src="${ph}" alt="Your photo">`:`<svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="7" width="22" height="16" rx="4" fill="none" stroke="${C.clay}" stroke-width="2"/><circle cx="14" cy="15" r="4.5" fill="none" stroke="${C.clay}" stroke-width="2"/><path d="M10 7l2-3h4l2 3" fill="none" stroke="${C.clay}" stroke-width="2"/></svg>`}<span><b>${ph?"Got it. Attach it in your text to Dana":esc(tool==="laser"?s.photo[0].replace("your tape","the laser reading"):s.photo[0])}</b><span>${ph?"Tap to retake. It stays on your phone.":esc(s.photo[1])}</span></span></label>`; }
+  if (s.recommend) body += recHTML();
+  if (s.form) body += formHTML();
+
+  const isLast = !detour && idx === path.length-1;
+  const nextLabel = detour ? "Back to the steps" : (s.choices && !pickVal(s)) ? "Choose one above" : isLast ? (guideKey==="measure"?"Measure another window":"Start over") : "Next";
+  $("#card").innerHTML = `<div class="art">${s.art()}</div><div class="copy">${body}</div>
+    <div class="nav"><button class="back" id="back" aria-label="Previous step" ${(!detour && idx===0)?"disabled":""}><svg viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="next" id="next" ${s.choices && !pickVal(s) && !detour ? "disabled style=\"opacity:.45;cursor:default\"":""}>${nextLabel} ${(!isLast||detour)?'<svg viewBox="0 0 20 20"><path d="M8 4l6 6-6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}</button></div>`;
+  wire(s);
+  renderDrawer();
+  // Presence: Dana sees where you are
+  $("#chatBtn").href = `sms:${DANA}?&body=${encodeURIComponent(`Hi Dana! I'm measuring my window and I'm on "${s.title}". Quick question: `)}`;
+  const key = guideKey+":"+id;
+  if (key !== lastLogged){ lastLogged = key; log(`${detour?"Opened extra step":"On step"}: <span class="now">${esc(s.title)}</span>`); }
+}
+
+/* ---------- Dana's recommendation from the photo ---------- */
+function recHTML(){
+  const av = document.querySelector("#dana img").src;
+  if (rec.status==="idle") return "";
+  const head = `<div class="rec-head"><img src="${av}" alt=""><b>${rec.status==="thinking"?"Dana's looking at your window…":"Dana's recommendation"}</b></div>`;
+  if (rec.status==="thinking") return `<div class="rec">${head}<div class="dots" aria-label="Thinking"><i></i><i></i><i></i></div></div>`;
+  if (rec.status==="unavailable") return `<div class="rec">${head.replace("Dana's recommendation","Dana has your photo")}<p>She'll look at it and send her recommendation in your chat in a few minutes. Keep going with the steps.</p></div>`;
+  const d = rec.data;
+  if (!d.is_window) return `<div class="rec">${head}<p>${esc(d.message||"That doesn't look like a window. Try a straight-on photo of the whole window.")}</p></div>`;
+  return `<div class="rec">${head}<p>${esc(d.message||"")}</p>
+    <dl><dt>Mount</dt><dd><b>${d.mount==="outside"?"Outside":"Inside"} mount.</b> ${esc(d.mount_why||"")}</dd>
+    <dt>Shade</dt><dd><b>${esc(d.shade)} · ${esc(d.light)}.</b> ${esc(d.shade_why||"")}</dd>
+    ${(d.watch_for&&d.watch_for.length)?`<dt>Watch for</dt><dd><ul>${d.watch_for.slice(0,3).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></dd>`:""}</dl></div>`;
+}
+async function analyze(file){
+  rec.status="thinking"; rec.data=null; render();
+  let sample=null;
+  try{ sample = await window.claude?.use?.("sample"); }catch(e){}
+  let caps=null; if (sample) caps = await sample.limits().catch(()=>null);
+  if (!sample || !caps?.images){ rec.status="unavailable"; render(); return; }
+  const prompt = `You are Dana, a friendly window-shade designer at Hello Shade. We sell custom Roller, Roman, Zebra and Woven (woven wood) shades, each in Light filtering, Blackout or Sheer. The image is a customer's photo of one of their windows, taken before measuring.
+Look at the window: its type, the frame and trim, how deep the frame looks, the room it seems to be in, and anything that could get in the way of a shade (cranks, handles, locks, alarm sensors, a shallow sill, crown molding, a radiator).
+Recommend a mount: "inside" if the frame looks deep and square enough for a clean fit, "outside" if it looks shallow, has obstructions, or needs better light blocking (bedrooms, nurseries).
+Recommend one shade type and one light level that suit the room and window.
+Reply with only this JSON:
+{"is_window": true, "window": "short description", "mount": "inside" or "outside", "mount_why": "one short sentence", "shade": "Roller" | "Roman" | "Zebra" | "Woven", "light": "Light filtering" | "Blackout" | "Sheer", "shade_why": "one short sentence", "watch_for": ["up to 3 short things to check while measuring"], "message": "two warm, plain sentences from Dana to the customer in first person, no emoji"}
+If the photo is not a window, reply {"is_window": false, "message": "one friendly sentence asking for a straight-on photo of the whole window"}.`;
+  try{
+    const d = await sample.json(prompt, {images:[file]});
+    if (!d || typeof d!=="object") throw {code:"invalid_json"};
+    d.light = d.light || "Light filtering"; d.shade = d.shade || "Roller";
+    rec.data=d; rec.status="done";
+    if (d.is_window) log(`Dana recommended <span class="now">${d.mount==="outside"?"outside":"inside"} mount · ${esc(d.shade)}, ${esc(d.light.toLowerCase())}</span>`);
+  }catch(e){ rec.status="unavailable"; }
+  render();
+}
+
+/* ---------- Activity feed (what Dana sees) ---------- */
+const photos = {};
+const feed = [];
+let lastLogged = "";
+function log(html, img){ return;
+  const t = new Date(); feed.push({t:`${t.getHours()%12||12}:${String(t.getMinutes()).padStart(2,"0")}`, html, img});
+  if (!$("#viewSheet").hidden) renderFeed();
+}
+function renderFeed(){
+  $("#feed").innerHTML = feed.slice().reverse().map(e=>`<li><time>${e.t}</time><div>${e.html}${e.img?`<img src="${e.img}" alt="">`:""}</div></li>`).join("") || `<li><time></time><div>Nothing yet.</div></li>`;
+}
+
+/* ---------- Chat, Dana's view ---------- */
+const thread = [];
+function openSheet(id){ document.querySelectorAll(".sheet").forEach(x=>x.hidden=true); $("#"+id).hidden=false; $("#scrim2").hidden=false; }
+function closeSheets(){ document.querySelectorAll(".sheet").forEach(x=>x.hidden=true); $("#scrim2").hidden=true; }
+function curTitle(){ const g=GUIDES[guideKey]; return g.steps[detour||path[idx]].title; }
+function renderThread(){
+  if (!thread.length) thread.push({who:"them",text:`Hi, I'm Dana. I'm right here while you ${guideKey==="measure"?"measure":"install"}. I can see you're on "${curTitle()}". Ask me anything, or send a photo and I'll check it.`});
+  $("#thread").innerHTML = thread.map(m=>`<div class="bub ${m.who}">${m.img?`<img src="${m.img}" alt="">`:""}${m.text?esc(m.text):""}</div>`).join("");
+  $("#thread").scrollTop = 1e6;
+  const q = guideKey==="measure" ? ["Is this inside or outside mount?","My window looks different","Can you check my numbers?"] : ["What screws do I use?","It's not clicking in","Can you check my brackets?"];
+  $("#quick").innerHTML = q.map(x=>`<button type="button">${esc(x)}</button>`).join("");
+  $("#quick").querySelectorAll("button").forEach(b=>b.onclick=()=>sendChat(b.textContent));
+}
+function sendChat(text){
+  if (!text.trim()) return;
+  thread.push({who:"me",text}); thread.push({who:"sys",text:"Delivered · Dana usually replies in a few minutes"});
+  log(`Asked: “${esc(text)}”`);
+  renderThread();
+}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeSheets);
+
+const FR = ["","⅛","¼","⅜","½","⅝","¾","⅞"];
+function fmt(x){ if (!isFinite(x)) return "—"; let e=Math.round(x*8); const w=Math.floor(e/8), f=e%8; return w===0&&f ? `${FR[f]}″` : `${w}${FR[f]}″`; }
+function num([i,f]){ const n=parseFloat(i); return isFinite(n) ? n + (+f||0)/8 : NaN; }
+function caseNum(){ const c=parseFloat(form.caseLen); return isFinite(c)?c:NaN; }
+const CALC = {
+  w:{labels:["Top","Middle","Bottom"], pick:"narrowest", add:true, name:"Width"},
+  h:{labels:["Left","Middle","Right"], pick:"longest", add:true, name:"Height"},
+  d:{labels:["Depth"], pick:null, add:false, name:"Depth"},
+};
+function totals(k){ const c=CALC[k], cl=caseNum(); return form[k].map(r=>{ const n=num(r); return isFinite(n) ? (c.add ? (isFinite(cl)? n+cl : NaN) : n) : NaN; }); }
+function result(k){ const t=totals(k).filter(isFinite); if(!t.length) return NaN; const c=CALC[k]; return c.pick==="narrowest"?Math.min(...t):c.pick==="longest"?Math.max(...t):t[0]; }
+function caseHTML(){
+  const opts=[["2.5","2½″"],["2.75","2¾″"],["3","3″"],["3.25","3¼″"],["3.5","3½″"],["4","4″"]];
+  const other = form.caseLen && !opts.some(o=>o[0]===form.caseLen);
+  return `<div class="field"><label>My case length is</label><div class="cases">${opts.map(([v,l])=>`<button type="button" class="casebtn" data-case="${v}" aria-pressed="${form.caseLen===v}">${l}</button>`).join("")}
+    <span class="caseother"><input id="caseOther" inputmode="decimal" placeholder="Other" value="${other?esc(form.caseLen):""}" aria-label="Other case length in inches"></span></div></div>`;
+}
+function calcHTML(k){
+  const c=CALC[k], cl=caseNum();
+  const rows = c.labels.map((l,i)=>`<div class="crow"><span class="clab">${l}</span>
+    <input id="c-${k}-${i}" inputmode="numeric" placeholder="${k==="d"?"2":k==="w"?"32":"56"}" value="${esc(form[k][i][0])}" aria-label="${c.name} ${l} inches">
+    <select id="c-${k}-${i}-f" aria-label="${c.name} ${l} fraction">${FR.map((f,j)=>`<option value="${j}" ${+form[k][i][1]===j?"selected":""}>${j?f:"0"}</option>`).join("")}</select>
+    <span class="cres" id="r-${k}-${i}"></span></div>`).join("");
+  const needCase = c.add && !isFinite(cl) ? `<p class="small">Add your case length on the previous step and we'll add it here.</p>` : "";
+  return `<div class="calc"><div class="chead"><span>${c.add?"Number at the case":"Reading"}</span>${c.add?`<span>+ case ${isFinite(cl)?fmt(cl):"?"}</span>`:""}</div>${rows}${needCase}<div class="csum" id="sum-${k}"></div></div>`;
+}
+function updateCalc(k){
+  const c=CALC[k], cl=caseNum(), t=totals(k);
+  form[k].forEach((r,i)=>{ const el=$(`#r-${k}-${i}`); if(!el) return; const n=num(r);
+    el.textContent = !isFinite(n) ? "" : c.add ? (isFinite(cl)? `= ${fmt(t[i])}` : "") : (n<2 ? "Shallow" : "OK"); });
+  const sum=$(`#sum-${k}`); if(!sum) return;
+  const good=t.filter(isFinite);
+  if (!good.length){ sum.innerHTML=""; return; }
+  if (k==="d"){ const d=good[0]; sum.innerHTML = d>=2.5 ? `<b>${fmt(d)}</b> deep. Room for every shade.` : d>=2 ? `<b>${fmt(d)}</b> deep. Great for Roller and Zebra. Dana will check Roman and Woven.` : `<b>${fmt(d)}</b> deep. Dana will likely suggest an outside mount.`; return; }
+  const r=result(k), spread=Math.max(...good)-Math.min(...good);
+  sum.innerHTML = `${c.name}: <b>${fmt(r)}</b> <span class="small">(the ${c.pick} of your ${good.length} reading${good.length>1?"s":""})</span>` +
+    (good.length>1 && spread>0.25 ? `<span class="warn">Your readings differ by ${fmt(spread)}. That's common in older windows. Double-check the odd one out, and Dana will take a look.</span>` : "");
+}
+function formHTML(){
+  const w=result("w"), h=result("h"), d=result("d");
+  return `<div class="form">
+    <div class="field"><label for="f-room">Which window?</label><input id="f-room" value="${esc(form.room)}" placeholder="Living room, left window"></div>
+    <div class="final"><div><span>Width</span><b>${fmt(w)}</b></div><div><span>Height</span><b>${fmt(h)}</b></div><div><span>Depth</span><b>${fmt(d)}</b></div></div>
+    <div class="field"><label>Your message</label><div class="msg" id="msg"></div></div>
+    <div class="send">
+      <a class="honey" id="sms" href="#">Send to Dana</a>
+      <button class="ghost" id="copy" type="button">Copy message</button>
+      <p class="small">Or text it to <b>(201) 745-3300</b>.</p>
+    </div></div>`;
+}
+function msgText(){
+  const list = k => form[k].map(r=>{ const n=num(r); return isFinite(n)?fmt(n):"—"; }).join(", ");
+  const r = rec.data && rec.data.is_window ? `\nDana's pick from my photo: ${rec.data.mount} mount, ${rec.data.shade}, ${rec.data.light.toLowerCase()}` : "";
+  return `Hi Dana! Measurements for ${form.room || "my window"}:\nWidth ${fmt(result("w"))} × Height ${fmt(result("h"))}, depth ${fmt(result("d"))}\nTape at the case, before adding my ${isFinite(caseNum())?fmt(caseNum()):"?"} case: widths ${list("w")}; heights ${list("h")}${r}`;
+}
+function updateMsg(){
+  const t = msgText();
+  const el = $("#msg"); if (el) el.textContent = t;
+  const a = $("#sms"); if (a) a.href = `sms:${DANA}?&body=${encodeURIComponent(t)}`;
+}
+
+function wire(s){
+  $("#back").onclick = () => { if (detour){ detour=null; } else if (idx>0){ idx--; } render(); focusTitle(); };
+  $("#next").onclick = () => {
+    if (detour){ detour=null; render(); focusTitle(); return; }
+    if (s.choices && !pickVal(s)) return;
+    if (idx < path.length-1){ idx++; }
+    else { idx = 0; if (guideKey==="measure"){ form.w=blank(); form.h=blank(); form.d=[["",0]]; form.room=""; rec.status="idle"; rec.data=null; delete photos.photo; save(); } }
+    render(); focusTitle();
+  };
+  document.querySelectorAll("[data-photo]").forEach(inp=>inp.addEventListener("change",()=>{
+    const f=inp.files&&inp.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>{ photos[inp.dataset.photo]=r.result; log(`Sent a photo on <span class="now">${esc(curTitle())}</span>`, r.result); render(); }; r.readAsDataURL(f);
+  }));
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{
+    const v=b.dataset.val;
+    if (b.dataset.pick==="mount"){ mount=v; log(`Chose <span class="now">${v} mount</span>`); buildPath(); }
+    else { tool=v; log(`Measuring with a <span class="now">${v==="laser"?"laser measure":"steel tape"}</span>`); }
+    idx++; render(); focusTitle(); });
+  document.querySelectorAll("[data-variant]").forEach(b=>b.onclick=()=>{ detour=b.dataset.variant; render(); focusTitle(); });
+  document.querySelectorAll("[data-switch]").forEach(b=>b.onclick=()=>{ mount=b.dataset.switch; buildPath(); detour=null; idx=path.indexOf(GUIDES.measure.paths[mount][0]); render(); focusTitle(); });
+  if (s.caseInput){
+    document.querySelectorAll("[data-case]").forEach(btn=>btn.onclick=()=>{ form.caseLen=btn.dataset.case; save(); log(`Case length <span class="now">${fmt(caseNum())}</span>`); render(); });
+    $("#caseOther").addEventListener("change",e=>{ const v=parseFloat(e.target.value); if(isFinite(v)&&v>0&&v<8){ form.caseLen=String(v); save(); log(`Case length <span class="now">${fmt(v)}</span>`); render(); } });
+  }
+  if (s.calc){ const k=s.calc;
+    form[k].forEach((r,i)=>{
+      $(`#c-${k}-${i}`).addEventListener("input",e=>{ form[k][i][0]=e.target.value.replace(/[^\d.]/g,""); save(); updateCalc(k); });
+      $(`#c-${k}-${i}-f`).addEventListener("change",e=>{ form[k][i][1]=+e.target.value; save(); updateCalc(k); });
+      $(`#c-${k}-${i}`).addEventListener("change",()=>{ const t=totals(k)[i]; if(isFinite(t)) log(`${CALC[k].name} ${CALC[k].labels[i].toLowerCase()}: <span class="now">${fmt(t)}</span>`); });
+    });
+    updateCalc(k);
+  }
+  if (s.form){
+    $("#f-room").addEventListener("input",e=>{ form.room=e.target.value; save(); updateMsg(); });
+    updateMsg();
+    $("#sms").addEventListener("click",()=>log(`Sent measurements: <span class="now">${fmt(result("w"))} × ${fmt(result("h"))}</span>`));
+    $("#copy").onclick = () => {
+      const t = msgText(), btn=$("#copy");
+      const done = () => { btn.textContent="Copied"; setTimeout(()=>btn.textContent="Copy message",1600); };
+      try{ navigator.clipboard.writeText(t).then(done).catch(()=>selectMsg()); }catch(e){ selectMsg(); }
+    };
+  }
+}
+function selectMsg(){ const r=document.createRange(); r.selectNodeContents($("#msg")); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+function focusTitle(){ const t=$("#stepTitle"); if(t) t.focus({preventScroll:true}); window.scrollTo({top:0,behavior:"smooth"}); }
+
+/* ---------- Steps drawer ---------- */
+function renderDrawer(){
+  const g = GUIDES[guideKey];
+  const groups = {};
+  path.forEach((id,i)=>{ const s=g.steps[id]; (groups[s.group] ||= []).push([id,i]); });
+  
+  let html = `<button class="close" id="closeD" aria-label="Close">×</button><h2>${esc(g.name)}</h2>`;
+  if (g.sub) html += `<p class="small" style="margin:-6px 0 6px">${esc(g.sub)}</p>`;
+  let n=0;
+  for (const [grp, items] of Object.entries(groups)){
+    html += `<h3>${esc(grp)}</h3><ol>`;
+    items.forEach(([id,i])=>{
+      if (id==="__choose"){ html += `<li><button disabled style="opacity:.6"><span class="num">·</span>Pick inside or outside first</button></li>`; return; }
+      n++;
+      html += `<li><button data-jump="${i}" ${(!detour && i===idx)?'aria-current="step"':""}><span class="num">${n}</span>${esc(g.steps[id].title)}</button></li>`;
+    });
+    html += `</ol>`;
+  }
+  const extras = Object.entries(g.steps).filter(([,s])=>s.detourOf && path.includes(s.detourOf));
+  if (extras.length){
+    html += `<h3>If your window looks different</h3><ol>`;
+    extras.forEach(([id,s])=>{ html += `<li><button data-detour="${id}" ${detour===id?'aria-current="step"':""}><span class="num">↳</span>${esc(s.title)}</button></li>`; });
+    html += `</ol>`;
+  }
+  html += `<h3>Help</h3><p class="small">Text a designer at <b>(201) 745-3300</b>. Send a photo and we'll walk you through it.</p>`;
+  const d=$("#drawer"); d.innerHTML=html;
+  $("#closeD").onclick=closeDrawer;
+  d.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>{ detour=null; idx=+b.dataset.jump; closeDrawer(); render(); focusTitle(); });
+  d.querySelectorAll("[data-detour]").forEach(b=>b.onclick=()=>{ detour=b.dataset.detour; idx=path.indexOf(g.steps[detour].detourOf); closeDrawer(); render(); focusTitle(); });
+}
+function openDrawer(){ $("#drawer").hidden=false; $("#scrim").hidden=false; $("#closeD").focus(); }
+function closeDrawer(){ $("#drawer").hidden=true; $("#scrim").hidden=true; $("#stepsBtn").focus(); }
+$("#stepsBtn").onclick=openDrawer; $("#scrim").onclick=closeDrawer;
+document.addEventListener("keydown",e=>{
+  if (e.key==="Escape" && !$("#drawer").hidden) closeDrawer();
+  if (e.target.matches("input,select,textarea")) return;
+  if (e.key==="ArrowRight") $("#next")?.click();
+  if (e.key==="ArrowLeft") $("#back")?.click();
+});
+
+/* ---------- Guide switching (hash: #measure / #install) ---------- */
+function setGuide(k){ guideKey = GUIDES[k]?k:"measure"; idx=0; detour=null; buildPath(); render(); }
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ if(location.hash!=="#"+t.dataset.guide) location.hash=t.dataset.guide; else setGuide(t.dataset.guide); });
+window.addEventListener("hashchange",()=>setGuide(location.hash.slice(1)));
+load();
+setGuide((location.hash||"#measure").slice(1));
+})();
+</script>
+</body>
+</html>
