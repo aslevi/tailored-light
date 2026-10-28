@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Try on your window | Hello Shade</title>
+<meta name="description" content="Snap a photo of your window and try on Hello Shade custom shades in place: roller, Roman, zebra and woven, in our real fabrics. Your photo never leaves your phone.">
+<link rel="canonical" href="https://aslevi.github.io/tailored-light/try-your-window/">
+<meta property="og:title" content="Try on your window | Hello Shade">
+<meta property="og:description" content="See our custom shades on your own window, from a photo. Your photo stays on your phone.">
+<meta property="og:image" content="https://aslevi.github.io/tailored-light/og.jpg">
+<meta name="theme-color" content="#FBF6F0">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preload" href="../fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+:root{
+  --bg:#FBF6F0;--paper:#FFFDFB;--blush:#F3DCD3;--line:#EAD7CE;--clay:#A9594A;--clay-d:#8F4A3D;
+  --honey:#E8AE45;--honey-d:#D99C2F;--ink:#4A3530;--muted:#7A5F57;
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);font-variation-settings:'SOFT' 100,'WONK' 0;overflow-x:hidden}
+a{color:var(--clay)}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px}
+.brand{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;color:var(--ink)}
+.wordmark{display:inline-flex;align-items:baseline;font-family:var(--serif);font-weight:500;font-variation-settings:'SOFT' 100,'WONK' 0,'opsz' 72;letter-spacing:-0.02em;font-size:26px;line-height:1;color:var(--ink);white-space:nowrap}
+.wordmark svg{width:.92em;height:.575em;margin-left:.08em;flex:none}
+.top-link{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-size:15px;font-weight:500}
+/* intro */
+h1,h2{font-family:var(--serif);font-weight:500;font-variation-settings:'SOFT' 100,'WONK' 0;letter-spacing:-.01em;line-height:1.12;margin:0}
+h1{font-size:clamp(30px,8vw,46px);margin-top:6px}
+.lede{color:var(--muted);margin:10px 0 0;max-width:36em}
+.private{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);margin-top:10px}
+.private svg{flex:none}
+/* layout */
+.app{display:grid;gap:16px;margin:18px 0 28px}
+@media (min-width:900px){.app{grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);align-items:start}.panel{position:sticky;top:12px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px}
+/* start */
+.start{padding:22px 18px;text-align:center}
+.start h2{font-size:22px}
+.start p{color:var(--muted);margin:6px 0 16px;font-size:15px}
+.start-btns{display:grid;gap:10px;max-width:360px;margin:0 auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:999px;border:0;font-weight:600;font-size:16px;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn-primary{background:var(--clay);color:#fff}
+.btn-primary:active{background:var(--clay-d)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:1.5px solid var(--line)}
+.btn-honey{background:var(--honey);color:var(--ink)}
+.btn-honey:active{background:var(--honey-d)}
+.btn-link{background:none;border:0;color:var(--clay);font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:44px;cursor:pointer;padding:0 6px}
+.file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+/* stage */
+.stage-card{padding:10px;overflow:hidden}
+.stage{position:relative;margin:0 auto;touch-action:pan-y;user-select:none;-webkit-user-select:none;border-radius:12px;overflow:hidden;background:#e9e0d8}
+.stage canvas{display:block;width:100%;height:100%}
+.outline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.outline polygon{fill:none;stroke:#fff;stroke-width:2;stroke-dasharray:6 5;filter:drop-shadow(0 0 1.5px rgba(0,0,0,.55))}
+.handle{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border:0;padding:0;background:none;touch-action:none;cursor:grab;z-index:2}
+.handle::before{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--clay);border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.handle:focus-visible::before{outline:3px solid var(--honey);outline-offset:2px}
+.handle.drag::before{background:var(--honey)}
+.stage.done .handle,.stage.done .outline{display:none}
+.loupe{position:absolute;width:104px;height:104px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;display:none;z-index:3;overflow:hidden;background:#000}
+.loupe canvas{width:100%;height:100%}
+.stage-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 2px 0}
+.hint{font-size:14px;color:var(--muted);margin:0;flex:1 1 180px}
+.stage-actions{display:flex;gap:4px;flex-wrap:wrap}
+.chip-btn{min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);font-weight:600;font-size:14.5px;cursor:pointer;color:var(--ink)}
+.chip-btn.on{background:var(--clay);border-color:var(--clay);color:#fff}
+/* panel */
+.panel{padding:16px}
+.group{border:0;margin:0 0 16px;padding:0;min-width:0}
+.group:last-child{margin-bottom:0}
+.label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600;font-size:15px;margin:0 0 8px;padding:0}
+.label small{font-weight:400;color:var(--muted);font-size:14px;text-align:right}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg button{min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);font-weight:600;font-size:14.5px;cursor:pointer;padding:4px 2px;line-height:1.15;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--blush);border-color:var(--clay);color:var(--ink)}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.fams{display:grid;gap:12px}
+.fam-name{font-size:14px;color:var(--muted);margin:0 0 4px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:44px;height:44px;border-radius:50%;border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--line);background-size:cover;background-position:center;cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--clay)}
+.sw.reed{background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 5px)}
+.range{width:100%;height:44px;margin:0;background:none;-webkit-appearance:none;appearance:none;accent-color:var(--clay)}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--clay) var(--p,50%),var(--line) var(--p,50%))}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:#fff;border:2px solid var(--clay);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.range::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
+.range::-moz-range-progress{height:6px;border-radius:3px;background:var(--clay)}
+.range::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--clay)}
+.range.night::-webkit-slider-runnable-track{background:linear-gradient(90deg,#F6D891,#6E5F8C 60%,#2F2A3E)}
+.ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:-6px}
+.price{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
+.price-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.price-row .k{font-weight:600}
+.price-row .v{font-family:var(--serif);font-size:26px;font-weight:500}
+.pick{margin:2px 0 0;font-size:14.5px;color:var(--muted)}
+.price .note{font-size:13px;color:var(--muted);margin:4px 0 12px}
+.cta{display:grid;gap:8px}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 14px;margin-top:4px}
+.links a{display:inline-flex;align-items:center;min-height:44px;font-weight:600;font-size:15px}
+.err{color:var(--clay);font-size:14px;margin:8px 0 0}
+.how{margin:0 0 36px}
+.how h2{font-size:24px;margin-bottom:10px}
+.how ol{margin:0;padding-left:22px;color:var(--muted)}
+.how li{margin:4px 0}
+footer{border-top:1px solid var(--line);padding:18px 0 32px;font-size:14px;color:var(--muted)}
+footer a{display:inline-flex;min-height:44px;align-items:center;margin-right:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="../"><span class="wordmark" role="img" aria-label="Hello Shade">hello shade<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="3.5" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg></span></a>
+  <a class="top-link" href="../how-to-measure/">How to measure</a>
+</header>
+
+<main class="wrap">
+  <h1>Try on your window</h1>
+  <p class="lede">Snap your window, drag the four dots to its corners, and try on any shade in our real fabrics.</p>
+  <p class="private"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your photo never leaves your phone.</p>
+
+  <div class="app">
+    <section class="card stage-card" aria-label="Your window">
+      <div class="start" id="start">
+        <h2>Start with your window</h2>
+        <p>Stand straight on, a few steps back, with the whole window in frame.</p>
+        <div class="start-btns">
+          <label class="btn btn-primary" for="cam">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            Take a photo</label>
+          <label class="btn btn-ghost" for="lib">Choose from photos</label>
+          <button type="button" class="btn-link" id="sample">No photo handy? Try ours</button>
+        </div>
+        <input class="file" id="cam" type="file" accept="image/*" capture="environment">
+        <input class="file" id="lib" type="file" accept="image/*">
+        <p class="err" id="err" role="alert" hidden></p>
+      </div>
+      <div id="stageWrap" hidden>
+        <div class="stage" id="stage">
+          <canvas id="gl" aria-label="Your window with the shade tried on" role="img"></canvas>
+          <svg class="outline" id="outline" aria-hidden="true"><polygon points=""/></svg>
+          <button type="button" class="handle" data-i="0" aria-label="Top left corner"></button>
+          <button type="button" class="handle" data-i="1" aria-label="Top right corner"></button>
+          <button type="button" class="handle" data-i="2" aria-label="Bottom right corner"></button>
+          <button type="button" class="handle" data-i="3" aria-label="Bottom left corner"></button>
+          <div class="loupe" id="loupe"><canvas width="208" height="208"></canvas></div>
+        </div>
+        <div class="stage-bar">
+          <p class="hint" id="hint">Drag the 4 dots to the inside corners of your window.</p>
+          <div class="stage-actions">
+            <button type="button" class="chip-btn" id="doneBtn">Done</button>
+            <label class="chip-btn" for="lib" style="display:inline-flex;align-items:center">New photo</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card panel" aria-label="Try on">
+      <fieldset class="group">
+        <legend class="label">Shade type</legend>
+        <div class="seg" id="types"></div>
+      </fieldset>
+      <fieldset class="group">
+        <legend class="label">Light level</legend>
+        <div class="seg three" id="levels"></div>
+      </fieldset>
+      <fieldset class="group">
+        <legend class="label">Fabric <small id="fabName"></small></legend>
+        <div class="fams" id="fams"></div>
+      </fieldset>
+      <div class="group">
+        <label class="label" for="drop">Raise and lower <small id="dropVal"></small></label>
+        <input class="range" id="drop" type="range" min="0" max="100" value="62">
+      </div>
+      <div class="group">
+        <label class="label" for="night">Day to night</label>
+        <input class="range night" id="night" type="range" min="0" max="100" value="0">
+        <div class="ends"><span>Day</span><span>Night</span></div>
+      </div>
+      <div class="price">
+        <div class="price-row"><span class="k">Your price</span><span class="v" id="price">From $149</span></div>
+        <p class="pick" id="pick"></p>
+        <p class="note" id="priceNote">Custom made to your size. Exact price once you measure.</p>
+        <div class="cta">
+          <a class="btn btn-honey" id="textBtn" href="sms:+12017453300">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+            Text a designer</a>
+          <div class="links">
+            <a href="../how-to-measure/">How to measure</a>
+            <a id="shadeLink" href="../shades/">See this shade</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="how">
+    <h2>Tips for a good try on</h2>
+    <ol>
+      <li>Shoot straight on, at about window-middle height.</li>
+      <li>Put the dots on the inside corners of the frame, where an inside-mount shade sits.</li>
+      <li>Tap Done to hide the dots, then slide Day to night to see how much light each fabric lets in.</li>
+      <li>Like it? Text a designer and attach your photo. We'll help with size and price.</li>
+    </ol>
+  </section>
+</main>
+<footer class="wrap">
+  <a href="../">Home</a><a href="../shades/">Shop shades</a><a href="../how-to-measure/">How to measure</a><a href="../privacy.html">Privacy</a>
+</footer>
+<script type="module" src="./try.js"></script>
+</body>
+</html>

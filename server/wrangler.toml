@@ -1,0 +1,9 @@
+# Cloudflare Worker config. Secrets are NOT stored here:
+#   npx wrangler secret put AIRTABLE_TOKEN
+name = "hs-api"
+main = "cloudflare/worker.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+BASE_ID = "appXvoZEwBTM7Uj7A"
+ALLOWED_ORIGINS = "https://aslevi.github.io"

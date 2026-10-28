@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My windows · Hello Shade</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FBF6F0">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="stylesheet" href="../api/pages.css">
+<style>
+.list{display:grid;gap:16px;margin:20px 0 0;padding:0;list-style:none}
+.win{overflow:hidden;display:grid}
+.win .photo{position:relative;aspect-ratio:16/10;background:var(--blush);overflow:hidden}
+.win .photo img{width:100%;height:100%;object-fit:cover;display:block}
+.win .photo .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:14px}
+.win .photo .chip{position:absolute;left:12px;top:12px;box-shadow:0 1px 2px rgba(74,53,48,.12)}
+.win .body{padding:16px}
+.win .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.win h2{font-size:22px}
+.win .price{font:600 18px/1.2 var(--sans);white-space:nowrap}
+.win .room{color:var(--muted);font-size:14px;margin:2px 0 0}
+.specs{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px}
+.specs dt{color:var(--muted)}
+.specs dd{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sw{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background-size:cover;background-position:center;flex:none}
+.size{font:600 20px/1.2 var(--sans);letter-spacing:-.01em}
+.size small{font:400 13px var(--sans);color:var(--muted);margin-left:4px}
+details.nums{margin-top:12px;border-top:1px solid var(--line);padding-top:4px}
+details.nums summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--rose);font-weight:600;font-size:15px;list-style:none}
+details.nums summary::-webkit-details-marker{display:none}
+details.nums summary::after{content:'';width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:10px;margin-top:-4px;transition:transform .15s}
+details.nums[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.numtable{width:100%;border-collapse:collapse;font-size:14px;margin:4px 0 8px}
+.numtable th,.numtable td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+.numtable th{color:var(--muted);font-weight:500}
+.numtable td.hl{font-weight:600}
+.numhelp{font-size:13px;color:var(--muted);margin:0}
+.total{margin:20px 0 0;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.total .lbl{font-family:var(--serif);font-size:22px}
+.total .sub{display:block;font:400 14px var(--sans);color:var(--muted)}
+.total .amt{font:600 26px/1 var(--sans)}
+.next{margin:20px 0 0;padding:20px 16px}
+.next h2{font-size:24px}
+.next p{margin:6px 0 16px;color:var(--muted)}
+.next .actions{display:grid;gap:10px}
+@media (min-width:640px){
+  .win{grid-template-columns:240px 1fr}
+  .win .photo{aspect-ratio:auto;min-height:100%}
+  .next .actions{grid-template-columns:1fr 1fr}
+}
+</style>
+<script src="../api/config.js"></script>
+<script src="../api/client.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div id="banner"></div>
+<header class="site-header">
+ <div class="wrap bar">
+  <a class="brand" href="../"><span class="wordmark" role="img" aria-label="Hello Shade">hello shade<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="3.5" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg></span></a>
+  <a class="btn gold sm" id="hdr-text" href="sms:+12017453300">Text a designer</a>
+ </div>
+</header>
+
+<main id="main" class="wrap" aria-live="polite" aria-busy="true">
+ <div class="state"><p>Loading your windows…</p></div>
+</main>
+
+<footer class="foot wrap">
+ <a href="../how-to-measure/">How to measure</a> · <a href="../how-to-install/">How to install</a> · <a href="../faq/">FAQ</a>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var HS = window.HS, esc = HS.esc;
+  var main = document.getElementById('main');
+  var token = HS.readToken();
+
+  var CHECK = {
+    waiting:  { cls: 'waiting',  text: 'Waiting for numbers' },
+    checking: { cls: 'checking', text: 'Checking' },
+    checked:  { cls: 'checked',  text: 'Checked ✓' }
+  };
+
+  function chip(state) {
+    var c = CHECK[state] || CHECK.waiting;
+    return '<span class="chip ' + c.cls + '">' + (state === 'checked' ? '' : '<span class="dot" aria-hidden="true"></span>') + esc(c.text) + '</span>';
+  }
+
+  function title(w) { return [w.room, w.label].filter(Boolean).join(' · ') || 'Window'; }
+
+  function numsTable(w) {
+    var inside = (w.mount || '').toLowerCase() === 'inside';
+    var W = w.widths || [], H = w.heights || [];
+    if (!W.some(isNum) && !H.some(isNum)) return '';
+    var rows = '';
+    var wl = inside ? ['Top', 'Middle', 'Bottom'] : ['Width', '', ''];
+    var hl = inside ? ['Left', 'Middle', 'Right'] : ['Height', '', ''];
+    for (var i = 0; i < 3; i++) {
+      if (!isNum(W[i]) && !isNum(H[i])) continue;
+      rows += '<tr><td>' + esc(isNum(W[i]) ? wl[i] + ' ' + HS.inches(W[i]) : '') + '</td><td>' + esc(isNum(H[i]) ? hl[i] + ' ' + HS.inches(H[i]) : '') + '</td></tr>';
+    }
+    if (isNum(w.depth)) rows += '<tr><td colspan="2">Depth ' + esc(HS.inches(w.depth)) + '</td></tr>';
+    rows += '<tr><td class="hl">We order ' + esc(HS.inches(w.orderWidth)) + ' wide</td><td class="hl">' + esc(HS.inches(w.orderHeight)) + ' high</td></tr>';
+    var help = inside
+      ? 'Inside mount: we use your narrowest width and longest height so the shade fits the opening.'
+      : 'Outside mount: we use the width and height you measured on the wall.';
+    return '<details class="nums"><summary>Your numbers</summary>' +
+      '<table class="numtable"><caption class="visually-hidden">Measurements for ' + esc(title(w)) + '</caption>' +
+      '<thead><tr><th scope="col">Widths</th><th scope="col">Heights</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p class="numhelp">' + help + '</p></details>';
+  }
+  function isNum(n) { return n !== null && n !== undefined && n !== '' && !isNaN(n); }
+
+  function card(w) {
+    var p = (w.photos || [])[0];
+    var src = p ? HS.safeUrl(p.thumb || p.url) : '';
+    var photo = src
+      ? '<img src="' + esc(src) + '" alt="' + esc(p.alt || ('Photo of ' + title(w))) + '" loading="lazy" decoding="async">'
+      : '<div class="ph"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg>Photo coming</div>';
+    var sw = HS.safeUrl(w.swatch);
+    var swStyle = 'background-color:' + (/^#[0-9a-f]{3,8}$/i.test(w.colorHex || '') ? w.colorHex : '#EAD7CE') + (sw ? ';background-image:url(\'' + sw.replace(/'/g, '') + '\')' : '');
+    var hasSize = isNum(w.orderWidth) && isNum(w.orderHeight);
+    var type = [w.style, w.control].filter(Boolean).join(' · ');
+    return '<li class="card win">' +
+      '<div class="photo">' + photo + chip(w.check) + '</div>' +
+      '<div class="body">' +
+        '<div class="top"><h2>' + esc(w.label || w.room || 'Window') + '</h2><span class="price">' + esc(HS.money(w.price)) + '</span></div>' +
+        '<p class="room">' + esc(w.room || '') + '</p>' +
+        '<dl class="specs">' +
+          '<dt>Size</dt><dd>' + (hasSize ? '<span class="size">' + esc(HS.inches(w.orderWidth)) + ' × ' + esc(HS.inches(w.orderHeight)) + '<small>W × H</small></span>' : '<span>Waiting for your numbers</span>') + '</dd>' +
+          '<dt>Type</dt><dd>' + esc(type || '—') + '</dd>' +
+          '<dt>Fabric</dt><dd><span class="sw" style="' + esc(swStyle) + '" aria-hidden="true"></span>' + esc([w.fabric, w.color].filter(Boolean).join(', ') || '—') + '</dd>' +
+          '<dt>Mount</dt><dd>' + esc(w.mount ? w.mount + ' mount' : '—') + '</dd>' +
+        '</dl>' +
+        numsTable(w) +
+      '</div></li>';
+  }
+
+  function nextStep(d) {
+    var ws = d.windows || [];
+    var name = (d.customer && d.customer.firstName) || '';
+    var code = (d.customer && d.customer.designCode) ? ' (' + d.customer.designCode + ')' : '';
+    var waiting = ws.filter(function (w) { return w.check === 'waiting'; });
+    var checking = ws.filter(function (w) { return w.check === 'checking'; });
+    var o = d.order || {};
+    var orderHref = '../order/' + (o.statusToken ? '?t=' + encodeURIComponent(o.statusToken) : '');
+    var h, p, primary, textBody;
+
+    if (o.paid) {
+      h = 'Your shades are on the way';
+      p = 'See where your order is and when it ships.';
+      primary = '<a class="btn" href="' + esc(orderHref) + '">Track your order</a>';
+      textBody = 'Hi Dana! Question about my order' + code + '.';
+    } else if (waiting.length) {
+      h = 'Measure your next window';
+      p = waiting.length === 1 ? title(waiting[0]) + ' still needs numbers and a photo.' : waiting.length + ' windows still need numbers and photos.';
+      primary = '<a class="btn" href="../how-to-measure/">Measure your next window</a>';
+      textBody = 'Hi Dana! Sending numbers for my project' + code + '.';
+    } else if (checking.length) {
+      h = 'Dana is checking your numbers';
+      p = 'She looks at every number and photo before anything is made. You’ll get a text when she’s done, usually within a day.';
+      primary = '<a class="btn ghost" href="../how-to-measure/">How to measure</a>';
+      textBody = 'Hi Dana! Checking in on my project' + code + '.';
+    } else if (o.payUrl && /^https:\/\//.test(o.payUrl)) {
+      h = 'Everything’s checked';
+      p = 'Your numbers look good. Pay when you’re ready and we’ll start making your shades.';
+      primary = '<a class="btn" href="' + esc(o.payUrl) + '" rel="noopener">Pay ' + esc(HS.money(d.total)) + '</a>';
+      textBody = 'Hi Dana! Question before I pay for my project' + code + '.';
+    } else {
+      h = 'Everything’s checked';
+      p = 'Dana will text you your quote and payment link.';
+      primary = '<a class="btn ghost" href="../how-to-measure/">How to measure</a>';
+      textBody = 'Hi Dana! I’m ready to order my project' + code + '.';
+    }
+    var sms = HS.smsHref(textBody);
+    document.getElementById('hdr-text').href = sms;
+    return '<section class="card next" aria-labelledby="next-h"><p class="eyebrow">Next step</p><h2 id="next-h">' + esc(h) + '</h2><p>' + esc(p) + '</p>' +
+      '<div class="actions">' + primary + '<a class="btn gold" href="' + esc(sms) + '">Text Dana</a></div></section>';
+  }
+
+  function render(d) {
+    if (d.demo) document.getElementById('banner').innerHTML = '<div class="demo-banner" role="note"><b>Sample data</b> — your real project appears here once Dana sends your link</div>';
+    var ws = d.windows || [];
+    var name = d.customer && d.customer.firstName;
+    var checked = ws.filter(function (w) { return w.check === 'checked'; }).length;
+    var html = '<div class="page-head"><p class="eyebrow">' + esc(name ? name + '’s project' : 'Your project') + (d.customer && d.customer.designCode ? ' · ' + esc(d.customer.designCode) : '') + '</p>' +
+      '<h1>My windows</h1><p>' + ws.length + ' window' + (ws.length === 1 ? '' : 's') + ' · ' + checked + ' checked by Dana</p></div>';
+    if (!ws.length) {
+      html += '<div class="card next"><h2>No windows yet</h2><p>Start with one window. It takes about 10 minutes.</p><div class="actions"><a class="btn" href="../how-to-measure/">How to measure</a></div></div>';
+    } else {
+      html += '<ul class="list">' + ws.map(card).join('') + '</ul>';
+      html += '<div class="card total"><span class="lbl">Your price<span class="sub">' + ws.length + ' shade' + (ws.length === 1 ? '' : 's') + ', free shipping</span></span><span class="amt">' + esc(HS.money(d.total)) + '</span></div>';
+    }
+    html += nextStep(d);
+    html += '<aside class="note" aria-labelledby="fit-h"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 3l9 3.5v6.8c0 5.6-3.8 10-9 11.7-5.2-1.7-9-6.1-9-11.7V6.5L14 3z" fill="#F3DCD3" stroke="#A9594A" stroke-width="1.6"/><path d="M9.5 14.2l3.1 3 5.9-6" stroke="#4E8B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<div><h2 id="fit-h">Fit guarantee</h2><p>Send your numbers and photos, and once Dana checks them, the fit is on us. If a checked shade doesn’t fit, we remake it free within 30 days of delivery. <a href="../how-it-works/#fit">How it works</a></p></div></aside>';
+    main.innerHTML = html;
+    main.setAttribute('aria-busy', 'false');
+  }
+
+  function fail(e) {
+    main.innerHTML = '<div class="state"><h1>Hmm, we can’t open this</h1><p>' + esc(e.message || 'Something went wrong.') + '</p>' +
+      '<a class="btn gold" href="' + esc(HS.smsHref('Hi Dana! My project link isn’t working.')) + '">Text Dana</a></div>';
+    main.setAttribute('aria-busy', 'false');
+  }
+
+  HS.getProject(token).then(render, fail);
+});
+</script>
+</body>
+</html>
