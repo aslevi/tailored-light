@@ -55,7 +55,7 @@ export function parseText(raw) {
     return { kind: 'quote', code: codeIn(text), hash: tlq ? tlq[1] : '', total: total ? Number(total[1].replace(/,/g, '')) : null };
   }
   const look = (text.match(URL_RE) || []).map(lookFromURL).find(Boolean);
-  if (!look && /free samples?/i.test(text)) return parseSamples(text);
+  if (!look && /samples?/i.test(text)) return parseSamples(text);
   if (!look) return { kind: null, error: "Didn't find a design link, a TLM1 measurement line or a TLQ1 approval in that text." };
   const q = look.q;
   const style = STYLES[q.get('s')] ? q.get('s') : '';
@@ -67,17 +67,17 @@ export function parseText(raw) {
   const code = designCode(q);
   const typed = codeIn(text);
   const refM = /\(via ([\w.-]{1,30})\)/.exec(text) || [null, q.get('ref')];
-  const kit = /swatch kit|free samples?/i.test(text);
+  const kit = /swatch kit|samples?/i.test(text);
   const lookUrl = look.url.split('?')[0] + '?' + canonical + (refM[1] ? '&ref=' + encodeURIComponent(refM[1]) : '');
   return { kind: 'lead', lead: { ...lead, code, ref: refM[1] || '', lookUrl }, kit, typedCode: typed, codeMismatch: !!typed && typed !== code, message: text };
 }
-// Free samples text from /swatch-kit/: "Hi Dana! I'd like free samples of: Raw Linen in Flax, Soft Cotton in Sage."
+// Samples text from /swatch-kit/: "Hi Dana! I'd like samples of: Raw Linen in Flax, Soft Cotton in Sage."
 // No design link: the lead gets the first pick as its design, so it still has a code and a look link.
 export const FAMILY_STYLE = { 'Daylight Weave': 'roller', 'Morning Haze': 'roller', 'Deep Sleep': 'roller', 'Clear View': 'roller',
   'Raw Linen': 'roman', 'Soft Cotton': 'roman', 'Ticking Stripe': 'roman', 'Sheer Voile': 'roman', 'Blackout Linen': 'roman', 'Natural Reed': 'roman',
   'Twin Light': 'zebra', 'Sand Stripe': 'zebra', 'Twin Shade': 'zebra' };
 export function parseSamples(text) {
-  const m = /free samples? of:\s*([^\n]+)/i.exec(text);
+  const m = /(?:free )?samples? of:\s*([^\n]+)/i.exec(text);
   const picks = m ? m[1].replace(/[.\s]+$/, '').split(/\s*,\s*(?:and\s+)?|\s+and\s+/).map(s => { const k = /^(.+?)\s+in\s+(.+)$/.exec(s.trim()); return k ? { family: k[1], color: k[2] } : null; }).filter(p => p && FAMILY_STYLE[p.family]) : [];
   const first = picks[0];
   const q = first ? new URLSearchParams({ s: FAMILY_STYLE[first.family], f: first.family, c: first.color }) : null;

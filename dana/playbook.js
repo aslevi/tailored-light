@@ -9,7 +9,7 @@ export const GROUPS = [
   { id: 'kit', title: 'Swatch kit', stages: ['new', 'swatches'], items: [
     ['Kit: yes', "Yes! Love that you're leaning [fabric] in [color]. Swatches are free, shipping too. Pick up to 5 and send me your address."],
     ['Kit: address', "I'll put in [color] plus 2–3 that I think would also work in a [room]. What's the best mailing address?"],
-    ['Kit offer', "Want to feel it first? I'll mail you free swatches, up to 5 fabrics. I'll include [color] plus a couple I think you'll like."],
+    ['Kit offer', "Want to feel it first? I'll mail you samples: up to 5 fabrics for $10, and the $10 comes off your order. I'll include [color] plus a couple I think you'll like."],
     ['Ready buyer', "You can skip swatches if you're happy with [color]. Or I can send them and we measure while they're in the mail, no time lost."],
     ['Kit shipped', "Your swatches are on the way! Tip: tape them to the window and look at them morning and evening. While you wait, want to measure? Takes about 10 minutes and I'll walk you through it."],
   ] },

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Free samples · Hello Shade</title>
-<meta name="description" content="Free samples from Hello Shade: pick up to 5 fabrics and we mail them free.">
+<title>Samples · Hello Shade</title>
+<meta name="description" content="Samples from Hello Shade: pick up to 5 fabrics for $10, credited to your order.">
 <meta name="tl-root" content="../">
 <link rel="canonical" href="https://aslevi.github.io/tailored-light/swatch-kit/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Hello Shade">
-<meta property="og:title" content="Free samples · Hello Shade">
-<meta property="og:description" content="Free samples from Hello Shade: pick up to 5 fabrics and we mail them free.">
+<meta property="og:title" content="Samples · Hello Shade">
+<meta property="og:description" content="Samples from Hello Shade: pick up to 5 fabrics for $10, credited to your order.">
 <meta property="og:url" content="https://aslevi.github.io/tailored-light/swatch-kit/">
 <meta property="og:image" content="https://aslevi.github.io/tailored-light/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -27,11 +27,12 @@
 <link rel="stylesheet" href="../flow/site.css">
 <script type="module" src="../flow/site.js"></script>
 <script type="module" src="../flow/shop.js"></script>
+<script defer src="../flow/analytics.js"></script>
 </head>
 <body class="has-mbar">
 <a class="skip" href="#main">Skip to content</a>
 <div class="promo"><ul>
- <li><a href="../swatch-kit/">Free samples</a></li>
+ <li><a href="../swatch-kit/">Samples</a></li>
  <li><a href="../how-it-works/#fit">Measure wrong? We'll remake it free</a></li>
  <li>Ships in 2–4 weeks</li>
 </ul></div>
@@ -58,7 +59,7 @@
    <nav class="menu-panel" aria-label="Main">
     <h2>Shop</h2><ul><li><a href="../shades/roller/">Roller<span>From $209</span></a></li><li><a href="../shades/roman/">Roman<span>From $259</span></a></li><li><a href="../shades/zebra/">Zebra<span>From $239</span></a></li><li><a href="../shades/woven/">Woven<span>From $269</span></a></li><li><a href="../shades/">All shades</a></li><li><a href="../shades/blackout/">Blackout shades</a></li></ul>
     <h2>Rooms</h2><ul><li><a href="../rooms/bedroom/">Bedroom</a></li><li><a href="../rooms/nursery/">Nursery</a></li><li><a href="../rooms/living-room/">Living room</a></li><li><a href="../rooms/kitchen/">Kitchen</a></li><li><a href="../rooms/bathroom/">Bathroom</a></li><li><a href="../rooms/home-office/">Home office</a></li></ul>
-    <h2>Help</h2><ul><li><a href="../studio/">Try on</a></li><li><a href="../fabrics/">Fabrics</a></li><li><a href="../swatch-kit/">Free samples</a></li><li><a href="../how-it-works/">How it works</a></li><li><a href="../how-to-measure/">How to measure</a></li><li><a href="../faq/">FAQ</a></li></ul>
+    <h2>Help</h2><ul><li><a href="../studio/">Try on</a></li><li><a href="../fabrics/">Fabrics</a></li><li><a href="../swatch-kit/">Samples</a></li><li><a href="../how-it-works/">How it works</a></li><li><a href="../how-to-measure/">How to measure</a></li><li><a href="../faq/">FAQ</a></li></ul>
     <div class="btn-row"><a class="btn" href="../studio/">Try on</a><a class="btn gold" href="../contact.html" data-text-sheet data-body="Hi Dana! I&#x27;d like a little help choosing shades.">Text a designer</a></div>
    </nav>
   </details>
@@ -69,8 +70,8 @@
 <div class="samples-top"><figure class="people samples-hero"><img src="../images/people/samples.webp" width="928" height="1152" alt="Holding fabric samples up to a window" fetchpriority="high" decoding="async"></figure></div>
 <section class="section samples-page" style="padding-top:24px">
  <div class="container narrow">
-  <h1 class="s-h1">Free samples</h1>
-  <p class="lede" style="margin-top:6px">Pick up to 5. We mail them free.</p>
+  <h1 class="s-h1">Samples</h1>
+  <p class="lede" style="margin-top:6px">Pick up to 5 for $10. We credit the $10 to your shade order.</p>
 
   <div class="s-block">
    <h2 class="s-head"><img class="dana-av" src="../images/people/dana-avatar.webp" width="32" height="32" alt=""> Dana's picks</h2>
@@ -94,7 +95,7 @@
    <div class="tray-head"><b>Your picks</b><span data-picks-count>0 of 5</span></div>
    <div class="tray-slots" data-picks><span class="slot"></span><span class="slot"></span><span class="slot"></span><span class="slot"></span><span class="slot"></span></div>
    <p class="hint" data-picks-full hidden>That's 5, the most we send. Remove one to add another.</p>
-   <a class="btn gold block" data-swatch-kit data-kit-note="#kit-optin" data-body="Hi Dana! I&#x27;d like free samples. Can you help me pick?" href="sms:+12017453300?body=Hi%20Dana%21%20I%27d%20like%20free%20samples.%20Can%20you%20help%20me%20pick%3F"><span data-kit-label="Order free samples">Text a designer</span></a>
+   <a class="btn gold block" data-swatch-kit data-kit-note="#kit-optin" data-body="Hi Dana! I&#x27;d like samples. Can you help me pick?" href="sms:+12017453300?body=Hi%20Dana%21%20I%27d%20like%20samples.%20Can%20you%20help%20me%20pick%3F"><span data-kit-label="Order samples">Text a designer</span></a>
    <p class="small tray-note" id="kit-optin">Your picks go in the text. We'll ask where to mail them.</p>
   </div>
  </div>
@@ -109,7 +110,7 @@
     <a class="brand" href="../"><span class="wordmark" role="img" aria-label="Hello Shade">hello shade<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="3.5" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg></span></a>
     <p>You don't need a designer at your door. Just a little guidance. Custom shades from $209.</p>
    </div>
-   <div><h2>Shop</h2><ul><li><a href="../shades/roller/">Roller</a></li><li><a href="../shades/roman/">Roman</a></li><li><a href="../shades/zebra/">Zebra</a></li><li><a href="../shades/woven/">Woven</a></li><li><a href="../shades/blackout/">Blackout shades</a></li><li><a href="../shades/">All shades</a></li><li><a href="../fabrics/">Fabrics</a></li><li><a href="../swatch-kit/" aria-current="page">Free samples</a></li></ul></div>
+   <div><h2>Shop</h2><ul><li><a href="../shades/roller/">Roller</a></li><li><a href="../shades/roman/">Roman</a></li><li><a href="../shades/zebra/">Zebra</a></li><li><a href="../shades/woven/">Woven</a></li><li><a href="../shades/blackout/">Blackout shades</a></li><li><a href="../shades/">All shades</a></li><li><a href="../fabrics/">Fabrics</a></li><li><a href="../swatch-kit/" aria-current="page">Samples</a></li></ul></div>
    <div><h2>Rooms</h2><ul><li><a href="../rooms/bedroom/">Bedroom</a></li><li><a href="../rooms/nursery/">Nursery</a></li><li><a href="../rooms/living-room/">Living room</a></li><li><a href="../rooms/kitchen/">Kitchen</a></li><li><a href="../rooms/bathroom/">Bathroom</a></li><li><a href="../rooms/home-office/">Home office</a></li></ul></div>
    <div><h2>Help</h2><ul><li><a href="../studio/">Try on</a></li><li><a href="../how-it-works/">How it works</a></li><li><a href="../how-to-measure/">How to measure</a></li><li><a href="../faq/">FAQ</a></li><li><a href="../contact.html">Contact</a></li></ul></div>
    <div><h2>Company</h2><ul><li><a href="../about/">About</a></li><li><a href="../terms.html">Terms of sale</a></li><li><a href="../privacy.html">Privacy</a></li><li><a href="../sms.html">Texting terms</a></li></ul></div>

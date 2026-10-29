@@ -17,13 +17,13 @@ document.querySelectorAll('[data-dana]').forEach(a => {
 });
 document.querySelectorAll('[data-dana-text]').forEach(el => { el.textContent = pretty(DANA_SMS); });
 
-// Free samples: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
+// Samples: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
 document.querySelectorAll('[data-swatch-kit]').forEach(a => {
   if (SWATCH_KIT_URL) {
     a.href = SWATCH_KIT_URL;
     a.removeAttribute('data-text-sheet');
     const label = a.querySelector('[data-kit-label]');
-    if (label) label.textContent = label.dataset.kitLabel || 'Order free samples';
+    if (label) label.textContent = label.dataset.kitLabel || 'Order samples';
     const note = document.querySelector(a.dataset.kitNote || '#kit-optin');
     if (note) note.hidden = true;
   } else {

@@ -103,7 +103,7 @@ if (dataEl) {
   render();
 }
 
-/* ---------- Free samples picks: Dana's picks, 1 Type, 2 Light, 3 Fabric, tray of up to 5 ---------- */
+/* ---------- Samples picks: Dana's picks, 1 Type, 2 Light, 3 Fabric, tray of up to 5 ---------- */
 const catEl = document.getElementById('catalog-data');
 if (catEl) {
   const CAT = JSON.parse(catEl.textContent);
@@ -149,7 +149,7 @@ if (catEl) {
       return `<button type="button" class="slot on" data-remove="${i}" aria-label="Remove ${esc(f)} in ${esc(c)}"><img src="${root}${CAT[f].colors[c].swatch}" alt=""><i aria-hidden="true">&times;</i></button>`;
     }).join('');
     const picks = list.map(k => { const [f, c] = k.split('|'); return `${f} in ${c}`; }).join(', ');
-    const body = list.length ? `Hi Dana! I'd like free samples of: ${picks}.` : kit.dataset.body;
+    const body = list.length ? `Hi Dana! I'd like samples of: ${picks}.` : kit.dataset.body;
     if (SWATCH_KIT_URL) { const u = new URL(SWATCH_KIT_URL, location.href); if (list.length) u.searchParams.set('fabrics', list.join(',')); kit.href = u.href; }
     else kit.href = smsHref(DANA_SMS, body);
     const cnt = document.querySelector('[data-picks-count]'); if (cnt) cnt.textContent = `${list.length} of ${SWATCH_KIT_MAX}`;

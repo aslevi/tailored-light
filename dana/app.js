@@ -118,7 +118,7 @@ function renderPreview() {
     const l = p.lead, dupes = leads.filter(x => x.code === l.code);
     el.innerHTML = `
       <div class="card">
-        <h2>New lead${p.kit ? ' · free samples request' : ''}</h2>
+        <h2>New lead${p.kit ? ' · samples request' : ''}</h2>
         <div class="recog">
           <img src="${thumb(l.room)}" alt="">
           <dl>
@@ -143,7 +143,7 @@ function renderPreview() {
     $('save-lead').onclick = async () => {
       const lead = newLead({ ...l, name: $('new-name').value.trim(), phone: $('new-phone').value.trim() });
       if (p.kit) { lead.stage = 'swatches'; lead.swatchKit = { requestedAt: now() }; }
-      logEvent(lead, 'created', p.kit ? 'Free samples request texted in' : 'Design texted in');
+      logEvent(lead, 'created', p.kit ? 'Samples request texted in' : 'Design texted in');
       logEvent(lead, 'message', p.message);
       const s = await save(lead); pending = null; toast('Lead saved'); location.hash = 'lead/' + s.id;
     };
@@ -154,7 +154,7 @@ function renderPreview() {
     const picksText = p.picks.map(x => `${x.family} in ${x.color}`).join(', ');
     el.innerHTML = `
       <div class="card">
-        <h2>Free samples request</h2>
+        <h2>Samples request</h2>
         ${p.picks.length ? `<ul class="mini-windows">${p.picks.map(x => `<li><b>${esc(x.family)}</b> · ${esc(x.color)}</li>`).join('')}</ul>` : '<p class="warn-line">No fabrics picked yet: they asked for help choosing.</p>'}
         <div class="grid2">
           <label><span class="lbl">Name (optional)</span><input id="s-name" autocomplete="off" placeholder="Jamie"></label>
@@ -176,14 +176,14 @@ function renderPreview() {
       if (!lead) {
         const lk = p.look, code = p.code || designCode({ room: 'samples', c: String(Date.now()) });
         lead = newLead({ code, name, phone, ...(lk ? { style: lk.style, family: lk.family, color: lk.color, lookUrl: new URL('../studio/?' + lk.query, BASE).href } : {}) });
-        logEvent(lead, 'created', 'Free samples request texted in');
+        logEvent(lead, 'created', 'Samples request texted in');
       } else {
         if (name && !lead.name) lead.name = name;
         if (phone && !lead.phone) lead.phone = phone;
       }
       lead.swatchKit = { ...(lead.swatchKit || {}), requestedAt: now() };
       if (stageIndex(lead.stage) < stageIndex('swatches')) lead.stage = 'swatches';
-      if (picksText) lead.notes = (lead.notes ? lead.notes + '\n' : '') + `Free samples: ${picksText}`;
+      if (picksText) lead.notes = (lead.notes ? lead.notes + '\n' : '') + `Samples: ${picksText}`;
       lead.needsReply = true;
       logEvent(lead, 'message', p.message);
       const s = await save(lead); pending = null; toast('Samples request saved'); location.hash = 'lead/' + s.id;

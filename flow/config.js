@@ -2,7 +2,7 @@
 export const DANA_SMS = '+12017453300';
 // Public contact email for policy pages. Leave '' to hide the email line.
 export const CONTACT_EMAIL = '';
-// Free samples (up to 5 fabrics, free shipping). Leave '' and the samples button texts a designer,
+// Samples ($10 for up to 5 fabrics, credited to the shade order). Leave '' and the samples button texts a designer,
 // which also captures the customer's number. Set it to a free order form later; the picked fabrics are
 // passed as ?fabrics=Family|Color,Family|Color. Its confirmation page can be https://aslevi.github.io/tailored-light/thanks.html
 export const SWATCH_KIT_URL = '';

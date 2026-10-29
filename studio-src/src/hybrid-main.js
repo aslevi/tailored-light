@@ -191,7 +191,7 @@ document.addEventListener('click',e=>{
 });
 /* Room menu on the room name */
 {const btn=$('room-btn'),menu=$('room-menu');
- menu.innerHTML=ROOMS.map(r=>`<li><button type="button" role="option" data-room-pick="${r.id}">${r.label}</button></li>`).join('');
+ menu.innerHTML=`<li><a class="own-win" href="../try-your-window/">Your own window →</a></li>`+ROOMS.map(r=>`<li><button type="button" role="option" data-room-pick="${r.id}">${r.label}</button></li>`).join('');
  const setOpen=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',String(o));};
  btn.addEventListener('click',e=>{e.stopPropagation();setOpen(menu.hidden);});
  menu.addEventListener('click',e=>{const b=e.target.closest('[data-room-pick]');if(!b)return;setOpen(false);document.querySelector(`#room-choices [data-room="${b.dataset.roomPick}"]`)?.click();});
@@ -218,7 +218,7 @@ function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
  if(kind==='self'){location.href=smsHref('',`My Hello Shade design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
- const body=kind==='kit'?`Hi Dana! Can I get free samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
+ const body=kind==='kit'?`Hi Dana! Can I get samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
  location.href=smsHref(SITE.DANA_SMS||DANA_SMS,body+tag);
 }
 document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',()=>textDana(b.dataset.text)));
@@ -365,7 +365,7 @@ function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classLi
 function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
-  `<strong>Dana</strong> · Want to feel it first? I'll mail you free samples, up to 5 fabrics.`];
+  `<strong>Dana</strong> · Want to feel it first? I'll mail you samples: up to 5 fabrics for $10, and the $10 comes off your order.`];
  const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
