@@ -30,8 +30,8 @@ or in an Airtable automation script: `crypto.randomUUID().replaceAll('-', '')`.
 
 Customer links Dana texts:
 
-- `https://aslevi.github.io/tailored-light/my-windows/?t=<Project token>`
-- `https://aslevi.github.io/tailored-light/order/?t=<Status token>`
+- `https://helloshade.co/my-windows/?t=<Project token>`
+- `https://helloshade.co/order/?t=<Status token>`
 
 `#t=` works too and keeps the token out of server logs and `Referer`. To revoke a link, change or clear the token.
 

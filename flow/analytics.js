@@ -5,7 +5,7 @@
   var CODE = '';
   if (!CODE || location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
 
-  window.goatcounter = { path: function (p) { return location.pathname.replace(/^\/tailored-light/, '') + location.search.replace(/[?&](phone|name|email)=[^&]*/g, ''); } };
+  window.goatcounter = { path: function (p) { return location.pathname + location.search.replace(/[?&](phone|name|email)=[^&]*/g, ''); } };
   var s = document.createElement('script');
   s.async = true;
   s.dataset.goatcounter = 'https://' + CODE + '.goatcounter.com/count';

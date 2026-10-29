@@ -4,7 +4,7 @@ import { b64urlDecode, b64urlEncode } from '../flow/config.js';
 export const DEFAULT_VALID_DAYS = 14;
 
 // Dana's board: build the customer link for a quote object.
-export const quoteLink = (quote, base = 'https://aslevi.github.io/tailored-light/quote/') => `${base}#d=${b64urlEncode(quote)}`;
+export const quoteLink = (quote, base = 'https://helloshade.co/quote/') => `${base}#d=${b64urlEncode(quote)}`;
 
 // FNV-1a 32-bit over JSON.stringify(quote), base36, 6 chars. Dana's board computes the same
 // from the quote JSON it stored, so a "TLQ1:xxxxxx" line in a reply identifies the exact quote.

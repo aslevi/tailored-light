@@ -1,6 +1,6 @@
 # Hello Shade — website
 
-Live at https://aslevi.github.io/tailored-light/ (GitHub Pages, branch `main`, no build step for site pages).
+Live at https://helloshade.co/ (GitHub Pages, branch `main`, no build step for site pages).
 
 ## Pages
 - `index.html` — marketing home. Old studio links (`/?room=…&s=…`) redirect to `/studio/`.
