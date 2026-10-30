@@ -113,8 +113,10 @@ const ldBlock = graph => `<!--aeo:ld--><script type="application/ld+json">${JSON
 
 // ---------- Quick answer markup ----------
 // `a` = one short paragraph that answers the question on its own; `facts` = a few scannable lines.
-const qaBox = ({ q, a, facts = [], more = [] }) => `<aside class="qa" aria-labelledby="qa-h"><p class="qa-top"><span class="qa-k" id="qa-h">Quick answer</span><time datetime="${UPDATED}">${UPDATED_LABEL}</time></p>${q ? `<h2 class="qa-q">${q}</h2>` : ''}<p class="qa-a">${a}</p>${facts.length ? `<ul class="qa-f">${facts.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}${more.length ? `<p class="qa-more">${more.map(([t, u]) => `<a href="${u}">${t}</a>`).join(' · ')}</p>` : ''}</aside>`;
-const QA = (inner, wrap) => `<!--aeo:qa-->${wrap === 'section' ? `<section class="section tight qa-sec"><div class="container narrow">${inner}</div></section>` : inner}<!--/aeo:qa-->`;
+// Written for people first: a plain section near the bottom of the page, in the site's normal type.
+// The same text gives answer engines a short, dated, quotable summary.
+const qaBox = ({ q, a, facts = [], more = [] }) => `<div class="aeo-about">${q ? `<h2>${q}</h2>` : ''}<p>${a}</p>${facts.length ? `<ul>${facts.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}<p class="aeo-meta">${more.map(([t, u]) => `<a href="${u}">${t}</a>`).join(' · ')}${more.length ? ' · ' : ''}<time datetime="${UPDATED}">${UPDATED_LABEL}</time></p></div>`;
+const QA = (inner, wrap) => `<!--aeo:qa-->${wrap === 'section' ? `<section class="section aeo-sec"><div class="container narrow">${inner}</div></section>` : inner}<!--/aeo:qa-->`;
 
 // Links in quick answers are root-relative so they work at any depth (the site is served at the domain root).
 const L = { prices: '/prices/', types: '/guides/which-shade-type/', noVisit: '/guides/custom-shades-without-a-home-visit/', mount: '/guides/inside-vs-outside-mount/', measure: '/how-to-measure/', samples: '/swatch-kit/', faq: '/faq/', blackout: '/shades/blackout/' };
@@ -138,10 +140,11 @@ const afterFirst = (needle, from = '<main') => h => { const s = h.indexOf(from);
 const afterMatch = re => h => { const m = h.match(re); return m ? m.index + m[0].length : -1; };
 
 const edited = [];
-function editPage(file, { ld, qa, anchor, wrap = 'section' }) {
+function editPage(file, { ld, qa }) {
   let h = read(file);
   if (ld) h = setBlock(h, 'ld', ldBlock(ld), beforeHeadEnd);
-  if (qa) h = setBlock(h, 'qa', QA(qaBox(qa), wrap), anchor);
+  h = h.replace(/<!--aeo:qa-->[\s\S]*?<!--\/aeo:qa-->/, '');
+  if (qa) h = setBlock(h, 'qa', QA(qaBox(qa), 'section'), x => x.lastIndexOf('</main>'));
   write(file, h);
   edited.push(file);
 }
@@ -149,7 +152,6 @@ function editPage(file, { ld, qa, anchor, wrap = 'section' }) {
 // Home
 editPage('index.html', {
   ld: [webPage('/', 'Hello Shade · Custom shades without the home visit', 'Custom window shades made to measure, with designer help by text.')],
-  anchor: afterFirst('</section>'),
   qa: {
     q: 'What is Hello Shade?',
     a: `Hello Shade sells custom window shades online: Roller, Roman, Zebra and Woven, made to measure for each window and shipped to your door ${SHIP} after you order. There's no home visit. You try shades on in a room on the site, then text a designer who helps you pick, measure and order. Shades start at ${usd(P.LOWEST_FROM)}; a 36×60″ Roller is ${usd(mType.roller)}. Each one hangs in about 15–20 minutes with a drill.`,
@@ -173,7 +175,6 @@ for (const t of Object.keys(TYPE)) {
   const ps = byType(t), T = TYPE[t];
   editPage(`shades/${t}/index.html`, {
     ld: [webPage(T.url, `${T.label} shades`, `${T.label} shades made to measure. From ${usd(fromType[t])}.`, 'CollectionPage'), itemList(ps), crumbs([['Home', '/'], ['Shop', '/shades/'], [T.label, T.url]])],
-    anchor: afterFirst('</section>'),
     qa: {
       q: `How much are custom ${T.label} shades?`,
       a: `Hello Shade ${T.label} shades start at ${usd(fromType[t])} (24×24″) and are ${usd(mType[t])} at 36×60″${t === 'zebra' ? ', an estimate until we confirm by text' : ''}. ${T.blurb} Choose from ${ps.length === 1 ? ps[0].name : list(ps.map(p => p.family))}. ${TYPE_LIGHT[t]}`,
@@ -187,7 +188,6 @@ for (const t of Object.keys(TYPE)) {
 const blackout = products.filter(p => /blackout/i.test(p.light));
 editPage('shades/blackout/index.html', {
   ld: [webPage('/shades/blackout/', 'Blackout shades', 'Custom blackout shades for bedrooms and nurseries.', 'CollectionPage'), itemList(blackout), crumbs([['Home', '/'], ['Shop', '/shades/'], ['Blackout shades', '/shades/blackout/']])],
-  anchor: afterFirst('</section>'),
   qa: {
     q: 'Which shades block the most light?',
     a: `For a dark bedroom or nursery, Hello Shade's blackout picks are the Deep Sleep Roller (from ${usd(products.find(p => p.family === 'Deep Sleep').from)}, ${usd(mType.roller)} at 36×60″) and the Blackout Linen Roman (from ${usd(fromType.roman)}, ${usd(mType.roman)} at 36×60″). Mounted outside the frame, on the wall above the window, a shade blocks the most light because it covers the gaps at the edges.`,
@@ -199,7 +199,6 @@ editPage('shades/blackout/index.html', {
 // All shades
 editPage('shades/index.html', {
   ld: [webPage('/shades/', 'All shades', 'Every Hello Shade type and fabric.', 'CollectionPage'), itemList(products), crumbs([['Home', '/'], ['Shop', '/shades/']])],
-  anchor: afterFirst('</section>'),
   qa: {
     q: 'What shades does Hello Shade make?',
     a: `Four types, all made to measure: Roller (from ${usd(fromType.roller)}), Zebra (from ${usd(fromType.zebra)}, estimate), Roman (from ${usd(fromType.roman)}) and Woven (from ${usd(fromType.woven)}), in ${products.length} fabrics. Light levels are light filtering, blackout and sheer. Fabric and color don't change the price within a type; size does.`,
@@ -222,7 +221,6 @@ for (const [room, [q, a]] of Object.entries(ROOM_QA)) {
   const ps = products.filter(p => p.rooms.includes(room.replace('-', ' ')));
   editPage(`rooms/${room}/index.html`, {
     ld: [webPage(`/rooms/${room}/`, `${name} shades`, q, 'CollectionPage'), itemList(ps), crumbs([['Home', '/'], ['Rooms', '/rooms/'], [name, `/rooms/${room}/`]])],
-    anchor: afterFirst('</section>'),
     qa: { q, a: `${a} Prices start at ${usd(P.LOWEST_FROM)}; at 36×60″ a Roller is ${usd(mType.roller)} and a Roman ${usd(mType.roman)}.`, facts: STD_FACTS, more: [['Prices by size', L.prices], ['Which type?', L.types]] },
   });
 }
@@ -230,13 +228,10 @@ for (const [room, [q, a]] of Object.entries(ROOM_QA)) {
 // Product pages
 for (const p of products) {
   const lining = p.lining ? ` Add a room-darkening lining for ${usd(p.mLined)} at 36×60″.` : '';
-  // Placed right under the product block (photo, price, buttons) so shoppers still see the product first.
-  // Drop a block left at an older spot (under the crumbs) so the anchor below decides where it goes.
-  write(p.file, read(p.file).replace(/<!--aeo:qa-->(?:(?!<section)[\s\S])*?<!--\/aeo:qa-->/, ''));
   editPage(p.file, {
     ld: [webPage(p.url, p.name, p.description, 'ItemPage'), productLd(p), crumbs([['Home', '/'], ['Shop', '/shades/'], [TYPE[p.type].label, TYPE[p.type].url], [p.family, p.url]])],
-    anchor: h => h.indexOf('<section', h.indexOf('<div class="pdp"')),
     qa: {
+      q: `About the ${p.name}`,
       a: `<b>${p.name}</b> is a ${p.light.toLowerCase()}${p.screen ? ' screen-weave' : ''} ${TYPE[p.type].label} shade in ${list(p.colors)}${p.rooms.length ? `, best for ${list(p.rooms)}` : ''}. From ${usd(p.from)}; ${usd(p.m)} at 36×60″${p.estimate ? ' (estimate until we confirm by text)' : ''}.${lining} Made to your size, ships in ${SHIP}. Samples $10, credited to your order.`,
     },
   });
@@ -249,8 +244,8 @@ for (const p of products) {
   const qas = [...h.matchAll(/<details><summary>([\s\S]*?)<\/summary><div class="answer">([\s\S]*?)<\/div><\/details>/g)].map(m => [m[1], m[2]]);
   editPage('faq/index.html', {
     ld: [{ ...webPage('/faq/', 'FAQ', 'Answers about Hello Shade custom shades.', 'FAQPage'), mainEntity: faqLd(qas).mainEntity }],
-    anchor: afterFirst('</section>'),
     qa: {
+      q: 'In short',
       a: `Hello Shade makes custom Roller, Roman, Zebra and Woven shades from ${usd(P.LOWEST_FROM)}, with no home visit: you text a designer who helps you pick, measure and order. Measuring takes about 7 minutes and a designer checks every number. Shades ship ${SHIP} after you order and hang in 15–20 minutes. Custom shades can't be returned for a change of mind, but a measuring mistake is remade free.`,
       more: [['Prices by size', L.prices], ['Which type?', L.types], ['No home visit', L.noVisit], ['Inside vs outside mount', L.mount]],
     },
@@ -260,7 +255,6 @@ for (const p of products) {
 // How it works
 editPage('how-it-works/index.html', {
   ld: [webPage('/how-it-works/', 'How it works', 'Custom shades without a home visit: try on, text a designer, we make it and ship it.')],
-  anchor: afterFirst('</section>'),
   qa: {
     q: 'How does Hello Shade work?',
     a: `Three steps. 1) Try on: see real shades in a room on the site and pick a type, fabric and color. 2) Text a designer: send a window photo; the designer helps you pick, measure (about 7 minutes) and order, and checks every number. 3) We make it and ship it: ${SHIP} after you order, and it hangs in about 15–20 minutes. You pay in full when you approve a written summary of each window.`,
@@ -272,9 +266,7 @@ editPage('how-it-works/index.html', {
 // Samples
 editPage('swatch-kit/index.html', {
   ld: [webPage('/swatch-kit/', 'Samples', 'Up to 5 fabric samples for $10, credited to your shade order.')],
-  anchor: afterMatch(/<h1 class="s-h1">[^<]*<\/h1>/),
-  wrap: 'inline',
-  qa: { a: `Pick up to 5 fabrics and we mail you samples for $10, shipping included. The $10 is credited to your shade order. One set per household. Tip: tape them to the window and look in the morning and the evening.` },
+  qa: { q: 'About samples', a: `Pick up to 5 fabrics and we mail you samples for $10, shipping included. The $10 is credited to your shade order. One set per household. Tip: tape them to the window and look in the morning and the evening.` },
 });
 
 // How to measure: the wizard renders with JavaScript, so add the full written guide as plain HTML below it.
@@ -288,8 +280,8 @@ editPage('swatch-kit/index.html', {
     ['Note anything in the way', 'Cranks, handles, locks and alarm sensors: measure how far they stick out. If they block the shade, mount outside or use a crank extender.'],
     ['Send your numbers', 'Text the numbers, the window photo and one photo of the tape. Don’t subtract anything; a designer does the math, checks every number and confirms inside or outside mount in writing.'],
   ];
-  const html = `<!--aeo:qa--><section class="aeo-guide" aria-labelledby="g-h"><style>.aeo-guide{max-width:560px;margin:8px auto 40px;padding:0 16px;color:#4A3530}.aeo-guide h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:24px;margin:24px 0 8px}.aeo-guide .qa{background:#FFFDFB;border:1px solid #EAD7CE;border-radius:16px;padding:16px 18px}.aeo-guide .qa-top{display:flex;justify-content:space-between;gap:12px;margin:0 0 6px;font-size:12px;color:#7A5F57}.aeo-guide .qa-k{font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A9594A}.aeo-guide .qa-a{margin:0}.aeo-guide ol{padding-left:22px}.aeo-guide li{margin:0 0 10px}.aeo-guide a{color:#A9594A}</style>
-${qaBox({ a: `Measure inside the window frame with a metal tape: three widths (top, middle, bottom) and three heights (left, middle, right), to the closest eighth below. We order the narrowest width and the longest height. Measure the depth too: Roller and Zebra need about 2″ and Roman and Woven about 2½″ to mount inside the frame. It takes about 7 minutes, and a Hello Shade designer checks every number before we make your shade. If you measured with this guide and we checked it, a measuring mistake is remade free.` })}
+  const html = `<!--aeo:qa--><section class="aeo-guide" aria-labelledby="g-h"><style>.aeo-guide{max-width:560px;margin:8px auto 40px;padding:0 16px;color:#4A3530}.aeo-guide h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:24px;margin:24px 0 8px}.aeo-guide .aeo-meta{font-size:13px;color:#7A5F57}.aeo-guide ol{padding-left:22px}.aeo-guide li{margin:0 0 10px}.aeo-guide a{color:#A9594A}</style>
+${qaBox({ q: 'Measuring in short', a: `Measure inside the window frame with a metal tape: three widths (top, middle, bottom) and three heights (left, middle, right), to the closest eighth below. We order the narrowest width and the longest height. Measure the depth too: Roller and Zebra need about 2″ and Roman and Woven about 2½″ to mount inside the frame. It takes about 7 minutes, and a Hello Shade designer checks every number before we make your shade. If you measured with this guide and we checked it, a measuring mistake is remade free.` })}
 <h2 id="g-h">How to measure a window for shades</h2>
 <ol>${steps.map(([t, d]) => `<li><b>${t}.</b> ${d}</li>`).join('')}</ol>
 <h2>How to install</h2>

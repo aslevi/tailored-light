@@ -790,18 +790,15 @@ h2{font-weight:500}
 body{font-variation-settings:'SOFT' 100,'WONK' 0}
 .promo li{display:flex;align-items:center;min-height:44px}
 
-/* ---------- Quick answers + guide pages (written by tools/aeo/build.mjs) ---------- */
-.qa-sec{padding:20px 0 4px}
-.qa{background:var(--paper);border:1px solid var(--blush);border-left:3px solid var(--gold);border-radius:6px;padding:16px 18px;margin:16px 0 8px;font-size:15px;line-height:1.55}
-.pdp+.qa,.crumbs+.qa{margin:12px 0 4px}
-.qa-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin:0 0 6px;font-size:12.5px;color:var(--muted)}
-.qa-k{font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text)}
-.qa-q{font-size:20px;line-height:1.25;margin:0 0 6px}
-.qa-a{margin:0}
-.qa-f{margin:10px 0 0;padding-left:18px;color:var(--muted)}
-.qa-f li{margin:2px 0}
-.qa-more{margin:10px 0 0;font-size:14px}
-.qa-more a{color:var(--link)}
+/* ---------- "About" sections + guide pages (written by tools/aeo/build.mjs) ---------- */
+.aeo-sec{border-top:1px solid var(--blush)}
+.aeo-about h2{margin:0 0 10px}
+.aeo-about p{margin:0 0 10px}
+.aeo-about ul{margin:0 0 10px;padding-left:20px}
+.aeo-about li{margin:2px 0}
+.aeo-meta{font-size:13.5px;color:var(--muted)}
+.aeo-meta a{color:var(--link)}
+.prose .aeo-about{margin:8px 0 0}
 .prose h2{margin:32px 0 10px}
 .prose ol,.prose ul{padding-left:22px}
 .prose li{margin:0 0 8px}
