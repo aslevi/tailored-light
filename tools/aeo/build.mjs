@@ -87,6 +87,9 @@ const PRICE_ROWS = [
 // ---------- Structured data ----------
 const ORG = {
   '@type': 'Organization', '@id': `${SITE}/#org`, name: 'Hello Shade', url: `${SITE}/`, logo: `${SITE}/icon-512.png`,
+  alternateName: ['Hello Shade window shades', 'helloshade.co'],
+  disambiguatingDescription: 'Online store for custom window shades (Roller, Roman, Zebra and Woven) at helloshade.co.',
+  knowsAbout: ['custom window shades', 'roller shades', 'roman shades', 'zebra shades', 'woven wood shades', 'blackout shades', 'measuring windows for shades'],
   description: 'Custom window shades made to measure and shipped to your door, with designer help by text instead of a home visit.',
   telephone: PHONE,
   contactPoint: { '@type': 'ContactPoint', telephone: PHONE, contactType: 'customer service', availableLanguage: 'English', description: 'Text a designer' },
@@ -353,7 +356,7 @@ const faqHtml = qas => `<div class="faq">${qas.map(([q, a]) => `<details><summar
       facts: STD_FACTS,
     },
     body: `<h2>Prices by window size</h2><p>Width × height in inches, price per shade.</p>${table(['Type', ...PRICE_SIZES.map(([w, h]) => `${w}×${h}″`)], PRICE_ROWS.map(r => [r.label, ...r.prices.map(usd)]))}
-<p class="small">Zebra prices are an estimate until we confirm by text. Roman prices are the same for Raw Linen, Soft Cotton, Ticking Stripe, Sheer Voile and Blackout Linen; only Raw Linen, Soft Cotton and Ticking Stripe can add the lining.</p>
+<p>By type: ${Object.entries(TYPE).map(([t, T]) => `<a href="${t}/">${T.label} prices</a>`).join(' · ')}</p><p class="small">Zebra prices are an estimate until we confirm by text. Roman prices are the same for Raw Linen, Soft Cotton, Ticking Stripe, Sheer Voile and Blackout Linen; only Raw Linen, Soft Cotton and Ticking Stripe can add the lining.</p>
 <h2>What sets the price</h2><ul><li><b>Type:</b> Roller costs least, then Zebra, Roman and Woven.</li><li><b>Size:</b> width × height. Bigger windows cost more.</li><li><b>Lining:</b> a room-darkening lining adds a little to a Roman.</li><li>Fabric and color don’t change the price within a type.</li></ul>
 <h2>Questions about price</h2>${faqHtml(qas)}`,
     ld: [webPage('/prices/', 'How much do custom shades cost?', 'Hello Shade prices by type and window size.'), crumbs([['Home', '/'], ['Prices', '/prices/']]), faqLd(qas)],
@@ -394,14 +397,14 @@ const faqHtml = qas => `<div class="faq">${qas.map(([q, a]) => `<details><summar
     ['How do I pay?', 'A designer texts a written summary of each window. Reply YES and we text a secure Stripe payment link. Nothing is made until you approve and pay.'],
   ];
   intentPage({
-    url: '/guides/custom-shades-without-a-home-visit/', title: 'Custom shades without a home visit', description: 'How to buy custom window shades without an in-home consultation: try on online, text a designer, measure in 7 minutes.',
-    h1: 'Custom shades without a home visit', lede: 'You don’t need a designer at your door. Just a little guidance.',
+    url: '/guides/custom-shades-without-a-home-visit/', title: 'Custom window shades with a designer by text, no home visit', description: 'Text a window designer instead of booking a home visit: send a photo, get help choosing and measuring, and custom shades ship in 2–4 weeks.',
+    h1: 'A designer by text, not at your door', lede: 'You don’t need a designer at your door. Just a little guidance.',
     qa: {
-      a: `Yes, you can get custom-made shades without an in-home consultation. With Hello Shade you try shades on in a room on the site, then text a designer a photo of your window. The designer helps you choose, walks you through measuring (about 7 minutes with a metal tape) and checks every number. Shades ship ${SHIP} after you order and hang in about 15–20 minutes. Without a showroom or home visits, prices are about half of in-home studio prices: a 36×60″ Roller is ${usd(mType.roller)}.`,
+      a: `Yes, you can get custom-made shades without an in-home consultation. Hello Shade works like a virtual window-treatment designer you text: you send a photo of your window and a designer texts back picks, prices and measuring help. You can also try shades on in a room on the site, then text a designer a photo of your window. The designer helps you choose, walks you through measuring (about 7 minutes with a metal tape) and checks every number. Shades ship ${SHIP} after you order and hang in about 15–20 minutes. Without a showroom or home visits, prices are about half of in-home studio prices: a 36×60″ Roller is ${usd(mType.roller)}.`,
       facts: STD_FACTS,
     },
     body: `<h2>How it works</h2><ol><li><b>Try on.</b> See real shades in a room and pick a type, fabric and color.</li><li><b>Text a designer.</b> Send a window photo or a look you like. We help you pick, measure and order, all by text.</li><li><b>We make it and ship it.</b> Made for your window, ships ${SHIP} after you order.</li></ol><h2>Common questions</h2>${faqHtml(qas)}`,
-    ld: [webPage('/guides/custom-shades-without-a-home-visit/', 'Custom shades without a home visit', 'Buying custom shades without an in-home consultation.', 'Article'), crumbs([['Home', '/'], ['Guides', '/faq/'], ['No home visit', '/guides/custom-shades-without-a-home-visit/']]), faqLd(qas)],
+    ld: [webPage('/guides/custom-shades-without-a-home-visit/', 'Custom window shades with a designer by text', 'Buying custom shades by texting a designer instead of an in-home consultation.', 'Article'), crumbs([['Home', '/'], ['Guides', '/faq/'], ['No home visit', '/guides/custom-shades-without-a-home-visit/']]), faqLd(qas)],
   });
 }
 
@@ -423,6 +426,48 @@ const faqHtml = qas => `<div class="faq">${qas.map(([q, a]) => `<details><summar
     ld: [webPage('/guides/inside-vs-outside-mount/', 'Inside vs outside mount shades', 'Choosing inside or outside mount.', 'Article'), crumbs([['Home', '/'], ['Guides', '/faq/'], ['Inside vs outside mount', '/guides/inside-vs-outside-mount/']]), faqLd(qas)],
   });
 }
+
+// 5. Cost by type: "how much do custom roller shades cost" is its own question per type.
+const COST_INTRO = {
+  roller: 'the simplest and lowest-priced type',
+  zebra: 'two layers of bands you slide for a view or privacy',
+  roman: 'soft folds and a tailored look',
+  woven: 'natural woven wood with a flat fold',
+};
+for (const t of Object.keys(TYPE)) {
+  const T = TYPE[t], ps = byType(t);
+  const rows = t === 'roman' ? PRICE_ROWS.filter(r => /^Roman/.test(r.label)) : PRICE_ROWS.filter(r => r.label.toLowerCase().startsWith(t === 'woven' ? 'woven' : t));
+  const est = t === 'zebra' ? ' (estimate until we confirm by text)' : '';
+  const qas = [
+    [`Why are ${T.label} shades priced by size?`, 'Each shade is made for one window, so the price follows width × height. Fabric and color don’t change the price within a type.'],
+    ['How do I get my exact price?', `Add your window size under Your price on any ${T.label} shade. Sizes from 12–96″ wide and 12–120″ high get an instant price; others are quoted by text.`],
+    ['Does the price include installation?', 'No. You hang it yourself in about 15–20 minutes with two brackets, a few screws and a drill. That’s part of why it costs less than an in-home studio.'],
+  ];
+  intentPage({
+    url: `/prices/${t}/`, title: `How much do custom ${T.label.toLowerCase()} shades cost? (2026 prices)`,
+    description: `Custom ${T.label} shade prices by window size: from ${usd(fromType[t])}, ${usd(mType[t])} at 36×60″${est}. Full price table.`,
+    h1: `How much do custom ${T.label} shades cost?`, lede: `${T.label} shades are ${COST_INTRO[t]}. Here’s every price by window size.`,
+    qa: {
+      a: `Hello Shade custom ${T.label} shades cost ${usd(fromType[t])} for a small 24×24″ window, ${usd(mType[t])} for a common 36×60″ window and ${usd(rows[0].prices.at(-1))} for a large 96×96″ window${est}. Price is set by width × height. ${t === 'roman' ? `A room-darkening lining adds a little: ${usd(mType.romanLined)} at 36×60″. ` : ''}Each shade is made to measure and ships ${SHIP} after you order. In-home studios typically charge about twice as much for a similar shade, because the price includes a showroom and a home visit.`,
+      facts: [`Fabrics: ${list(ps.map(p => p.family))}.`, ...STD_FACTS],
+    },
+    body: `<h2>${T.label} prices by window size</h2><p>Width × height in inches, price per shade.</p>${table(['', ...PRICE_SIZES.map(([w, h]) => `${w}×${h}″`)], rows.map(r => [r.label, ...r.prices.map(usd)]))}<h2>Questions</h2>${faqHtml(qas)}<p><a href="../../${T.url.slice(1)}">Shop ${T.label} shades</a> · <a href="../">All prices</a> · <a href="../../guides/which-shade-type/">Which type?</a></p>`,
+    ld: [webPage(`/prices/${t}/`, `How much do custom ${T.label} shades cost?`, `Custom ${T.label} shade prices by window size.`, 'Article'), crumbs([['Home', '/'], ['Prices', '/prices/'], [T.label, `/prices/${t}/`]]), faqLd(qas)],
+  });
+}
+
+// Page titles: say what the page is, in the words people search with.
+function setTitle(file, title, description) {
+  let h = read(file);
+  h = h.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`).replace(/(<meta property="og:title" content=")[^"]*/, `$1${esc(title)}`);
+  if (description) h = h.replace(/(<meta name="description" content=")[^"]*/, `$1${esc(description)}`).replace(/(<meta property="og:description" content=")[^"]*/, `$1${esc(description)}`);
+  write(file, h);
+}
+setTitle('index.html', 'Hello Shade · Custom window shades, no home visit',
+  `Custom window shades made to measure: Roller, Roman, Zebra and Woven, from ${usd(P.LOWEST_FROM)}. Try shades on in a room, then text a designer. Ships in ${SHIP}.`);
+for (const t of Object.keys(TYPE)) setTitle(`shades/${t}/index.html`, `Custom ${TYPE[t].label.toLowerCase()} shades, from ${usd(fromType[t])} · Hello Shade`);
+setTitle('shades/blackout/index.html', `Custom blackout shades, from ${usd(P.LOWEST_FROM)} · Hello Shade`);
+for (const r of Object.keys(ROOM_QA)) setTitle(`rooms/${r}/index.html`, `Best shades for a ${r.replace('-', ' ')} · Hello Shade`);
 
 // ---------- feed.json (public, live catalog and prices) ----------
 const feed = {
@@ -448,9 +493,9 @@ write('feed.json', JSON.stringify(feed, null, 2) + '\n');
 
 // ---------- llms.txt ----------
 const page = (t, u, d) => `- [${t}](${SITE}${u}): ${d}`;
-const llms = `# Hello Shade
+const llms = `# Hello Shade (custom window shades)
 
-> Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door ${SHIP} after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at ${usd(P.LOWEST_FROM)}; a 36×60″ Roller is ${usd(mType.roller)}. Facts on this page were updated ${UPDATED}. Live prices and products as JSON: ${SITE}/feed.json
+> Hello Shade (helloshade.co) is an online store for custom window shades. Not to be confused with other businesses using the name. Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door ${SHIP} after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at ${usd(P.LOWEST_FROM)}; a 36×60″ Roller is ${usd(mType.roller)}. Facts on this page were updated ${UPDATED}. Live prices and products as JSON: ${SITE}/feed.json
 
 Key facts:
 - Types and From prices (24×24″): Roller ${usd(fromType.roller)}, Zebra ${usd(fromType.zebra)} (estimate), Roman ${usd(fromType.roman)}, Woven ${usd(fromType.woven)}.
@@ -464,8 +509,9 @@ Key facts:
 
 ## Guides
 ${page('How much do custom shades cost?', L.prices, 'full price table by type and window size')}
+${Object.entries(TYPE).map(([t, T]) => page(`How much do custom ${T.label} shades cost?`, `/prices/${t}/`, `from ${usd(fromType[t])}, ${usd(mType[t])} at 36×60″`)).join('\n')}
 ${page('Roller vs Roman vs Zebra vs Woven', L.types, 'which shade type to choose')}
-${page('Custom shades without a home visit', L.noVisit, 'how buying by text works')}
+${page('Custom window shades with a designer by text', L.noVisit, 'text a designer instead of a home visit')}
 ${page('Inside vs outside mount', L.mount, 'depth needed and which is darker')}
 ${page('How to measure', L.measure, 'step-by-step measuring and install guide')}
 ${page('FAQ', L.faq, 'common questions')}
@@ -488,7 +534,7 @@ write('llms.txt', llms);
 
 // ---------- sitemap.xml ----------
 const urls = ['/', '/shades/', ...Object.values(TYPE).map(t => t.url), '/shades/blackout/', ...products.map(p => p.url),
-  '/rooms/', ...Object.keys(ROOM_QA).map(r => `/rooms/${r}/`), '/fabrics/', '/swatch-kit/', '/prices/', L.types, L.noVisit, L.mount,
+  '/rooms/', ...Object.keys(ROOM_QA).map(r => `/rooms/${r}/`), '/fabrics/', '/swatch-kit/', '/prices/', ...Object.keys(TYPE).map(t => `/prices/${t}/`), L.types, L.noVisit, L.mount,
   '/how-to-measure/', '/how-it-works/', '/faq/', '/about/', '/studio/', '/try-your-window/', '/contact.html', '/terms.html', '/privacy.html', '/sms.html'];
 write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${SITE}${u}</loc><lastmod>${UPDATED}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 

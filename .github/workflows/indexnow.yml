@@ -1,0 +1,21 @@
+# Tells Bing (which feeds ChatGPT search), Yandex and others about new or changed pages via IndexNow,
+# a few minutes after each push to main, once GitHub Pages has published.
+name: IndexNow
+on:
+  push:
+    branches: [main]
+    paths: ['**.html', 'sitemap.xml', 'llms.txt', 'feed.json']
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for GitHub Pages to publish
+        run: sleep 180
+      - name: Submit sitemap URLs
+        run: |
+          KEY=aaae479f133143b247a91c8abe127e32
+          URLS=$(grep -o '<loc>[^<]*' sitemap.xml | sed 's/<loc>//' | python3 -c 'import sys,json;print(json.dumps([l.strip() for l in sys.stdin if l.strip()]+["https://helloshade.co/llms.txt","https://helloshade.co/feed.json"]))')
+          BODY=$(printf '{"host":"helloshade.co","key":"%s","keyLocation":"https://helloshade.co/%s.txt","urlList":%s}' "$KEY" "$KEY" "$URLS")
+          curl -sS -o /dev/null -w 'IndexNow: HTTP %{http_code}\n' -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$BODY"

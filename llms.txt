@@ -1,6 +1,6 @@
-# Hello Shade
+# Hello Shade (custom window shades)
 
-> Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door 2–4 weeks after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at $209; a 36×60″ Roller is $229. Facts on this page were updated 2026-10-30. Live prices and products as JSON: https://helloshade.co/feed.json
+> Hello Shade (helloshade.co) is an online store for custom window shades. Not to be confused with other businesses using the name. Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door 2–4 weeks after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at $209; a 36×60″ Roller is $229. Facts on this page were updated 2026-10-30. Live prices and products as JSON: https://helloshade.co/feed.json
 
 Key facts:
 - Types and From prices (24×24″): Roller $209, Zebra $239 (estimate), Roman $259, Woven $269.
@@ -14,8 +14,12 @@ Key facts:
 
 ## Guides
 - [How much do custom shades cost?](https://helloshade.co/prices/): full price table by type and window size
+- [How much do custom Roller shades cost?](https://helloshade.co/prices/roller/): from $209, $229 at 36×60″
+- [How much do custom Roman shades cost?](https://helloshade.co/prices/roman/): from $259, $329 at 36×60″
+- [How much do custom Zebra shades cost?](https://helloshade.co/prices/zebra/): from $239, $259 at 36×60″
+- [How much do custom Woven shades cost?](https://helloshade.co/prices/woven/): from $269, $399 at 36×60″
 - [Roller vs Roman vs Zebra vs Woven](https://helloshade.co/guides/which-shade-type/): which shade type to choose
-- [Custom shades without a home visit](https://helloshade.co/guides/custom-shades-without-a-home-visit/): how buying by text works
+- [Custom window shades with a designer by text](https://helloshade.co/guides/custom-shades-without-a-home-visit/): text a designer instead of a home visit
 - [Inside vs outside mount](https://helloshade.co/guides/inside-vs-outside-mount/): depth needed and which is darker
 - [How to measure](https://helloshade.co/how-to-measure/): step-by-step measuring and install guide
 - [FAQ](https://helloshade.co/faq/): common questions
