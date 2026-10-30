@@ -1,9 +1,15 @@
 // Try on your window: photo + 4 corners -> a shade drawn in perspective (WebGL homography).
-// Everything runs on the phone; the photo is never uploaded.
+// Everything runs on the phone. If DETECT_URL is set (flow/config.js), a small copy of the photo is sent once to
+// our detect-window Worker to place the corners automatically; otherwise the photo is never uploaded.
 import { CATALOG } from './catalog-lite.js';
 import { fromPrice, money, ESTIMATE_NOTE } from '../flow/pricing.js';
+import { DETECT_URL } from '../flow/config.js';
 
 const PHONE = '+12017453300';
+const DEFAULT_CORNERS = [[0.24, 0.2], [0.76, 0.2], [0.76, 0.72], [0.24, 0.72]];
+const DETECT_PX = 768;          // long side of the copy we send (enough for ~2-3% corner accuracy, ~40-90 KB)
+const DETECT_TIMEOUT_MS = 4000; // after this, keep the default dots and let the customer drag
+const HINT_DRAG = 'Drag the 4 dots to the inside corners of your window.';
 const SAMPLE = { src: './sample-window.webp', corners: [[208 / 950, 128 / 633], [740 / 950, 128 / 633], [740 / 950, 491 / 633], [208 / 950, 491 / 633]] };
 const TYPES = [
   { id: 'roller', label: 'Roller' }, { id: 'roman', label: 'Roman' },
@@ -35,6 +41,7 @@ function optics(f, type) {
 const state = {
   type: 'roller', level: 'Light filtering', family: null, color: null,
   drop: 0.62, night: 0, corners: null, photo: null, sample: false, done: false,
+  windows: [], win: 0, // auto-detected windows (best first) and which one the dots are on
 };
 
 /* ---------------- UI ---------------- */
@@ -403,6 +410,8 @@ function computeGain() {
 }
 
 function setPhoto(img, corners, sample) {
+  cancelDetect();
+  state.windows = []; state.win = 0; $('nextWin').hidden = true;
   const max = 1600, sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
   const cv = document.createElement('canvas');
   cv.width = Math.max(1, Math.round(img.naturalWidth * sc)); cv.height = Math.max(1, Math.round(img.naturalHeight * sc));
@@ -465,6 +474,7 @@ handles.forEach((el, i) => {
     state.corners[i] = [clamp((e.clientX - r.left + off[0]) / r.width, 0, 1), clamp((e.clientY - r.top + off[1]) / r.height, 0, 1)];
     placeHandles(); drawLoupe(i); drawPlate(); requestRender();
   });
+  el.addEventListener('pointerdown', () => { if (detecting) cancelDetect(HINT_DRAG); }, { capture: true });
   const end = () => { if (!off) return; off = null; el.classList.remove('drag'); loupe.style.display = 'none'; computeGain(); requestRender(); };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end); el.addEventListener('lostpointercapture', end);
   el.addEventListener('keydown', e => {
@@ -472,6 +482,7 @@ handles.forEach((el, i) => {
     if (!k) return; e.preventDefault();
     const s = e.shiftKey ? 0.02 : 0.005, [x, y] = state.corners[i];
     state.corners[i] = [clamp(x + k[0] * s, 0, 1), clamp(y + k[1] * s, 0, 1)];
+    if (detecting) cancelDetect(HINT_DRAG);
     placeHandles(); drawPlate(); requestRender();
   });
 });
@@ -480,7 +491,7 @@ function setDone(on) {
   state.done = on; stage.classList.toggle('done', on);
   $('doneBtn').textContent = on ? 'Adjust corners' : 'Done';
   $('doneBtn').classList.toggle('on', !on);
-  $('hint').textContent = on ? 'Looking good? Try other fabrics, or slide Day to night.' : 'Drag the 4 dots to the inside corners of your window.';
+  $('hint').textContent = on ? 'Looking good? Try other fabrics, or slide Day to night.' : HINT_DRAG;
 }
 $('doneBtn').addEventListener('click', () => setDone(!state.done));
 
@@ -490,7 +501,8 @@ function readFile(input) {
   const url = URL.createObjectURL(f), img = new Image();
   img.onload = () => {
     URL.revokeObjectURL(url);
-    setPhoto(img, [[0.24, 0.2], [0.76, 0.2], [0.76, 0.72], [0.24, 0.72]], false);
+    setPhoto(img, DEFAULT_CORNERS, false);
+    if (DETECT_URL) detectWindow();
   };
   img.onerror = () => { URL.revokeObjectURL(url); showError("We couldn't open that photo. Try a JPG or PNG, or take a new one."); };
   img.src = url;
@@ -502,6 +514,68 @@ $('sample').addEventListener('click', () => {
   img.onload = () => setPhoto(img, SAMPLE.corners, true);
   img.src = SAMPLE.src;
 });
+
+/* ---------------- auto-detect (optional) ---------------- */
+// Shows the default dots right away, asks the Worker for the corners, and moves the dots when it answers.
+// Any error, an empty answer, or no answer within DETECT_TIMEOUT_MS leaves the default dots to drag by hand.
+let detecting = null; // { ctrl, timer } while a request is in flight
+function cancelDetect(hint) {
+  if (!detecting) return;
+  detecting.ctrl.abort(); clearTimeout(detecting.timer); detecting = null;
+  stage.classList.remove('detecting'); $('finding').hidden = true;
+  if (hint) $('hint').textContent = hint;
+}
+function photoBlob() {
+  const p = state.photo, sc = Math.min(1, DETECT_PX / Math.max(p.width, p.height));
+  const cv = document.createElement('canvas');
+  cv.width = Math.max(1, Math.round(p.width * sc)); cv.height = Math.max(1, Math.round(p.height * sc));
+  cv.getContext('2d').drawImage(p, 0, 0, cv.width, cv.height);
+  return new Promise(res => cv.toBlob(b => res(b), 'image/jpeg', 0.8));
+}
+const validQuad = q => Array.isArray(q) && q.length === 4 &&
+  q.every(p => Array.isArray(p) && p.length === 2 && p.every(v => typeof v === 'number' && v >= 0 && v <= 1));
+async function detectWindow() {
+  const ctrl = new AbortController(), job = { ctrl, timer: setTimeout(() => ctrl.abort(), DETECT_TIMEOUT_MS) };
+  detecting = job;
+  stage.classList.add('detecting'); $('finding').hidden = false; $('hint').textContent = 'Finding your window…';
+  let windows = [];
+  try {
+    const blob = await photoBlob();
+    if (!blob) throw new Error('no blob');
+    const r = await fetch(DETECT_URL, { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob, signal: ctrl.signal });
+    if (!r.ok) throw new Error('detect ' + r.status);
+    const j = await r.json();
+    windows = (Array.isArray(j.windows) ? j.windows : []).filter(w => w && validQuad(w.corners)).slice(0, 6);
+  } catch (e) { windows = []; }
+  if (detecting !== job) return; // a new photo, a drag, or the timeout got there first
+  clearTimeout(job.timer); detecting = null;
+  stage.classList.remove('detecting'); $('finding').hidden = true;
+  if (!windows.length) { $('hint').textContent = "We couldn't spot the window. " + HINT_DRAG; return; }
+  state.windows = windows.map(w => w.corners.map(p => p.slice()));
+  pickWindow(0);
+}
+function pickWindow(i) {
+  const n = state.windows.length;
+  state.win = ((i % n) + n) % n;
+  state.corners = state.windows[state.win].map(p => p.slice());
+  $('nextWin').hidden = n < 2;
+  $('nextWin').textContent = `Next window · ${state.win + 1}/${n}`;
+  $('nextWin').setAttribute('aria-label', `Showing window ${state.win + 1} of ${n}. Move the shade to the next window`);
+  setDone(false); // shows the dots; then replace its generic hint
+  $('hint').textContent = n > 1
+    ? `We found ${n} windows. Nudge the dots if they're off, or tap Next window.`
+    : "We found your window. Nudge the dots if they're off.";
+  computeGain(); placeHandles(); drawPlate(); requestRender();
+}
+$('nextWin').addEventListener('click', () => {
+  // Keep any nudges made to the current window, then move the shade to the next one.
+  if (state.windows.length) state.windows[state.win] = state.corners.map(p => p.slice());
+  pickWindow(state.win + 1);
+});
+if (DETECT_URL) {
+  $('lede').textContent = "Snap your window and we'll find its corners. Nudge the dots if needed, then try on any shade in our real fabrics.";
+  $('privateText').textContent = "Your photo is only used to find your window. We don't keep it.";
+}
 
 update();
 if (new URLSearchParams(location.search).has('sample')) $('sample').click();

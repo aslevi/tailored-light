@@ -1,0 +1,9 @@
+# Cloudflare Worker for "Try on your window" auto-detect. The API key is a secret, NOT stored here:
+#   npx wrangler secret put OPENROUTER_API_KEY
+name = "hs-detect-window"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://helloshade.co"
+MODEL = "google/gemma-4-26b-a4b-it"

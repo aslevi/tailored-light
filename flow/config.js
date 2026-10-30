@@ -10,6 +10,10 @@ export const SWATCH_KIT_MAX = 5;
 // "Prefer we text you?" form endpoint. Leave '' to hide the phone field everywhere and keep only the text buttons.
 // When set, the form POSTs JSON {phone, consent, consentText, context, page, ts} to this URL.
 export const LEAD_FORM_URL = '';
+// "Try on your window" auto-detect. Leave '' and customers drag the 4 corner dots themselves (photo never leaves
+// the phone). Set it to the deployed server/detect-window Worker URL and the page sends a small copy of the photo
+// there to find the window corners, then lets the customer nudge them. See server/detect-window/README.md.
+export const DETECT_URL = '';
 // Reply-time line (used in the studio if shown).
 export const REPLY_PROMISE = 'We usually reply within minutes.';
 // The designer card next to "Text a designer". DESIGNER_PHOTO: path or URL of a real team photo.

@@ -70,6 +70,12 @@ h1{font-size:clamp(30px,8vw,46px);margin-top:6px}
 .stage.done .handle,.stage.done .outline{display:none}
 .loupe{position:absolute;width:104px;height:104px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;display:none;z-index:3;overflow:hidden;background:#000}
 .loupe canvas{width:100%;height:100%}
+.finding{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:14px;background:linear-gradient(180deg,rgba(74,53,48,0) 55%,rgba(74,53,48,.28));z-index:4;pointer-events:none}
+.finding-pill{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 16px;border-radius:999px;background:var(--paper);color:var(--ink);font-weight:600;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--clay);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none;border-top-color:var(--clay)}}
+.stage.detecting .handle,.stage.detecting .outline{opacity:.35}
 .stage-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 2px 0}
 .hint{font-size:14px;color:var(--muted);margin:0;flex:1 1 180px}
 .stage-actions{display:flex;gap:4px;flex-wrap:wrap}
@@ -128,8 +134,8 @@ footer a{display:inline-flex;min-height:44px;align-items:center;margin-right:14p
 
 <main class="wrap">
   <h1>Try on your window</h1>
-  <p class="lede">Snap your window, drag the four dots to its corners, and try on any shade in our real fabrics.</p>
-  <p class="private"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your photo never leaves your phone.</p>
+  <p class="lede" id="lede">Snap your window, drag the four dots to its corners, and try on any shade in our real fabrics.</p>
+  <p class="private" id="private"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="privateText">Your photo never leaves your phone.</span></p>
 
   <div class="app">
     <section class="card stage-card" aria-label="Your window">
@@ -156,10 +162,12 @@ footer a{display:inline-flex;min-height:44px;align-items:center;margin-right:14p
           <button type="button" class="handle" data-i="2" aria-label="Bottom right corner"></button>
           <button type="button" class="handle" data-i="3" aria-label="Bottom left corner"></button>
           <div class="loupe" id="loupe"><canvas width="208" height="208"></canvas></div>
+          <div class="finding" id="finding" hidden><span class="finding-pill"><span class="spin" aria-hidden="true"></span>Finding your window…</span></div>
         </div>
         <div class="stage-bar">
-          <p class="hint" id="hint">Drag the 4 dots to the inside corners of your window.</p>
+          <p class="hint" id="hint" aria-live="polite">Drag the 4 dots to the inside corners of your window.</p>
           <div class="stage-actions">
+            <button type="button" class="chip-btn" id="nextWin" hidden>Next window</button>
             <button type="button" class="chip-btn" id="doneBtn">Done</button>
             <label class="chip-btn" for="lib" style="display:inline-flex;align-items:center">New photo</label>
           </div>
