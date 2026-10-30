@@ -1,0 +1,55 @@
+# Hello Shade
+
+> Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door 2–4 weeks after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at $209; a 36×60″ Roller is $229. Facts on this page were updated 2026-10-30. Live prices and products as JSON: https://helloshade.co/feed.json
+
+Key facts:
+- Types and From prices (24×24″): Roller $209, Zebra $239 (estimate), Roman $259, Woven $269.
+- At 36×60″: Roller $229, Zebra $259 (estimate), Roman $329, Roman with room-darkening lining $359, Woven $399.
+- Price is set by type and size; fabric and color don't change it. Each window is priced separately. Same prices for everyone.
+- Sizes: 12–96″ wide, 12–120″ high. Larger or unusual windows are quoted by text.
+- Samples: up to 5 fabrics for $10, credited to the shade order.
+- Fit guarantee: measure wrong and the shade is remade free, once per shade, within 30 days of delivery, when a designer checked the numbers and photos first.
+- Customers measure themselves (about 7 minutes) and install themselves (about 15–20 minutes a shade). Hello Shade doesn't install.
+- Text a designer: (201) 745-3300.
+
+## Guides
+- [How much do custom shades cost?](https://helloshade.co/prices/): full price table by type and window size
+- [Roller vs Roman vs Zebra vs Woven](https://helloshade.co/guides/which-shade-type/): which shade type to choose
+- [Custom shades without a home visit](https://helloshade.co/guides/custom-shades-without-a-home-visit/): how buying by text works
+- [Inside vs outside mount](https://helloshade.co/guides/inside-vs-outside-mount/): depth needed and which is darker
+- [How to measure](https://helloshade.co/how-to-measure/): step-by-step measuring and install guide
+- [FAQ](https://helloshade.co/faq/): common questions
+
+## Shop
+- [Roller shades](https://helloshade.co/shades/roller/): Clean and simple. Rolls up tight. From $209.
+- [Roman shades](https://helloshade.co/shades/roman/): Soft folds, tailored look. From $259.
+- [Zebra shades](https://helloshade.co/shades/zebra/): Two layers of bands slide to go from open view to privacy without raising the shade. From $239.
+- [Woven shades](https://helloshade.co/shades/woven/): Natural woven wood, classic flat fold. From $269.
+- [Blackout shades](https://helloshade.co/shades/blackout/): for bedrooms and nurseries
+- [Daylight Weave Roller](https://helloshade.co/shades/roller/daylight-weave/): Light filtering, White/Oat/Mocha. From $209; $229 at 36×60″.
+- [Morning Haze Roller](https://helloshade.co/shades/roller/morning-haze/): Light filtering, Cream/Oat/Harbor Blue. From $209; $229 at 36×60″.
+- [Deep Sleep Roller](https://helloshade.co/shades/roller/deep-sleep/): Blackout, White/Oat/Latte/Fog. From $209; $229 at 36×60″.
+- [Clear View Roller](https://helloshade.co/shades/roller/clear-view/): Light filtering, White/Mist/Slate. From $209; $229 at 36×60″.
+- [Twin Light Zebra](https://helloshade.co/shades/zebra/twin-light/): Light filtering, White/Oat/Mist/Slate. From $239; $259 at 36×60″.
+- [Sand Stripe Zebra](https://helloshade.co/shades/zebra/sand-stripe/): Light filtering, Oat/Walnut. From $239; $259 at 36×60″.
+- [Twin Shade Zebra](https://helloshade.co/shades/zebra/twin-shade/): Light filtering, Mist/Sand. From $239; $259 at 36×60″.
+- [Raw Linen Roman](https://helloshade.co/shades/roman/raw-linen/): Light filtering, Flax/Cream. From $259; $329 at 36×60″.
+- [Soft Cotton Roman](https://helloshade.co/shades/roman/soft-cotton/): Light filtering, Sand/Mist/Sage/Slate. From $259; $329 at 36×60″.
+- [Ticking Stripe Roman](https://helloshade.co/shades/roman/ticking-stripe/): Light filtering, Cream & Fog. From $259; $329 at 36×60″.
+- [Sheer Voile Roman](https://helloshade.co/shades/roman/sheer-voile/): Sheer, Harbor. From $259; $329 at 36×60″.
+- [Blackout Linen Roman](https://helloshade.co/shades/roman/blackout-linen/): Blackout, Cream. From $259; $329 at 36×60″.
+- [Natural Reed Woven](https://helloshade.co/shades/woven/natural-reed/): Light filtering, Natural/Honey/Driftwood. From $269; $399 at 36×60″.
+
+## Rooms
+- [Bedroom](https://helloshade.co/rooms/bedroom/): What are the best shades for a bedroom?
+- [Nursery](https://helloshade.co/rooms/nursery/): What are the best shades for a nursery?
+- [Living room](https://helloshade.co/rooms/living-room/): What are the best shades for a living room?
+- [Kitchen](https://helloshade.co/rooms/kitchen/): What are the best shades for a kitchen?
+- [Bathroom](https://helloshade.co/rooms/bathroom/): What are the best shades for a bathroom?
+- [Home office](https://helloshade.co/rooms/home-office/): What are the best shades for a home office?
+
+## Optional
+- [How it works](https://helloshade.co/how-it-works/): try on, text a designer, we make it and ship it
+- [Samples](https://helloshade.co/swatch-kit/): $10 for up to 5 fabrics
+- [About](https://helloshade.co/about/): who we are
+- [Terms of sale](https://helloshade.co/terms.html): returns, Fit guarantee, payment

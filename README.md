@@ -33,3 +33,8 @@ Live at https://helloshade.co/ (GitHub Pages, branch `main`, no build step for s
 - `images/p/` — product photos rendered in the studio: `<family>-<color>-room|sq|win.webp`, `<family>-alt.webp`.
 - `images/` — marketing images rendered from our sample rooms in the studio.
 - `config.js`, `supabase/` — inbox backend (Supabase).
+
+## AEO (answer engines: ChatGPT, Perplexity, Claude, Gemini)
+- `robots.txt` lets AI search and user-triggered fetchers in (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot…) and blocks training crawlers (GPTBot, ClaudeBot, CCBot, Google-Extended…).
+- `node tools/aeo/build.mjs` writes everything else from `catalog.js` + `flow/pricing.js`: dated "Quick answer" boxes and JSON-LD on key pages (between `<!--aeo:…-->` markers, safe to re-run), the intent pages `prices/` and `guides/*`, `llms.txt`, `feed.json` (public catalog + prices) and `sitemap.xml`. Re-run it and bump `UPDATED` whenever prices, fabrics or policies change.
+- `flow/analytics.js` tags visits from AI assistants (`utm_source=chatgpt.com` or the referrer) as `ai_source`. Paste the PostHog project key into `POSTHOG_KEY` to turn it on.

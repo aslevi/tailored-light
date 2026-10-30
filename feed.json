@@ -1,0 +1,395 @@
+{
+  "name": "Hello Shade",
+  "url": "https://helloshade.co/",
+  "updated": "2026-10-30",
+  "currency": "USD",
+  "about": "Custom window shades made to measure and shipped to your door. Designer help by text instead of a home visit.",
+  "contact": {
+    "text_a_designer": "+1-201-745-3300",
+    "hours": "New texts 9am–8pm local time, Monday to Saturday"
+  },
+  "policies": {
+    "sizes_in": {
+      "width": [
+        12,
+        96
+      ],
+      "height": [
+        12,
+        120
+      ],
+      "outside_range": "quoted by text"
+    },
+    "ships": "2–4 weeks after you order",
+    "install": "About 15–20 minutes a shade with a drill; we don’t install",
+    "samples": {
+      "price": 10,
+      "max_fabrics": 5,
+      "credited_to_order": true,
+      "url": "https://helloshade.co/swatch-kit/"
+    },
+    "fit_guarantee": "Measure wrong and we remake it free, once per shade, within 30 days of delivery, when a designer checked your numbers and photos first.",
+    "returns": "Custom shades can’t be returned for a change of mind. Measuring mistakes are remade free; defects are fixed or replaced; shipping damage is replaced.",
+    "pricing": "Price by type and width × height; fabric and color don’t change it. Zebra prices are an estimate until confirmed by text. Prices are the same for everyone."
+  },
+  "types": {
+    "roller": {
+      "name": "Roller",
+      "url": "https://helloshade.co/shades/roller/",
+      "description": "Clean and simple. Rolls up tight.",
+      "from_price": 209,
+      "price_36x60": 229
+    },
+    "roman": {
+      "name": "Roman",
+      "url": "https://helloshade.co/shades/roman/",
+      "description": "Soft folds, tailored look.",
+      "from_price": 259,
+      "price_36x60": 329
+    },
+    "zebra": {
+      "name": "Zebra",
+      "url": "https://helloshade.co/shades/zebra/",
+      "description": "Two layers of bands slide to go from open view to privacy without raising the shade.",
+      "from_price": 239,
+      "price_36x60": 259
+    },
+    "woven": {
+      "name": "Woven",
+      "url": "https://helloshade.co/shades/woven/",
+      "description": "Natural woven wood, classic flat fold.",
+      "from_price": 269,
+      "price_36x60": 399
+    }
+  },
+  "price_table": {
+    "sizes_in": [
+      "24x36",
+      "36x60",
+      "48x60",
+      "60x72",
+      "72x72",
+      "96x96"
+    ],
+    "rows": [
+      {
+        "type": "Roller",
+        "prices": [
+          209,
+          229,
+          259,
+          319,
+          369,
+          499
+        ]
+      },
+      {
+        "type": "Zebra (estimate)",
+        "prices": [
+          239,
+          259,
+          299,
+          369,
+          419,
+          569
+        ]
+      },
+      {
+        "type": "Roman",
+        "prices": [
+          259,
+          329,
+          429,
+          639,
+          769,
+          1369
+        ]
+      },
+      {
+        "type": "Roman with room-darkening lining",
+        "prices": [
+          279,
+          359,
+          469,
+          709,
+          849,
+          1499
+        ]
+      },
+      {
+        "type": "Woven (Natural Reed)",
+        "prices": [
+          269,
+          399,
+          489,
+          659,
+          759,
+          1249
+        ]
+      }
+    ]
+  },
+  "products": [
+    {
+      "name": "Daylight Weave Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/daylight-weave/",
+      "light": "Light filtering",
+      "colors": [
+        "White",
+        "Oat",
+        "Mocha"
+      ],
+      "best_rooms": [
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/daylight-weave-white-room.webp"
+    },
+    {
+      "name": "Morning Haze Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/morning-haze/",
+      "light": "Light filtering",
+      "colors": [
+        "Cream",
+        "Oat",
+        "Harbor Blue"
+      ],
+      "best_rooms": [
+        "kitchen",
+        "bathroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/morning-haze-cream-room.webp"
+    },
+    {
+      "name": "Deep Sleep Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/deep-sleep/",
+      "light": "Blackout",
+      "colors": [
+        "White",
+        "Oat",
+        "Latte",
+        "Fog"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/deep-sleep-white-room.webp"
+    },
+    {
+      "name": "Clear View Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/clear-view/",
+      "light": "Light filtering",
+      "colors": [
+        "White",
+        "Mist",
+        "Slate"
+      ],
+      "best_rooms": [
+        "kitchen",
+        "bathroom",
+        "home office"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/clear-view-white-room.webp"
+    },
+    {
+      "name": "Twin Light Zebra",
+      "type": "zebra",
+      "url": "https://helloshade.co/shades/zebra/twin-light/",
+      "light": "Light filtering",
+      "colors": [
+        "White",
+        "Oat",
+        "Mist",
+        "Slate"
+      ],
+      "best_rooms": [
+        "bathroom",
+        "living room",
+        "home office"
+      ],
+      "from_price": 239,
+      "price_36x60": 259,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": true,
+      "image": "https://helloshade.co/images/p/twin-light-white-room.webp"
+    },
+    {
+      "name": "Sand Stripe Zebra",
+      "type": "zebra",
+      "url": "https://helloshade.co/shades/zebra/sand-stripe/",
+      "light": "Light filtering",
+      "colors": [
+        "Oat",
+        "Walnut"
+      ],
+      "best_rooms": [
+        "kitchen",
+        "home office"
+      ],
+      "from_price": 239,
+      "price_36x60": 259,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": true,
+      "image": "https://helloshade.co/images/p/sand-stripe-oat-room.webp"
+    },
+    {
+      "name": "Twin Shade Zebra",
+      "type": "zebra",
+      "url": "https://helloshade.co/shades/zebra/twin-shade/",
+      "light": "Light filtering",
+      "colors": [
+        "Mist",
+        "Sand"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery"
+      ],
+      "from_price": 239,
+      "price_36x60": 259,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": true,
+      "image": "https://helloshade.co/images/p/twin-shade-mist-room.webp"
+    },
+    {
+      "name": "Raw Linen Roman",
+      "type": "roman",
+      "url": "https://helloshade.co/shades/roman/raw-linen/",
+      "light": "Light filtering",
+      "colors": [
+        "Flax",
+        "Cream"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "living room",
+        "home office"
+      ],
+      "from_price": 259,
+      "price_36x60": 329,
+      "price_36x60_with_lining": 359,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/raw-linen-flax-room.webp"
+    },
+    {
+      "name": "Soft Cotton Roman",
+      "type": "roman",
+      "url": "https://helloshade.co/shades/roman/soft-cotton/",
+      "light": "Light filtering",
+      "colors": [
+        "Sand",
+        "Mist",
+        "Sage",
+        "Slate"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "bathroom"
+      ],
+      "from_price": 259,
+      "price_36x60": 329,
+      "price_36x60_with_lining": 359,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/soft-cotton-sand-room.webp"
+    },
+    {
+      "name": "Ticking Stripe Roman",
+      "type": "roman",
+      "url": "https://helloshade.co/shades/roman/ticking-stripe/",
+      "light": "Light filtering",
+      "colors": [
+        "Cream & Fog"
+      ],
+      "best_rooms": [
+        "kitchen",
+        "bathroom",
+        "living room"
+      ],
+      "from_price": 259,
+      "price_36x60": 329,
+      "price_36x60_with_lining": 359,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/ticking-stripe-cream-and-fog-room.webp"
+    },
+    {
+      "name": "Sheer Voile Roman",
+      "type": "roman",
+      "url": "https://helloshade.co/shades/roman/sheer-voile/",
+      "light": "Sheer",
+      "colors": [
+        "Harbor"
+      ],
+      "best_rooms": [
+        "living room"
+      ],
+      "from_price": 259,
+      "price_36x60": 329,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/sheer-voile-harbor-room.webp"
+    },
+    {
+      "name": "Blackout Linen Roman",
+      "type": "roman",
+      "url": "https://helloshade.co/shades/roman/blackout-linen/",
+      "light": "Blackout",
+      "colors": [
+        "Cream"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery"
+      ],
+      "from_price": 259,
+      "price_36x60": 329,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/blackout-linen-cream-room.webp"
+    },
+    {
+      "name": "Natural Reed Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/natural-reed/",
+      "light": "Light filtering",
+      "colors": [
+        "Natural",
+        "Honey",
+        "Driftwood"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/natural-reed-natural-room.webp"
+    }
+  ]
+}

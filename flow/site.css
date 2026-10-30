@@ -789,3 +789,25 @@ h2{font-weight:500}
 @media (max-width:380px){.wordmark{font-size:24px}}
 body{font-variation-settings:'SOFT' 100,'WONK' 0}
 .promo li{display:flex;align-items:center;min-height:44px}
+
+/* ---------- Quick answers + guide pages (written by tools/aeo/build.mjs) ---------- */
+.qa-sec{padding:20px 0 4px}
+.qa{background:var(--paper);border:1px solid var(--blush);border-left:3px solid var(--gold);border-radius:6px;padding:16px 18px;margin:16px 0 8px;font-size:15px;line-height:1.55}
+.pdp+.qa,.crumbs+.qa{margin:12px 0 4px}
+.qa-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin:0 0 6px;font-size:12.5px;color:var(--muted)}
+.qa-k{font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text)}
+.qa-q{font-size:20px;line-height:1.25;margin:0 0 6px}
+.qa-a{margin:0}
+.qa-f{margin:10px 0 0;padding-left:18px;color:var(--muted)}
+.qa-f li{margin:2px 0}
+.qa-more{margin:10px 0 0;font-size:14px}
+.qa-more a{color:var(--link)}
+.prose h2{margin:32px 0 10px}
+.prose ol,.prose ul{padding-left:22px}
+.prose li{margin:0 0 8px}
+.tbl{overflow-x:auto;margin:12px 0;border:1px solid var(--blush);border-radius:6px;background:var(--paper)}
+.tbl table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--blush);vertical-align:top}
+.tbl thead th{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tbl tbody th{font-weight:600}
+.tbl tr:last-child>*{border-bottom:0}
