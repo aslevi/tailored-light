@@ -808,3 +808,96 @@ body{font-variation-settings:'SOFT' 100,'WONK' 0}
 .tbl thead th{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
 .tbl tbody th{font-weight:600}
 .tbl tr:last-child>*{border-bottom:0}
+
+
+/* ---------- Calmer layout (Nov 2026): bigger lighter type with one italic phrase, one accent color, pill buttons, more space ---------- */
+
+/* ---------- 4. Layout rhythm ---------- */
+.container{max-width:1360px}
+.section{padding:64px 0}
+.section.tight{padding:40px 0}
+.section.tint{background:transparent}
+.lined{border-top:0}
+.section-head{margin:0 0 28px;align-items:flex-end}
+@media (min-width:900px){.section{padding:96px 0}.section.tight{padding:56px 0}.section-head{margin-bottom:36px}}
+
+/* ---------- 2. Type ---------- */
+body{font-size:17px}
+h1{font-weight:350;letter-spacing:-1px}
+.studio-copy h1,.list-hero h1,.page-hero h1{font-size:clamp(42px,10vw,80px);line-height:1.02;letter-spacing:-1.2px}
+main h2{font-weight:350;font-size:clamp(32px,5.4vw,56px);line-height:1.06;letter-spacing:-.8px}
+h3{font-weight:400}
+h1 em,main h2 em{font-style:italic;font-weight:350;color:var(--ink);font-variation-settings:'SOFT' 100,'WONK' 1}
+.lede{font-size:clamp(17px,1.6vw,20px);color:var(--muted)}
+
+/* ---------- 3. One accent: rose-clay only on primary buttons; pills ---------- */
+.btn{border-radius:999px;font-weight:500;letter-spacing:0;padding:12px 28px}
+.btn.gold,.site-header .btn.gold,.mbar .btn.gold{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn.gold:hover{background:var(--ink);color:#FFF8EE;border-color:var(--ink)}
+.mbar .btn.gold{background:var(--paper)}
+.text-link{color:var(--ink);text-decoration-color:rgba(74,53,48,.35);text-underline-offset:4px}
+.text-link:hover{text-decoration-color:var(--ink)}
+.promo{background:var(--paper);color:var(--muted);border-bottom:1px solid rgba(74,53,48,.08)}
+.promo a{color:var(--ink)}
+
+/* ---------- Hero: people photo kept, cleaner copy ---------- */
+.studio-hero{padding:24px 0 48px}
+.studio-copy h1{max-width:12ch}
+.studio-copy .lede{max-width:30ch;margin-bottom:6px}
+.studio-copy .lede b{color:var(--ink);font-weight:600}
+.hero-media .hero-photo img{border-radius:14px}
+.hero-note{display:none}
+.trust{display:flex;justify-content:flex-start;text-align:left;width:100%;align-items:center;gap:8px;margin:0 0 18px;font:500 13px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.trust svg{width:22px;height:14px;flex:none;margin:0}
+@media (min-width:900px){.studio-hero{padding:48px 0 72px}.studio-copy h1{font-size:clamp(52px,5.2vw,80px)}}
+
+/* ---------- 1. Product cards: plain backdrop, image + name + price only ---------- */
+.pcard .ph{border-radius:14px;background:#F3ECE4}
+.pcard .ph img{transition:transform .6s ease}
+.pcard .dots,.pcard .badge{display:none}
+.pcard .name{font:500 16px/1.3 var(--sans);margin:14px 0 2px}
+.pcard:hover .name{text-decoration:none}
+.pcard .price{font-weight:400;color:var(--muted);font-size:15px}
+.pcard .price .est{font-size:12px}
+.grid{gap:36px 16px}
+@media (min-width:900px){.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:48px 32px}}
+
+/* Type tiles: same backdrop */
+.tiles{grid-auto-columns:46%;gap:16px}
+.tile img{aspect-ratio:1;border-radius:14px;background:#F3ECE4}
+.tile b{font:500 17px/1.3 var(--sans);margin-top:14px}
+.tile span{font-size:15px}
+@media (min-width:900px){.tiles{grid-auto-flow:row;grid-template-columns:repeat(4,1fr);overflow:visible;margin:0;padding:0;gap:32px}}
+
+/* How it works: three quiet columns */
+.steps3{list-style:none;margin:0;padding:0;display:grid;gap:28px}
+.steps3 li{border-top:1px solid rgba(74,53,48,.15);padding-top:18px}
+.steps3 .n{font:350 italic 30px/1 var(--serif);color:var(--muted);font-variation-settings:'SOFT' 100,'WONK' 1}
+.steps3 h3{font:400 26px/1.15 var(--serif);margin:14px 0 8px}
+.steps3 p{margin:0;color:var(--muted);max-width:32ch}
+@media (min-width:900px){.steps3{grid-template-columns:repeat(3,1fr);gap:32px}}
+
+/* Designer feature */
+.feature-media img,.feature-media figure.people img{border-radius:14px}
+.d-card{border-radius:14px}
+
+/* FAQ */
+.faq{border-top:1px solid rgba(74,53,48,.15)}
+.faq details{border-bottom:1px solid rgba(74,53,48,.15)}
+.faq summary{font:500 18px/1.4 var(--sans);padding:22px 2px}
+@media (min-width:900px){.faq-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:64px;align-items:start}}
+
+/* Shop listing */
+.list-hero{border-bottom:0;padding:40px 0 8px}
+.list-hero p{color:var(--muted);font-size:18px}
+.style-nav a{border-radius:999px}
+.filters{border-bottom:0;padding:8px 0 4px}
+.chip-btn{border-radius:999px}
+.chip-btn .dot{display:none}
+.count{color:var(--muted)}
+.site-foot{border-top:1px solid rgba(74,53,48,.1)}
+
+/* selected pills: cocoa, not the accent */
+.chip-btn[aria-pressed="true"],.style-nav a[aria-current]{background:var(--ink);border-color:var(--ink);color:#FFF8EE}
+.aeo-about h2{font-size:clamp(26px,3.4vw,34px)}
+.seg button[aria-pressed=true]{background:var(--ink);color:#FFF8EE}

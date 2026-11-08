@@ -25,6 +25,7 @@
 <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link href="fonts/fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="flow/site.css">
+<link rel="preload" href="fonts/fraunces-italic.woff2" as="font" type="font/woff2" crossorigin>
 <script type="module" src="flow/site.js"></script>
 <script>/* Old try-on links (/?room=...&s=...) now live at /studio/ */(function(){var q=location.search;if(/[?&](room|s|f|c)=/.test(q))location.replace('studio/'+q+location.hash);})();</script>
 <script defer src="flow/analytics.js"></script>
@@ -71,8 +72,9 @@
  <div class="container studio-hero-grid">
   <div class="hero-media has-people"><figure class="people hero-photo"><img src="images/people/hero-couple.webp" width="928" height="1152" alt="A couple relaxing on a linen sofa under a Roman shade" fetchpriority="high" decoding="async"></figure></div>
   <div class="studio-copy">
-   <h1>You don't need a designer at your door.</h1>
-   <p class="lede">Just a little guidance. Try shades on in a room, then text a designer.</p>
+   <p class="trust"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="4" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg>Measure wrong? We'll remake it free.</p>
+   <h1>You don't need a designer <em>at your door.</em></h1>
+   <p class="lede">Just a little guidance. Try shades on, then text a designer. <b>Ships in 2–4 weeks.</b></p>
    <div class="btn-row stack"><a class="btn" href="studio/">Try on shades</a><a class="btn gold" data-dana data-body="Hi Dana! I&#x27;d like a little help choosing shades." href="sms:+12017453300?body=Hi%20Dana%21%20I%27d%20like%20a%20little%20help%20choosing%20shades.">Text a designer</a></div>
    <p class="small"><a class="text-link arrow" href="try-your-window/">Or try on your own window</a></p>
    <p class="small hero-note">Custom shades from $209 · Measure wrong? We'll remake it free.</p>
@@ -80,19 +82,33 @@
   </div>
  </div>
 </section>
-
-<section class="section tint lined">
+<section class="section">
  <div class="container">
-  <div class="section-head"><div><h2>How it works</h2></div><a class="text-link arrow" href="how-it-works/">More</a></div>
-  <ol class="steps-c"><li><span class="n">1</span><div><h3>Try it on</h3><p>See real shades in a room. Pick a type, a fabric and a color.</p></div><figure class="people step-thumb"><img src="images/people/coffee-window.webp" width="928" height="1152" alt="Morning coffee in the kitchen under a woven shade" loading="lazy" decoding="async"></figure></li><li><span class="n">2</span><div><h3>Text a designer</h3><p>We help you pick, measure and order. Measuring takes about 7 minutes.</p></div><figure class="people step-thumb"><img src="images/people/measuring.webp" width="928" height="1152" alt="Measuring a window with a metal tape" loading="lazy" decoding="async"></figure></li><li><span class="n">3</span><div><h3>We make it and ship it</h3><p>Ships in 2–4 weeks. Hangs in about 15–20 minutes.</p></div><figure class="people step-thumb" data-people="step-3" hidden><img alt="" loading="lazy" decoding="async"></figure></li></ol>
+  <div class="section-head"><div><h2>Four styles. <em>Made to measure.</em></h2></div><a class="text-link arrow" href="shades/">All shades</a></div>
+  <div class="tiles four"><a class="tile" href="shades/roller/"><img src="images/p/daylight-weave-oat-sq.webp" width="700" height="700" alt="Roller shades" loading=lazy decoding="async"><b>Roller</b><span>From $209</span></a><a class="tile" href="shades/roman/"><img src="images/p/raw-linen-flax-sq.webp" width="700" height="700" alt="Roman shades" loading=lazy decoding="async"><b>Roman</b><span>From $259</span></a><a class="tile" href="shades/zebra/"><img src="images/p/twin-light-white-sq.webp" width="700" height="700" alt="Zebra shades" loading=lazy decoding="async"><b>Zebra</b><span>From $239</span></a><a class="tile" href="shades/woven/"><img src="images/p/natural-reed-honey-sq.webp" width="700" height="700" alt="Woven shades" loading=lazy decoding="async"><b>Woven</b><span>From $269</span></a></div>
  </div>
 </section>
-
+<section class="section">
+ <div class="container">
+  <div class="section-head"><div><h2>Start <em>here.</em></h2></div><a class="text-link arrow" href="shades/">Shop all</a></div>
+  <div class="grid"><a class="pcard" href="shades/roman/raw-linen/" data-light="filtering" data-colors="beige white"><span class="ph"><img src="images/p/raw-linen-flax-sq.webp" width="700" height="700" alt="Raw Linen Roman in Flax" loading=lazy decoding="async"></span><span class="dots" aria-label="2 colors"><span class="dot" style="--c:#D9D8CA;background-image:url(swatches/raw-linen-flax.webp)" title="Flax"></span><span class="dot" style="--c:#C9C9BB;background-image:url(swatches/raw-linen-cream.webp)" title="Cream"></span></span><span class="badge">Light filtering</span><span class="name">Raw Linen Roman</span><p class="price">From $259</p></a><a class="pcard" href="shades/roller/deep-sleep/" data-light="blackout" data-colors="beige brown gray white"><span class="ph"><img src="images/p/deep-sleep-white-sq.webp" width="700" height="700" alt="Deep Sleep Roller in White" loading=lazy decoding="async"></span><span class="dots" aria-label="4 colors"><span class="dot" style="--c:#E7E7E7;background-image:url(swatches/deep-sleep-white.webp)" title="White"></span><span class="dot" style="--c:#CEC0A9;background-image:url(swatches/deep-sleep-oat.webp)" title="Oat"></span><span class="dot" style="--c:#AEA79B;background-image:url(swatches/deep-sleep-latte.webp)" title="Latte"></span><span class="dot" style="--c:#727581;background-image:url(swatches/deep-sleep-fog.webp)" title="Fog"></span></span><span class="badge">Blackout</span><span class="name">Deep Sleep Roller</span><p class="price">From $209</p></a><a class="pcard" href="shades/woven/natural-reed/" data-light="filtering" data-colors="beige brown"><span class="ph"><img src="images/p/natural-reed-natural-sq.webp" width="700" height="700" alt="Natural Reed Woven in Natural" loading=lazy decoding="async"></span><span class="dots" aria-label="3 colors"><span class="dot" style="--c:#C9A877;background-image:url(images/p/natural-reed-natural-swatch.webp)" title="Natural"></span><span class="dot" style="--c:#A9783F;background-image:url(images/p/natural-reed-honey-swatch.webp)" title="Honey"></span><span class="dot" style="--c:#9C968A;background-image:url(images/p/natural-reed-driftwood-swatch.webp)" title="Driftwood"></span></span><span class="badge">Light filtering</span><span class="name">Natural Reed Woven</span><p class="price">From $269</p></a><a class="pcard" href="shades/zebra/twin-light/" data-light="filtering" data-colors="beige gray white"><span class="ph"><img src="images/p/twin-light-white-sq.webp" width="700" height="700" alt="Twin Light Zebra in White" loading=lazy decoding="async"></span><span class="dots" aria-label="4 colors"><span class="dot" style="--c:#E9ECF4;background-image:url(swatches/twin-light-white.webp)" title="White"></span><span class="dot" style="--c:#F3F0E6;background-image:url(swatches/twin-light-oat.webp)" title="Oat"></span><span class="dot" style="--c:#C1C3CD;background-image:url(swatches/twin-light-mist.webp)" title="Mist"></span><span class="dot" style="--c:#A9AFBC;background-image:url(swatches/twin-light-slate.webp)" title="Slate"></span></span><span class="badge">Light filtering</span><span class="name">Twin Light Zebra</span><p class="price">From $239 <span class="est">estimate</span></p></a></div>
+ </div>
+</section>
+<section class="section">
+ <div class="container">
+  <div class="section-head"><div><h2>How it <em>works.</em></h2></div><a class="text-link arrow" href="how-it-works/">More</a></div>
+  <ol class="steps3">
+   <li><span class="n">01</span><h3>Try it on</h3><p>See real shades in a room. Pick a type, a fabric and a color.</p></li>
+   <li><span class="n">02</span><h3>Text a designer</h3><p>We help you pick and measure, and we check every number. About 7 minutes.</p></li>
+   <li><span class="n">03</span><h3>We make it and ship it</h3><p>Made for your window, ships in 2–4 weeks. Hangs in about 15–20 minutes.</p></li>
+  </ol>
+ </div>
+</section>
 <section class="section">
  <div class="container feature">
   <div class="feature-media has-people"><figure class="people text-photo"><img src="images/people/texting.webp" width="928" height="1152" alt="A woman texting her designer from the sofa" loading="lazy" decoding="async"></figure></div>
   <div>
-   <h2>A little guidance, by text.</h2>
+   <h2>A little guidance, <em>by text.</em></h2>
    <p class="lede">Send a photo of your window or a look you like. Your designer helps you pick, measure and order, whenever it suits you.</p>
    <div class="d-card">
     <div class="designer" data-designer><span class="d-avatar photo" data-designer-avatar aria-hidden="true" style="background-image:url(images/people/dana-avatar.webp)"></span><div><b data-designer-name>Dana</b><span>Your designer · usually replies within minutes</span></div></div><p class="bubble">Send me a photo of your window and I'll suggest a few fabrics.</p>
@@ -102,31 +118,12 @@
   </div>
  </div>
 </section>
-
-<section class="section tint lined" id="compare">
- <div class="container">
-  <div class="section-head"><div><h2>Skip the home visit.</h2></div></div>
-  <div class="cmp"><table class="cmp-table"><colgroup><col class="c0"><col><col><col></colgroup><thead><tr><th scope="col"><span class="sr-only">Compare</span></th><th scope="col">Online stores</th><th scope="col" class="us">Hello Shade</th><th scope="col">In-home studios</th></tr></thead><tbody><tr><th scope="row">Price</th><td>Budget</td><td class="us">About half of in-home studio prices</td><td>Premium</td></tr><tr><th scope="row">Help</th><td>None</td><td class="us">A designer by text</td><td>In-home designer</td></tr><tr><th scope="row">Measuring</th><td>You're on your own</td><td class="us">We check every number, remake free if wrong</td><td>They measure</td></tr></tbody></table></div>
- </div>
-</section>
-
-<section class="section tight">
- <div class="container"><div class="fit-band" id="fit"><svg class="shield" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><p><b>Fit guarantee.</b> Measure wrong? We'll remake it free.</p></div></div>
-</section>
-
-<section class="section tint lined">
- <div class="container">
-  <div class="section-head"><div><h2>Shop</h2></div><a class="text-link arrow" href="shades/">All shades</a></div>
-  <div class="tiles four"><a class="tile" href="shades/roller/"><img src="images/p/daylight-weave-oat-sq.webp" width="700" height="700" alt="Roller shades" loading=lazy decoding="async"><b>Roller</b><span>From $209</span></a><a class="tile" href="shades/roman/"><img src="images/p/raw-linen-flax-sq.webp" width="700" height="700" alt="Roman shades" loading=lazy decoding="async"><b>Roman</b><span>From $259</span></a><a class="tile" href="shades/zebra/"><img src="images/p/twin-light-white-sq.webp" width="700" height="700" alt="Zebra shades" loading=lazy decoding="async"><b>Zebra</b><span>From $239</span></a><a class="tile" href="shades/woven/"><img src="images/p/natural-reed-honey-sq.webp" width="700" height="700" alt="Woven shades" loading=lazy decoding="async"><b>Woven</b><span>From $269</span></a></div>
-  <h2 class="sub-h">Popular</h2>
-  <div class="grid four compact"><a class="pcard" href="shades/roman/raw-linen/" data-light="filtering" data-colors="beige white"><span class="ph"><img src="images/p/raw-linen-flax-sq.webp" width="700" height="700" alt="Raw Linen Roman in Flax" loading=lazy decoding="async"></span><span class="dots" aria-label="2 colors"><span class="dot" style="--c:#D9D8CA;background-image:url(swatches/raw-linen-flax.webp)" title="Flax"></span><span class="dot" style="--c:#C9C9BB;background-image:url(swatches/raw-linen-cream.webp)" title="Cream"></span></span><span class="badge">Light filtering</span><span class="name">Raw Linen Roman</span><p class="price">From $259</p></a><a class="pcard" href="shades/roller/deep-sleep/" data-light="blackout" data-colors="beige brown gray white"><span class="ph"><img src="images/p/deep-sleep-white-sq.webp" width="700" height="700" alt="Deep Sleep Roller in White" loading=lazy decoding="async"></span><span class="dots" aria-label="4 colors"><span class="dot" style="--c:#E7E7E7;background-image:url(swatches/deep-sleep-white.webp)" title="White"></span><span class="dot" style="--c:#CEC0A9;background-image:url(swatches/deep-sleep-oat.webp)" title="Oat"></span><span class="dot" style="--c:#AEA79B;background-image:url(swatches/deep-sleep-latte.webp)" title="Latte"></span><span class="dot" style="--c:#727581;background-image:url(swatches/deep-sleep-fog.webp)" title="Fog"></span></span><span class="badge">Blackout</span><span class="name">Deep Sleep Roller</span><p class="price">From $209</p></a><a class="pcard" href="shades/woven/natural-reed/" data-light="filtering" data-colors="beige brown"><span class="ph"><img src="images/p/natural-reed-natural-sq.webp" width="700" height="700" alt="Natural Reed Woven in Natural" loading=lazy decoding="async"></span><span class="dots" aria-label="3 colors"><span class="dot" style="--c:#C9A877;background-image:url(images/p/natural-reed-natural-swatch.webp)" title="Natural"></span><span class="dot" style="--c:#A9783F;background-image:url(images/p/natural-reed-honey-swatch.webp)" title="Honey"></span><span class="dot" style="--c:#9C968A;background-image:url(images/p/natural-reed-driftwood-swatch.webp)" title="Driftwood"></span></span><span class="badge">Light filtering</span><span class="name">Natural Reed Woven</span><p class="price">From $269</p></a><a class="pcard" href="shades/zebra/twin-light/" data-light="filtering" data-colors="beige gray white"><span class="ph"><img src="images/p/twin-light-white-sq.webp" width="700" height="700" alt="Twin Light Zebra in White" loading=lazy decoding="async"></span><span class="dots" aria-label="4 colors"><span class="dot" style="--c:#E9ECF4;background-image:url(swatches/twin-light-white.webp)" title="White"></span><span class="dot" style="--c:#F3F0E6;background-image:url(swatches/twin-light-oat.webp)" title="Oat"></span><span class="dot" style="--c:#C1C3CD;background-image:url(swatches/twin-light-mist.webp)" title="Mist"></span><span class="dot" style="--c:#A9AFBC;background-image:url(swatches/twin-light-slate.webp)" title="Slate"></span></span><span class="badge">Light filtering</span><span class="name">Twin Light Zebra</span><p class="price">From $239 <span class="est">estimate</span></p></a></div>
- </div>
-</section>
-
 <section class="section">
  <div class="container">
-  <div class="section-head"><div><h2>Rooms</h2></div><a class="text-link arrow" href="rooms/">All rooms</a></div>
-  <div class="rtiles"><a class="rtile" href="rooms/bedroom/"><img src="images/people/bedroom.webp" width="700" height="700" alt="A quiet bedroom with a blackout roller shade" loading="lazy" decoding="async"><b>Bedroom</b></a><a class="rtile" href="rooms/nursery/"><img src="images/people/parent-kid.webp" width="700" height="700" alt="A parent reading with a toddler in a bright nursery" loading="lazy" decoding="async"><b>Nursery</b></a><a class="rtile" href="rooms/living-room/"><img src="images/p/raw-linen-flax-sq.webp" width="700" height="700" alt="Living room" loading="lazy" decoding="async"><b>Living room</b></a><a class="rtile" href="rooms/kitchen/"><img src="images/p/natural-reed-honey-sq.webp" width="700" height="700" alt="Kitchen" loading="lazy" decoding="async"><b>Kitchen</b></a><a class="rtile" href="rooms/bathroom/"><img src="images/p/ticking-stripe-cream-fog-sq.webp" width="700" height="700" alt="Bathroom" loading="lazy" decoding="async"><b>Bathroom</b></a><a class="rtile" href="rooms/home-office/"><img src="images/p/clear-view-white-sq.webp" width="700" height="700" alt="Home office" loading="lazy" decoding="async"><b>Home office</b></a></div>
+  <div class="faq-wrap">
+   <div><h2>Good <em>questions.</em></h2><p class="lede" style="margin-top:12px">Something else? <a class="text-link" href="faq/">See all</a> or text a designer.</p></div>
+   <div class="faq"><details><summary>Do I need someone to come to my house?</summary><div class="answer"><p>No. Try shades on here, then text a designer. We'll help you pick, measure and order, all by text.</p></div></details><details><summary>How much do shades cost?</summary><div class="answer"><p>From $209 a shade: roller from $209, zebra from $239, Roman from $259, woven from $269. Add your window size on any shade to see your price. Each window is priced separately. Zebra prices are an estimate until we confirm by text.</p></div></details><details><summary>Is measuring hard?</summary><div class="answer"><p>Not really. About 7 minutes with a regular tape: a window photo, three widths and three heights. We do the math, and Dana checks every number. Measure wrong? We'll remake it free. <a href="how-to-measure/">Start the measuring guide</a></p></div></details><details><summary>Can I see the fabric first?</summary><div class="answer"><p>Yes. Pick up to 5 fabrics and we'll mail you <a href="swatch-kit/">samples</a> for $10, credited to your order.</p></div></details><details><summary>How long does it take?</summary><div class="answer"><p>Shades ship 2–4 weeks after you order. We'll text you tracking.</p></div></details><details><summary>Do you install?</summary><div class="answer"><p>No, and you probably won't need help. Each shade hangs in about 15–20 minutes with two brackets, a few screws and a drill. Everything you need is in the box except the drill.</p></div></details></div>
+  </div>
  </div>
 </section>
 
