@@ -1,0 +1,115 @@
+<!doctype html><meta charset="utf-8">
+<!-- Renders plain-backdrop product images for every fabric/color (option B product cards).
+     Run: node tools/render-cards/run.mjs [filter]  (serves the repo and screenshots each shot with Playwright). -->
+<style>html,body{margin:0;background:#F4EDE5}canvas{display:block}</style>
+<body>
+<script src="../../three.min.js"></script>
+<script src="../../catalog.js"></script>
+<script>
+const S = 900;
+const lin = hex => new THREE.Color(hex).convertSRGBToLinear();
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(S, S);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+
+const BG = '#F3ECE4';
+const scene = new THREE.Scene(); scene.background = lin(BG);
+const camera = new THREE.PerspectiveCamera(24, 1, 0.1, 100);
+camera.position.set(1.4, 0.25, 7.5); camera.lookAt(0.02, -0.08, 0);
+
+scene.add(new THREE.HemisphereLight(lin('#FFFFFF'), lin('#EDE3D8'), 0.7));
+const sun = new THREE.DirectionalLight(lin('#FFF2E2'), 0.48);
+sun.position.set(-3, 3.4, 4.5); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 8; sun.shadow.bias = -0.0005;
+Object.assign(sun.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 0.5, far: 15 });
+scene.add(sun);
+
+const mat = (hex, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: lin(hex), roughness: 0.9, metalness: 0 }, o));
+const box = (w, h, d, m) => { const g = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); g.castShadow = g.receiveShadow = true; return g; };
+const at = (o, x, y, z) => { o.position.set(x, y, z); return o; };
+
+// Seamless wall (slightly darker than the page so the white window reads)
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), mat('#F6F0E8', { roughness: 1 }));
+wall.position.z = -0.12; wall.receiveShadow = true; scene.add(wall);
+
+// Minimal window: white casing, sill, soft sky glass, one muntin
+const W = 1.7, H = 2.1, C = 0.1, D = 0.08;
+const frame = mat('#FCF9F4', { roughness: 0.75 });
+const win = new THREE.Group(); scene.add(win);
+win.add(at(box(W + 2 * C, C, D, frame), 0, H / 2 + C / 2, -0.07));
+win.add(at(box(C, H + 2 * C, D, frame), -W / 2 - C / 2, 0, -0.07));
+win.add(at(box(C, H + 2 * C, D, frame), W / 2 + C / 2, 0, -0.07));
+win.add(at(box(W + 2 * C, C * 0.8, D, frame), 0, -H / 2 - C * 0.4, -0.07));
+win.add(at(box(W + 2 * C + 0.18, 0.055, 0.2, frame), 0, -H / 2 - C * 0.8 - 0.02, -0.02));
+const skyTex = (() => { const c = document.createElement('canvas'); c.width = 8; c.height = 256; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, '#E4EDF1'); g.addColorStop(.62, '#EEF2EF'); g.addColorStop(.63, '#DCE5D6'); g.addColorStop(1, '#D3DECC'); x.fillStyle = g; x.fillRect(0, 0, 8, 256);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; })();
+const glass = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshBasicMaterial({ map: skyTex }));
+glass.position.z = -0.112; win.add(glass);
+win.add(at(box(0.03, H, 0.025, frame), 0, 0, -0.1));
+
+const shade = new THREE.Group(); scene.add(shade);
+const clear = g => { while (g.children.length) g.remove(g.children[0]); };
+
+function loadImg(src) {
+  return new Promise(res => { const img = new Image(); img.onload = () => res(img); img.onerror = () => res(null); img.src = src; });
+}
+// Canvas texture from a swatch. zebra: alternating opaque/sheer bands (alpha), so the window shows through.
+async function fabricTexture(src, { zebra = false } = {}) {
+  const img = await loadImg(src);
+  const c = document.createElement('canvas'), n = 512; c.width = c.height = n; const x = c.getContext('2d');
+  if (img) x.drawImage(img, 0, 0, n, n); else { x.fillStyle = '#ddd'; x.fillRect(0, 0, n, n); }
+  if (zebra) {
+    x.globalCompositeOperation = 'destination-out';
+    for (let y = 0; y < n; y += 128) { x.fillStyle = 'rgba(0,0,0,.62)'; x.fillRect(0, y + 64, n, 64); }
+    x.globalCompositeOperation = 'source-over';
+  }
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t;
+}
+const fabricMat = (tex, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ map: tex, roughness: 0.96, side: THREE.DoubleSide }, o));
+
+async function build({ style, src, sheer }) {
+  clear(shade);
+  const sw = W - 0.02, z = -0.035;
+  if (style === 'roller' || style === 'zebra') {
+    const zebra = style === 'zebra', drop = zebra ? H * 0.74 : H * 0.6, top = H / 2 - 0.12;
+    const tex = await fabricTexture(src, { zebra });
+    tex.repeat.set(1, zebra ? drop / 0.33 / 4 : drop / sw);
+    const casTex = (await fabricTexture(src)); casTex.repeat.set(1, 0.08);
+    shade.add(at(box(sw + 0.05, 0.13, 0.11, fabricMat(casTex)), 0, H / 2 - 0.06, z + 0.03));
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(sw, drop), fabricMat(tex, { transparent: zebra, alphaTest: zebra ? 0.02 : 0 }));
+    at(panel, 0, top - drop / 2, z); panel.castShadow = true; shade.add(panel);
+    if (zebra) { const back = panel.clone(); back.material = panel.material.clone(); back.material.map = tex.clone(); back.material.map.offset.y = 0.09; back.material.map.needsUpdate = true; at(back, 0, top - drop / 2, z - 0.015); shade.add(back); }
+    const railTex = casTex.clone(); railTex.needsUpdate = true;
+    shade.add(at(box(sw, 0.035, 0.03, fabricMat(railTex)), 0, top - drop - 0.017, z));
+  } else { // roman / woven: flat panel on top, soft folds stacked below
+    const flat = H * 0.34, folds = 5, r = 0.05, top = H / 2 - 0.035;
+    const tex = await fabricTexture(src);
+    tex.repeat.set(style === 'woven' ? 1.4 : 1, flat / sw * (style === 'woven' ? 1.4 : 1));
+    const fm = fabricMat(tex, { transparent: !!sheer, opacity: sheer ? 0.8 : 1 });
+    shade.add(at(box(sw + 0.02, 0.045, 0.06, mat('#F4EEE6', { roughness: 0.6 })), 0, top + 0.02, z));
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(sw, flat), fm);
+    at(panel, 0, top - flat / 2, z); panel.castShadow = true; shade.add(panel);
+    for (let i = 0; i < folds; i++) {
+      const t2 = tex.clone(); t2.needsUpdate = true; t2.repeat.set(tex.repeat.x, 0.12); t2.offset.y = i * 0.13;
+      const f = new THREE.Mesh(new THREE.CylinderGeometry(r, r, sw, 28), fabricMat(t2, { transparent: !!sheer, opacity: sheer ? 0.85 : 1 }));
+      f.rotation.z = Math.PI / 2; f.scale.set(1, 1, 0.7);
+      at(f, 0, top - flat - r - i * r * 1.75, z + 0.012); f.castShadow = f.receiveShadow = true; shade.add(f);
+    }
+  }
+  renderer.render(scene, camera);
+  return true;
+}
+
+const slug = s => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+window.shots = [];
+for (const [style, s] of Object.entries(TL_CATALOG)) for (const g of s.groups) for (const c of g.colors) {
+  const woven = g.family === 'Natural Reed';
+  window.shots.push({ style: woven ? 'woven' : style, family: g.family, color: c[0],
+    src: woven ? `../../images/p/natural-reed-${slug(c[0])}-swatch.webp` : c[2], sheer: g.family === 'Sheer Voile' });
+}
+window.build = build;
+window.ready = true;
+</script>

@@ -46,6 +46,7 @@ Disallow: /supabase/
 Disallow: /studio-src/
 Disallow: /tests/
 Disallow: /tools/
-Disallow: /home-preview.html
+Disallow: /home-b.html
+Disallow: /shades-b.html
 
 Sitemap: https://helloshade.co/sitemap.xml

@@ -1,0 +1,90 @@
+/* Option B: calmer, cleaner layer on top of site.css (preview pages only: home-b.html, shades-b.html).
+   1. product cards on one plain backdrop  2. bigger, lighter type with one italic word
+   3. one accent color (rose-clay on primary buttons only)  4. fewer items per section, more space. */
+
+/* ---------- 4. Layout rhythm ---------- */
+.b .container{max-width:1360px}
+.b .section{padding:64px 0}
+.b .section.tight{padding:40px 0}
+.b .section.tint{background:transparent}
+.b .lined{border-top:0}
+.b .section-head{margin:0 0 28px;align-items:flex-end}
+@media (min-width:900px){.b .section{padding:96px 0}.b .section.tight{padding:56px 0}.b .section-head{margin-bottom:36px}}
+
+/* ---------- 2. Type ---------- */
+.b{font-size:17px}
+.b h1{font-weight:350;font-size:clamp(42px,10vw,80px);line-height:1.02;letter-spacing:-1.2px}
+.b main h2{font-weight:350;font-size:clamp(32px,5.4vw,56px);line-height:1.06;letter-spacing:-.8px}
+.b h3{font-weight:400}
+.b h1 em,.b main h2 em{font-style:italic;font-weight:350;color:var(--ink);font-variation-settings:'SOFT' 100,'WONK' 1}
+.b .lede{font-size:clamp(17px,1.6vw,20px);color:var(--muted)}
+
+/* ---------- 3. One accent: rose-clay only on primary buttons; pills ---------- */
+.b .btn{border-radius:999px;font-weight:500;letter-spacing:0;padding:12px 28px}
+.b .btn.gold,.b .site-header .btn.gold,.b .mbar .btn.gold{background:transparent;color:var(--ink);border-color:var(--ink)}
+.b .btn.gold:hover{background:var(--ink);color:#FFF8EE;border-color:var(--ink)}
+.b .mbar .btn.gold{background:var(--paper)}
+.b .text-link{color:var(--ink);text-decoration-color:rgba(74,53,48,.35);text-underline-offset:4px}
+.b .text-link:hover{text-decoration-color:var(--ink)}
+.b .promo{background:var(--paper);color:var(--muted);border-bottom:1px solid rgba(74,53,48,.08)}
+.b .promo a{color:var(--ink)}
+
+/* ---------- Hero: people photo kept, cleaner copy ---------- */
+.b .studio-hero{padding:24px 0 48px}
+.b .studio-copy h1{max-width:12ch}
+.b .studio-copy .lede{max-width:30ch;margin-bottom:6px}
+.b .studio-copy .lede b{color:var(--ink);font-weight:600}
+.b .hero-media .hero-photo img{border-radius:14px}
+.b .hero-note{display:none}
+.b .trust{display:flex;justify-content:flex-start;text-align:left;width:100%;align-items:center;gap:8px;margin:0 0 18px;font:500 13px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.b .trust svg{width:22px;height:14px;flex:none;margin:0}
+@media (min-width:900px){.b .studio-hero{padding:48px 0 72px}.b .studio-copy h1{font-size:clamp(52px,5.2vw,80px)}}
+
+/* ---------- 1. Product cards: plain backdrop, image + name + price only ---------- */
+.b .pcard .ph{border-radius:14px;background:#F3ECE4}
+.b .pcard .ph img{transition:transform .6s ease}
+.b .pcard .dots,.b .pcard .badge{display:none}
+.b .pcard .name{font:500 16px/1.3 var(--sans);margin:14px 0 2px}
+.b .pcard:hover .name{text-decoration:none}
+.b .pcard .price{font-weight:400;color:var(--muted);font-size:15px}
+.b .pcard .price .est{font-size:12px}
+.b .grid{gap:36px 16px}
+@media (min-width:900px){.b .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:48px 32px}}
+
+/* Type tiles: same backdrop */
+.b .tiles{grid-auto-columns:46%;gap:16px}
+.b .tile img{aspect-ratio:1;border-radius:14px;background:#F3ECE4}
+.b .tile b{font:500 17px/1.3 var(--sans);margin-top:14px}
+.b .tile span{font-size:15px}
+@media (min-width:900px){.b .tiles{grid-auto-flow:row;grid-template-columns:repeat(4,1fr);overflow:visible;margin:0;padding:0;gap:32px}}
+
+/* How it works: three quiet columns */
+.b .steps3{list-style:none;margin:0;padding:0;display:grid;gap:28px}
+.b .steps3 li{border-top:1px solid rgba(74,53,48,.15);padding-top:18px}
+.b .steps3 .n{font:350 italic 30px/1 var(--serif);color:var(--muted);font-variation-settings:'SOFT' 100,'WONK' 1}
+.b .steps3 h3{font:400 26px/1.15 var(--serif);margin:14px 0 8px}
+.b .steps3 p{margin:0;color:var(--muted);max-width:32ch}
+@media (min-width:900px){.b .steps3{grid-template-columns:repeat(3,1fr);gap:32px}}
+
+/* Designer feature */
+.b .feature-media img,.b .feature-media figure.people img{border-radius:14px}
+.b .d-card{border-radius:14px}
+
+/* FAQ */
+.b .faq{border-top:1px solid rgba(74,53,48,.15)}
+.b .faq details{border-bottom:1px solid rgba(74,53,48,.15)}
+.b .faq summary{font:500 18px/1.4 var(--sans);padding:22px 2px}
+@media (min-width:900px){.b .faq-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:64px;align-items:start}}
+
+/* Shop listing */
+.b .list-hero{border-bottom:0;padding:40px 0 8px}
+.b .list-hero p{color:var(--muted);font-size:18px}
+.b .style-nav a{border-radius:999px}
+.b .filters{border-bottom:0;padding:8px 0 4px}
+.b .chip-btn{border-radius:999px}
+.b .chip-btn .dot{display:none}
+.b .count{color:var(--muted)}
+.b .site-foot{border-top:1px solid rgba(74,53,48,.1)}
+
+/* selected pills: cocoa, not the accent */
+.b .chip-btn[aria-pressed="true"],.b .style-nav a[aria-current]{background:var(--ink);border-color:var(--ink);color:#FFF8EE}
