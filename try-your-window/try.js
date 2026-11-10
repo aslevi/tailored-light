@@ -3,7 +3,7 @@
 // our detect-window Worker to place the corners automatically; otherwise the photo is never uploaded.
 import { CATALOG } from './catalog-lite.js';
 import { fromPrice, money, ESTIMATE_NOTE } from '../flow/pricing.js';
-import { DETECT_URL } from '../flow/config.js';
+import { DETECT_URL, RESTYLE_URL } from '../flow/config.js';
 
 const PHONE = ''; // business texting line; '' = not live yet
 const DEFAULT_CORNERS = [[0.24, 0.2], [0.76, 0.2], [0.76, 0.72], [0.24, 0.72]];
@@ -572,9 +572,78 @@ $('nextWin').addEventListener('click', () => {
   if (state.windows.length) state.windows[state.win] = state.corners.map(p => p.slice());
   pickWindow(state.win + 1);
 });
+/* ---------------- See it in your room ---------------- */
+// Straighten the photo into a Try on room plate (on the phone), optionally restyle it (RESTYLE_URL), save it on
+// the phone and open Try on with the same shade picked. Any restyle failure falls back to the straightened photo.
+const RESTYLE_TIMEOUT_MS = 100000;
+const iou = (a, b) => {
+  const ix = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])), iy = Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+  const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - ix * iy;
+  return u > 0 ? ix * iy / u : 0;
+};
+const bbox = q => [Math.min(...q.map(p => p[0])), Math.min(...q.map(p => p[1])), Math.max(...q.map(p => p[0])), Math.max(...q.map(p => p[1]))];
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+const toBlob = (cv, q) => new Promise(res => cv.toBlob(res, 'image/jpeg', q));
+function studioLook() {
+  const woven = state.type === 'woven';
+  return new URLSearchParams({ room: 'mine', s: woven ? 'roman' : state.type, f: state.family.family, c: state.color.name });
+}
+async function restyle(plate, win, setText) {
+  const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), RESTYLE_TIMEOUT_MS);
+  const slow = setTimeout(() => setText('Almost there…'), 25000);
+  try {
+    const r = await fetch(RESTYLE_URL, { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: await toBlob(plate, 0.86), signal: ctrl.signal });
+    if (!r.ok) throw new Error('restyle ' + r.status);
+    const j = await r.json(), img = await loadImg(j.image);
+    const sx = ROOMPLATE.W / img.naturalWidth, sy = ROOMPLATE.H / img.naturalHeight;
+    // Image models move the window a little: use the detected window nearest to where we put it.
+    let best = null, score = 0.3;
+    for (const w of (Array.isArray(j.windows) ? j.windows : [])) {
+      if (!validQuad(w.corners)) continue;
+      const q = w.corners.map(([x, y]) => [x * img.naturalWidth, y * img.naturalHeight]);
+      const s = iou(bbox(q).map((v, i) => v * (i % 2 ? sy : sx)), win);
+      if (s > score) { score = s; best = q; }
+    }
+    if (!best) { // no match: assume it stayed put
+      const cv = document.createElement('canvas'); cv.width = ROOMPLATE.W; cv.height = ROOMPLATE.H;
+      cv.getContext('2d').drawImage(img, 0, 0, ROOMPLATE.W, ROOMPLATE.H);
+      return { canvas: cv, win, floor: j.floor };
+    }
+    // Square the detected window up onto its own bounding box (a tiny warp) so the shade fits it exactly.
+    const rect = bbox(best).map((v, i) => Math.round(v * (i % 2 ? sy : sx)));
+    return { canvas: ROOMPLATE.warpToPlate(img, best, rect), win: rect, floor: j.floor };
+  } finally { clearTimeout(timer); clearTimeout(slow); }
+}
+let ROOMPLATE = null;
+$('roomBtn').addEventListener('click', async () => {
+  if (!state.photo || $('working').hidden === false) return;
+  const btn = $('roomBtn'), err = $('roomErr'), setText = t => { $('workingText').textContent = t; };
+  err.hidden = true; btn.disabled = true; $('working').hidden = false;
+  setText(RESTYLE_URL ? 'Making your room look its best…' : 'Setting up your room…');
+  try {
+    const [rp, store] = await Promise.all([import('../flow/room-plate.js'), import('../flow/my-room.js')]);
+    ROOMPLATE = { W: rp.PLATE_W, H: rp.PLATE_H, warpToPlate: rp.warpToPlate };
+    await new Promise(r => setTimeout(r, 30)); // let the overlay paint before the warp
+    const base = rp.buildPlate(state.photo, state.corners);
+    let out = { canvas: base.canvas, win: base.win, floor: null };
+    if (RESTYLE_URL) {
+      try { out = await restyle(base.canvas, base.win, setText); }
+      catch (e) { setText('Using your photo as is…'); }
+    }
+    const [x0, y0, x1, y1] = out.win;
+    const floor = typeof out.floor === 'number' && out.floor > 0.3 ? Math.round(out.floor * rp.PLATE_H) : Math.round(y1 + (rp.PLATE_H - y1) * 0.55);
+    await store.saveMyRoom({ blob: await toBlob(out.canvas, 0.9), win: [x0, y0, x1, y1], floor: Math.max(floor, y1 + 20) });
+    location.href = '../studio/?' + studioLook();
+  } catch (e) {
+    err.textContent = "We couldn't set up your room on this phone. Try again, or text a designer a photo.";
+    err.hidden = false; btn.disabled = false; $('working').hidden = true;
+  }
+});
+if (RESTYLE_URL) $('roomBtnSub').textContent = 'We tidy and restyle the room, then you try shades with real light';
+
 if (DETECT_URL) {
   $('lede').textContent = "Snap your window and we'll find its corners. Nudge the dots if needed, then try on any shade in our real fabrics.";
-  $('privateText').textContent = "Your photo is only used to find your window. We don't keep it.";
+  $('privateText').textContent = RESTYLE_URL ? "Your photo is only used to find your window and restyle your room. We don't keep it." : "Your photo is only used to find your window. We don't keep it.";
 }
 
 update();

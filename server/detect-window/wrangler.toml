@@ -7,3 +7,4 @@ compatibility_date = "2026-10-01"
 [vars]
 ALLOWED_ORIGINS = "https://helloshade.co"
 MODEL = "google/gemma-4-26b-a4b-it"
+# RESTYLE_MODEL = "google/gemini-3-pro-image-preview"   # image model for /restyle ("See it in your room")

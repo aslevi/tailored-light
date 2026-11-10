@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {roomAsset} from './room-catalog.js';
+import {roomAsset,roomWindow} from './room-catalog.js';
 import {roomLightingLevels} from './room-response.js';
 
 // Runtime relighting: retain base-image geometry; use blurred ratios from the
@@ -38,12 +38,12 @@ export function createRoomPlateRenderer(host){
  renderer.setPixelRatio(1);renderer.setSize(1536,1024,false);
  renderer.domElement.setAttribute('aria-hidden','true');host.append(renderer.domElement);
  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-1,1,1,-1,0,2);
- const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},sunElev:{value:.6},sunAz:{value:.3},sunWarm:{value:.3},dusk:{value:0},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3}};
+ const u={base:{value:null},ceilingMap:{value:null},lampMap:{value:null},dayLevel:{value:1},ceilingLevel:{value:0},lampLevel:{value:0},night:{value:0},warm:{value:1},fixture:{value:new THREE.Vector4()},lampPosition:{value:new THREE.Vector2()},sunAmt:{value:1},sunElev:{value:.6},sunAz:{value:.3},sunWarm:{value:.3},dusk:{value:0},shadeBottom:{value:535},floorY:{value:660},trans:{value:.3},win:{value:new THREE.Vector4(504,154,1040,535)},glass:{value:new THREE.Vector4(536,182,1008,508)},hasLamp:{value:1}};
  const material=new THREE.ShaderMaterial({toneMapped:false,uniforms:u,vertexShader:'varying vec2 st;void main(){st=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
  varying vec2 st;
  uniform sampler2D base,ceilingMap,lampMap;
  uniform float dayLevel,ceilingLevel,lampLevel,night,warm;
- uniform vec4 fixture;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans,dusk,sunElev,sunAz,sunWarm;
+ uniform vec4 fixture,win,glass;uniform float hasLamp;uniform vec2 lampPosition;uniform float sunAmt,shadeBottom,floorY,trans,dusk,sunElev,sunAz,sunWarm;
  vec3 blurred(sampler2D tex,vec2 uv){
   vec2 d=vec2(14./1536.,14./1024.);
   return (texture2D(tex,uv).rgb*4.+texture2D(tex,uv+d).rgb+texture2D(tex,uv-d).rgb+texture2D(tex,uv+vec2(d.x,-d.y)).rgb+texture2D(tex,uv+vec2(-d.x,d.y)).rgb)/8.;
@@ -62,41 +62,41 @@ export function createRoomPlateRenderer(host){
   vec2 dc=(p-fixture.xy)*vec2(.62,1.);
   float cg=1.05*pow(1.-smoothstep(0.,980.,length(dc)),1.3);
   // Keep artificial light out of the exterior and confine lamp illumination.
-  float outside=step(504.,p.x)*step(p.x,1040.)*step(154.,p.y)*step(p.y,535.);
+  float outside=step(win.x,p.x)*step(p.x,win.z)*step(win.y,p.y)*step(p.y,win.w);
   float nearLamp=1.-smoothstep(190.,620.,length((p-lampPosition)*vec2(1.,.75)));
   vec3 daylightTint=mix(vec3(.88,.95,1.08),vec3(1.04,1.,.94),warm);
   daylightTint=mix(daylightTint,vec3(1.24,.80,.55),dusk*.9);
   daylightTint=mix(daylightTint,vec3(.48,.62,.90),night);
   vec3 color=b*dayLevel*daylightTint;
   color+=b*(cg+.22)*vec3(1.,.88,.70)*ceilingLevel*(1.-outside);
-  color+=b*(lg+.12)*vec3(1.,.79,.52)*lampLevel*nearLamp*(1.-outside);
+  color+=b*(lg+.12)*vec3(1.,.79,.52)*lampLevel*nearLamp*(1.-outside)*hasLamp;
   // Glowing lamp shade and fixture: brighten the base plate's own pixels (no second image, so no ghost).
   vec2 ld=abs(p-lampPosition)/vec2(60.,46.);
   float lampMask=(1.-smoothstep(.82,1.04,ld.x))*(1.-smoothstep(.82,1.04,ld.y))*(1.-outside);
   float fixtureMask=(1.-smoothstep(.85,1.05,length((p-fixture.xy)/fixture.zw)))*(1.-outside);
   vec3 glowL=b*vec3(2.05,1.70,1.18)+vec3(.10,.07,.03);
   vec3 glowC=b*vec3(1.85,1.65,1.30)+vec3(.08,.07,.05);
-  color=mix(color,max(color,glowL),lampMask*lampLevel);
+  color=mix(color,max(color,glowL),lampMask*lampLevel*hasLamp);
   color=mix(color,max(color,glowC),fixtureMask*ceilingLevel);
   // Sunlight through the window, traced with simple perspective. Wall plane = image plane (px).
   // Camera distance D, eye line E. Sun elevation tan sunElev, sideways drift sunAz per px of depth.
   // Sharp light only through the open part of the window; the shade blocks it, a light-filtering
   // fabric lets a soft glow through (trans), blackout lets nothing through (trans = 0).
-  float D=1800.,E=300.,TE=sunElev,TA=sunAz,cx=772.;
-  float top=max(shadeBottom,182.);
-  float openFrac=clamp((508.-top)/326.,0.,1.);
+  float D=1800.,E=300.,TE=sunElev,TA=sunAz,cx=(glass.x+glass.z)*.5;
+  float top=max(shadeBottom,glass.y);
+  float openFrac=clamp((glass.w-top)/(glass.w-glass.y),0.,1.);
   vec3 sunCol=mix(vec3(1.,.93,.80),vec3(1.,.74,.46),sunWarm);
   float lum=dot(b,vec3(.299,.587,.114));
   if(sunAmt>0.&&p.y>floorY+1.){
    float k=(p.y-E)/(floorY-E),Z=D*(1.-1./k);
    float yw=floorY-TE*Z,xw=cx+(p.x-cx)/k-TA*Z;
    float soft=3.+Z*.018;
-   float inX=smoothstep(536.-soft,536.+soft,xw)*(1.-smoothstep(1008.-soft,1008.+soft,xw));
-   float inOpen=smoothstep(top-soft,top+soft,yw)*(1.-smoothstep(508.-soft,508.+soft,yw));
+   float inX=smoothstep(glass.x-soft,glass.x+soft,xw)*(1.-smoothstep(glass.z-soft,glass.z+soft,xw));
+   float inOpen=smoothstep(top-soft,top+soft,yw)*(1.-smoothstep(glass.w-soft,glass.w+soft,yw));
    // light through the fabric: same footprint, much softer and dimmer
    float sx=soft*7.;
-   float inXs=smoothstep(536.-sx,536.+sx,xw)*(1.-smoothstep(1008.-sx,1008.+sx,xw));
-   float inCloth=smoothstep(182.-sx,182.+sx,yw)*(1.-smoothstep(top-sx,top+sx,yw));
+   float inXs=smoothstep(glass.x-sx,glass.x+sx,xw)*(1.-smoothstep(glass.z-sx,glass.z+sx,xw));
+   float inCloth=smoothstep(glass.y-sx,glass.y+sx,yw)*(1.-smoothstep(top-sx,top+sx,yw));
    float fade=1.-smoothstep(700.,1700.,Z);
    float lit=(inX*inOpen+inXs*inCloth*trans*.62)*fade;
    // light adds in proportion to the surface it lands on (rugs and wood brighten, shadows stay)
@@ -111,13 +111,13 @@ export function createRoomPlateRenderer(host){
     float X=(p.x-cx)/k;
     float yw=Y-TE*Z,xw=cx+X-TA*Z;
     float e=8.+Z*.02;
-    acc+=smoothstep(538.-e,538.+e,xw)*(1.-smoothstep(1006.-e,1006.+e,xw))*smoothstep(top-e,top+e,yw)*(1.-smoothstep(506.-e,506.+e,yw))*smoothstep(80.,380.,Z)*(1.-smoothstep(700.,1200.,Z));
+    acc+=smoothstep(glass.x+2.-e,glass.x+2.+e,xw)*(1.-smoothstep(glass.z-2.-e,glass.z-2.+e,xw))*smoothstep(top-e,top+e,yw)*(1.-smoothstep(glass.w-2.-e,glass.w-2.+e,yw))*smoothstep(80.,380.,Z)*(1.-smoothstep(700.,1200.,Z));
    }
    color+=sunCol*(acc/14.)*sunAmt*.11*(.6+.4*lum);
   }
   // a little bounce light around the window when the sun is in
   if(sunAmt>0.){
-   vec2 wc=vec2(772.,(top+508.)*.5);
+   vec2 wc=vec2(cx,(top+glass.w)*.5);
    float halo=(1.-smoothstep(120.,640.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
    color+=b*halo*sunAmt*(.07*openFrac+.13*trans)*sunCol;
   }
@@ -129,13 +129,14 @@ export function createRoomPlateRenderer(host){
  return {
   async load(room){
    const ticket=++generation;
-   const result=await Promise.allSettled(['day'].map(kind=>loadPlate(new URL(roomAsset(room.id,kind),document.baseURI).href)));
+   const result=await Promise.allSettled([loadPlate(room.src||new URL(roomAsset(room.id,'day'),document.baseURI).href)]);
    const loaded=result.filter(x=>x.status==='fulfilled').map(x=>x.value);
    if(ticket!==generation||result.some(x=>x.status==='rejected')){loaded.forEach(t=>t.dispose());if(ticket===generation)throw new Error('Room artwork failed to load');return false;}
    loaded.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;});
    textures.forEach(t=>t.dispose());textures=loaded;
    [u.base.value]=loaded;u.ceilingMap.value=loaded[0];u.lampMap.value=loaded[0];
-   u.fixture.value.set(...room.fixture);u.floorY.value=room.floor||660;u.lampPosition.value.set(...room.lamp);ready=true;return loaded[0];
+   u.fixture.value.set(...(room.fixture||[-999,-999,1,1]));u.floorY.value=room.floor||660;u.lampPosition.value.set(...(room.lamp||[-999,-999]));u.hasLamp.value=room.lamp?1:0;
+   const w=roomWindow(room);u.win.value.set(...w.outer);u.glass.value.set(...w.glass);ready=true;return loaded[0];
   },
   update(state,response){
    const tod=state.tod??(state.mood==='evening'?2:state.mood==='afternoon'?1:0),night=Math.min(1,Math.max(0,tod-1));

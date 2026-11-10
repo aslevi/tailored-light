@@ -10,3 +10,13 @@ export const ROOMS=[
  {id:'nursery',floor:660,label:'Nursery',lamp:[265,320],fixture:[767,43,95,36],note:'Playful prints, a blue rug and a flowering tree.'}
 ];
 export const roomAsset=(id,kind='day')=>site('rooms/frontal-v2/'+id+(kind==='day'?'':'-'+kind)+'.webp');
+
+// Window opening in plate pixels. Stock rooms share the frontal installation; a customer's own room
+// ("mine") carries its own rectangle. glass = the clear opening the sun comes through (inside the sash).
+export const STOCK_WINDOW={outer:[504,154,1040,535],glass:[536,182,1008,508]};
+export function roomWindow(room){
+ if(!room?.win)return STOCK_WINDOW;
+ const [x0,y0,x1,y1]=room.win,ix=Math.min(32,(x1-x0)*.06),iy=Math.min(28,(y1-y0)*.07);
+ return {outer:[x0,y0,x1,y1],glass:room.glass||[x0+ix,y0+iy,x1-ix,y1-iy]};
+}
+export const windowCorners=room=>{const [x0,y0,x1,y1]=roomWindow(room).outer;return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]];};

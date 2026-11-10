@@ -4,6 +4,13 @@
 // Corners are normalized 0-1, ordered top-left, top-right, bottom-right, bottom-left, best window first.
 // The photo is passed straight to the model and never stored or logged.
 //
+// POST /restyle  (raw JPEG, the 1536 × 1024 "room plate" built on the phone, <= 1.5 MB)
+//   An image model restyles the room around the window (tidier, nicer, bare window), then the window is found
+//   again in the result, because image models move things a little.
+//   200 {"image":"data:image/...;base64,...","windows":[...same as above...],"floor":0.82|null,"ms":21000}
+//
+// Env (restyle): RESTYLE_MODEL (optional, default google/gemini-3-pro-image-preview)
+//
 // Env: OPENROUTER_API_KEY (secret, required), MODEL (optional), ALLOWED_ORIGINS (optional, comma separated),
 //      PROVIDER_ORDER (optional, comma separated OpenRouter provider slugs to try first; falls back to any other).
 
@@ -12,6 +19,21 @@ const DEFAULT_ORIGINS = 'https://helloshade.co';
 const MAX_BYTES = 300 * 1024;
 const UPSTREAM_TIMEOUT_MS = 8000;
 const MAX_WINDOWS = 6;
+const RESTYLE_MAX_BYTES = 1536 * 1024;
+const RESTYLE_TIMEOUT_MS = 90000;
+const DEFAULT_RESTYLE_MODEL = 'google/gemini-3-pro-image-preview';
+// Tested Nov 2026 on a cluttered, angled bedroom photo: keeps the window and its view, removes clutter,
+// fills the edges, squares up the room. The window still drifts a few percent, so we re-detect it after.
+const RESTYLE_PROMPT = "This is a customer's photo of their room, already straightened so the window faces the camera. " +
+  'Turn it into a beautiful, calm, professionally styled interior photo of the same room, shot straight-on at eye level ' +
+  'like a magazine photo. STRICT RULES: keep the window exactly where it is, at exactly the same size, position and ' +
+  'proportions in the frame; keep the same window type, trim, sill and the view outside. The window must stay completely ' +
+  'bare: no curtains, blinds, shades or valances. Fill any smeared or blank areas near the edges with a natural ' +
+  'continuation of the room. Remove clutter (laundry, cables, mess) and tidy the room; you may add a few tasteful pieces ' +
+  'of furniture, a rug, a plant and a soft fresh wall color, keeping it believable for this home. Keep some floor visible ' +
+  'below the window. A bright, warm, sunny day outside, with soft daylight filling the room. Photorealistic, no text, no people.';
+const FLOOR_ASK = ' Also add "floor": the y coordinate (same scale) of the line where the back wall meets the floor, ' +
+  'directly below the window, or null if the floor is not visible.';
 
 // Prompt "A" for models that return clean 0-1 decimals (Claude). Gemini and Gemma models are more reliable with
 // their native 0-1000 integer scale (prompt "C" in the benchmark), so they get that wording instead.
@@ -50,13 +72,32 @@ export default {
     if (request.method !== 'POST') return reply(405, { error: 'method_not_allowed' });
     if (!env.OPENROUTER_API_KEY) return reply(500, { error: 'not_configured' });
 
+    const restyle = new URL(request.url).pathname.replace(/\/+$/, '') === '/restyle';
+    const limit = restyle ? RESTYLE_MAX_BYTES : MAX_BYTES;
     const type = (request.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
     if (type !== 'image/jpeg') return reply(415, { error: 'send_image_jpeg' });
     const declared = Number(request.headers.get('Content-Length') || 0);
-    if (declared > MAX_BYTES) return reply(413, { error: 'too_large', max_bytes: MAX_BYTES });
+    if (declared > limit) return reply(413, { error: 'too_large', max_bytes: limit });
     const bytes = new Uint8Array(await request.arrayBuffer());
-    if (bytes.length > MAX_BYTES) return reply(413, { error: 'too_large', max_bytes: MAX_BYTES });
+    if (bytes.length > limit) return reply(413, { error: 'too_large', max_bytes: limit });
     if (bytes.length < 3 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) return reply(400, { error: 'not_a_jpeg' });
+
+    const t0 = Date.now();
+    if (restyle) {
+      const img = await restyleImage('data:image/jpeg;base64,' + toBase64(bytes), env);
+      if (img.error) return reply(img.status, { error: img.error });
+      const found = await detect(img.url, env, true);
+      // The picture is still useful without corners (the page falls back to where it placed the window).
+      return reply(200, { image: img.url, windows: found.windows || [], floor: found.floor ?? null, ms: Date.now() - t0 });
+    }
+    const found = await detect('data:image/jpeg;base64,' + toBase64(bytes), env, false);
+    if (found.error) return reply(found.status, { error: found.error });
+    return reply(200, { windows: found.windows, ms: Date.now() - t0 });
+  },
+};
+
+// Ask the vision model for window corners (and optionally the floor line). Returns {windows, floor} or {error, status}.
+async function detect(imageUrl, env, withFloor) {
 
     const model = env.MODEL || DEFAULT_MODEL;
     // Gemma (open-weights, no reasoning mode) and Gemini both use the 0-1000 integer prompt and parsing.
@@ -70,8 +111,8 @@ export default {
       messages: [{
         role: 'user',
         content: [
-          { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + toBase64(bytes) } },
-          { type: 'text', text: scale1000 ? PROMPT_1000 : PROMPT_UNIT },
+          { type: 'image_url', image_url: { url: imageUrl } },
+          { type: 'text', text: (scale1000 ? PROMPT_1000 : PROMPT_UNIT) + (withFloor ? FLOOR_ASK : '') },
         ],
       }],
     };
@@ -83,7 +124,6 @@ export default {
     const order = (env.PROVIDER_ORDER || (gemma ? 'makora,parasail' : '')).split(',').map(s => s.trim()).filter(Boolean);
     if (order.length) body.provider = { order, allow_fallbacks: true };
 
-    const t0 = Date.now();
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), UPSTREAM_TIMEOUT_MS);
     let text = '';
@@ -99,19 +139,59 @@ export default {
         },
         body: JSON.stringify(body),
       });
-      if (!r.ok) return reply(502, { error: 'upstream', status: r.status });
+      if (!r.ok) return { error: 'upstream', status: 502 };
       const j = await r.json();
       text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
     } catch (e) {
-      return reply(e && e.name === 'AbortError' ? 504 : 502, { error: e && e.name === 'AbortError' ? 'upstream_timeout' : 'upstream' });
+      const timeout = e && e.name === 'AbortError';
+      return { error: timeout ? 'upstream_timeout' : 'upstream', status: timeout ? 504 : 502 };
     } finally {
       clearTimeout(timer);
     }
-
     const windows = parseWindows(text, scale1000);
-    return reply(200, { windows, ms: Date.now() - t0 });
-  },
-};
+    let floor = null;
+    const fm = /"?floor"?\s*:\s*(-?\d*\.?\d+)/.exec(text);
+    if (withFloor && fm) { const v = Number(fm[1]); floor = clamp01(scale1000 || v > 1.5 ? v / 1000 : v); }
+    return { windows, floor };
+}
+
+// Image model via OpenRouter: returns {url: data URL} or {error, status}.
+async function restyleImage(dataUrl, env) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), RESTYLE_TIMEOUT_MS);
+  try {
+    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: {
+        'Authorization': 'Bearer ' + env.OPENROUTER_API_KEY,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://helloshade.co',
+        'X-Title': 'Hello Shade your room',
+      },
+      body: JSON.stringify({
+        model: env.RESTYLE_MODEL || DEFAULT_RESTYLE_MODEL,
+        modalities: ['image', 'text'],
+        image_config: { aspect_ratio: '3:2' },
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: dataUrl } },
+          { type: 'text', text: RESTYLE_PROMPT },
+        ] }],
+      }),
+    });
+    if (!r.ok) return { error: 'upstream', status: 502 };
+    const j = await r.json();
+    const msg = j.choices && j.choices[0] && j.choices[0].message;
+    const url = msg && msg.images && msg.images[0] && msg.images[0].image_url && msg.images[0].image_url.url;
+    if (!url || !/^data:image\//.test(url)) return { error: 'no_image', status: 502 };
+    return { url };
+  } catch (e) {
+    const timeout = e && e.name === 'AbortError';
+    return { error: timeout ? 'upstream_timeout' : 'upstream', status: timeout ? 504 : 502 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function toBase64(bytes) {
   let s = '';

@@ -125,6 +125,12 @@ footer a{display:inline-flex;min-height:44px;align-items:center;margin-right:14p
 [hidden]{display:none!important}
 </style>
 <script defer src="../flow/analytics.js"></script>
+<style>/* See it in your room */
+.room-cta{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-top:12px;min-height:58px}
+.room-cta small{font-weight:500;font-size:13px;opacity:.85}
+.working{position:absolute;inset:0;display:grid;place-items:center;background:rgba(251,246,240,.55);backdrop-filter:blur(2px);z-index:6}
+.working-pill{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:#fff;box-shadow:0 6px 24px rgba(74,53,48,.18);font-weight:600;font-size:15px}
+</style>
 <style>/* Consistency pass (Nov 2026) */
 a{color:var(--ink)}
 .btn-honey{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
@@ -171,6 +177,7 @@ a{color:var(--ink)}
           <button type="button" class="handle" data-i="2" aria-label="Bottom right corner"></button>
           <button type="button" class="handle" data-i="3" aria-label="Bottom left corner"></button>
           <div class="loupe" id="loupe"><canvas width="208" height="208"></canvas></div>
+          <div class="working" id="working" hidden><div class="working-pill"><span class="spin" aria-hidden="true"></span><span id="workingText">Making your room look its best…</span></div></div>
           <div class="finding" id="finding" hidden><span class="finding-pill"><span class="spin" aria-hidden="true"></span>Finding your window…</span></div>
         </div>
         <div class="stage-bar">
@@ -181,6 +188,8 @@ a{color:var(--ink)}
             <label class="chip-btn" for="lib" style="display:inline-flex;align-items:center">New photo</label>
           </div>
         </div>
+        <button type="button" class="btn btn-primary room-cta" id="roomBtn">See it in your room<small id="roomBtnSub">Your window in Try on, with real light</small></button>
+        <p class="err" id="roomErr" role="alert" hidden></p>
       </div>
     </section>
 

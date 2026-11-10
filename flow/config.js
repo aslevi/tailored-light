@@ -14,6 +14,9 @@ export const LEAD_FORM_URL = '';
 // the phone). Set it to the deployed server/detect-window Worker URL and the page sends a small copy of the photo
 // there to find the window corners, then lets the customer nudge them. See server/detect-window/README.md.
 export const DETECT_URL = '';
+// "See it in your room": the same Worker's /restyle route restyles the customer's room around their window with an
+// image model, then Try on opens it. Follows DETECT_URL; with no Worker, Try on opens their straightened photo as is.
+export const RESTYLE_URL = DETECT_URL ? DETECT_URL.replace(/\/+$/, '') + '/restyle' : '';
 // Reply-time line (used in the studio if shown).
 export const REPLY_PROMISE = '';
 // The designer card next to "Text a designer". DESIGNER_PHOTO: path or URL of a real team photo.

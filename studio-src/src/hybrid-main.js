@@ -11,15 +11,20 @@ let SITE={DANA_SMS,LEAD_FORM_URL:'',REPLY_PROMISE:'',priceFor:()=>null,quote:()=
 const siteReady=Promise.all([import(/* @vite-ignore */ site('flow/config.js')),import(/* @vite-ignore */ site('flow/pricing.js'))]).then(([c,pr])=>{SITE={...SITE,...c,...pr};setupLead();updatePrice();updatePick();if(c.REPLY_PROMISE){const el=document.getElementById('reply-promise');if(el)el.textContent=c.REPLY_PROMISE.replace(/\.$/,'');}}).catch(()=>{});
 const swatchURL=(f,c)=>SWATCH[f+'|'+c]?`url(${site('swatches/'+SWATCH[f+'|'+c]+'.webp')})`:'none';
 import { createMechanism } from './shade-mechanisms.js';
-import { createRoomInstallation, fitShadeCanvas } from './room-installation.js';
+import { createRoomInstallation, fitShadeCanvas, aspectFactor } from './room-installation.js';
 import { roomResponse } from './room-response.js';
 import { prepareClothLighting } from './cloth-lighting.js';
-import { ROOMS } from './room-catalog.js';
+import { ROOMS, roomWindow, windowCorners } from './room-catalog.js';
+// The customer's own restyled photo (flow/my-room.js, saved on their phone by Try on your window).
+let myRoom=null;
+const myRoomReady=import(/* @vite-ignore */ site('flow/my-room.js')).then(m=>m.loadMyRoom()).then(r=>{myRoom=r;return r;}).catch(()=>null);
+const roomById=id=>id==='mine'?myRoom:ROOMS.find(r=>r.id===id);
+const curRoom=()=>roomById(state.room)||ROOMS[0];
 import { createRoomPlateRenderer } from './room-plate-renderer.js';
 
 const $=id=>document.getElementById(id),cap=s=>s[0].toUpperCase()+s.slice(1),W=1536,H=1024;
 const state={tod:.5,room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
-let roomPlate,ceilingLight,roomRequest=0;
+let roomPlate,ceilingLight,roomRequest=0,winK=1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 state.breeze=!reduced;
 let renderer,scene,camera,roomCamera,inspectCamera,controls,mechanism,installation,key,fill,ambient,environment,frame=0,last=0,actualDrop=.65,actualOpen=1,playTime=0,zoom=1,pan={x:0,y:0},drag=null;
@@ -64,7 +69,7 @@ function positionModel(){
 function rebuild(){
  if(!installation){refresh();return;}
  if(mechanism){scene.remove(mechanism.root);mechanism.dispose();}
- mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66,height:1.30});
+ mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66*winK,height:1.30});
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();lighting();
 }
 function lighting(){
@@ -73,10 +78,11 @@ function lighting(){
  const response=roomResponse({...state,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
  const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4:.3;
- roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:154+(.07-by)/1.38*381},response);
+ const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
+ roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:shadeBottomY},response);
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
-  const g=$('window-glow'),cover=mechanism.state.actualDrop??state.drop,shadeBottom=154+(.07-by)/1.38*381;
-  g.style.height=((Math.max(shadeBottom,160)-154)/1024*100)+'%';
+  const g=$('window-glow'),cover=mechanism.state.actualDrop??state.drop,shadeBottom=shadeBottomY;
+  g.style.height=((Math.max(shadeBottom,OPEN.y0+6)-OPEN.y0)/1024*100)+'%';
   g.style.opacity=String(Math.min(.95,clothTrans*sun*2.1*Math.min(1,cover*3)));}
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
@@ -105,7 +111,7 @@ function lighting(){
 }
 function size(){
  zoom=Math.min(zoom,Math.max(1,1536/$('viewport').clientWidth));
- fitShadeCanvas($('shade-canvas'),$('composition'));
+ fitShadeCanvas($('shade-canvas'),$('composition'),windowCorners(curRoom()));
  const host=state.inspect?$('inspect-stage'):$('shade-canvas'),width=host.clientWidth,height=host.clientHeight;
  if(!renderer||!width||!height)return;renderer.setPixelRatio(Math.min(devicePixelRatio*(state.inspect?1:zoom),6));renderer.setSize(width,height,false);inspectCamera.aspect=width/height;inspectCamera.updateProjectionMatrix();
 }
@@ -159,6 +165,7 @@ const slugify=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
 const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):/Reed/.test(f)?site('images/p/natural-reed-'+slugify(c)+'-swatch.webp'):'';
 // Dana's pick for each room: type, light, fabric, color.
 const RECS={'living-room':{text:'a <b>Roman in Raw Linen</b> for living rooms',chip:'roman',f:'Raw Linen',c:'Flax'},
+ mine:{text:'a <b>Roman in Raw Linen</b> for your room',chip:'roman',f:'Raw Linen',c:'Flax'},
  bedroom:{text:'a <b>blackout Roller</b> for bedrooms',chip:'roller',f:'Deep Sleep',c:'Oat'},
  nursery:{text:'a <b>blackout Roller</b> for nurseries',chip:'roller',f:'Deep Sleep',c:'Oat'},
  kitchen:{text:'a <b>Woven</b> shade for kitchens',chip:'woven',f:'Natural Reed',c:'Honey'},
@@ -182,7 +189,7 @@ function updatePick(){
  $('sz-prod').textContent=name;$('sz-dot').style.background=c.hex;
  $('sz-price-num').textContent=z.price?SITE.money(z.price)+(z.estimate?'*':''):'—';
  $('sz-cta-sub').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','').replace(/"/g,'')} · ${SITE.money(z.price)}`:'Add your size to see your price';
- const rn=ROOMS.find(r=>r.id===state.room);if(rn)$('room-name').textContent=rn.label;
+ const rn=curRoom();if(rn)$('room-name').textContent=rn.label;
  const rec=RECS[state.room]||RECS['living-room'];$('rec-text').innerHTML=`Dana recommends ${rec.text}`;
  const applied=chip===rec.chip&&f.name===rec.f;const ap=$('rec-apply');ap.setAttribute('aria-pressed',String(applied));ap.textContent=applied?'Applied':'Apply';
 }
@@ -219,7 +226,7 @@ function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)ret
   try{const r=await fetch(SITE.LEAD_FORM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,consent:true,consentText:$('lead-consent-text').textContent.trim(),context:'studio:'+designCode(lookQuery())+' '+summary()+(sizeInfo().ok?' '+sizeInfo().text:''),page:lookURL(),ts:new Date().toISOString()})});if(!r.ok)throw 0;st.textContent="Thanks! We'll text you shortly.";}catch{st.textContent="That didn't go through. Please text a designer instead.";}});}
 for(const id of['size-w','size-h'])$(id).addEventListener('input',updatePrice);
 function textDana(kind){
- const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
+ const room=curRoom().label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
  if(kind==='self'){location.href=(b=>`sms:${/iPhone|iPad|Macintosh/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(b)}`)(`My Hello Shade design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
  const body=kind==='kit'?`Hi Dana! Can I get samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
@@ -230,7 +237,7 @@ document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',(
  if(CATALOG[q.get('s')])state.style=q.get('s');
  if(CATALOG[state.style].families.some(f=>f.name===q.get('f')))state.family=q.get('f');else if(q.get('s'))state.family=CATALOG[state.style].families[0].name;
  if(q.get('c'))state.colorName=q.get('c');if(FOLDS[q.get('r')])state.fold=q.get('r');if(q.get('l')==='dark')state.opacity='blackout';
- if(ROOMS.some(r=>r.id===q.get('room')))state.room=q.get('room');
+ if(ROOMS.some(r=>r.id===q.get('room'))||q.get('room')==='mine')state.room=q.get('room');
  syncFamily();renderOptions();}
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));
 // Compile and first-use one material's shader program at a time, yielding between them, so a tap
@@ -259,9 +266,10 @@ async function start3D(){try{
  $('shade-canvas').append(renderer.domElement);renderer.domElement.setAttribute('aria-label','Moving three-dimensional shade');
  await yieldUI();
  roomPlate=createRoomPlateRenderer($('room-plate'));
- const startRoom=ROOMS.find(r=>r.id===state.room);const firstTexture=await roomPlate.load(startRoom);
+ await myRoomReady;if(state.room==='mine'&&!myRoom)state.room='living-room';addMyRoomButton();
+ const startRoom=curRoom();const firstTexture=await roomPlate.load(startRoom);
  await yieldUI();
- installation=await createRoomInstallation(firstTexture);scene.add(installation.group);roomCamera=installation.camera;camera=roomCamera;
+ installation=await createRoomInstallation(firstTexture);scene.add(installation.group);roomCamera=installation.camera;camera=roomCamera;applyWindow(startRoom);
  inspectCamera=new THREE.PerspectiveCamera(39,1,.01,40);controls=new OrbitControls(inspectCamera,renderer.domElement);controls.enableDamping=true;controls.enablePan=false;controls.minDistance=1.4;controls.maxDistance=5;controls.enabled=false;
  await yieldUI();
  const pmrem=new THREE.PMREMGenerator(renderer);environment=pmrem.fromScene(new RoomEnvironment(),.04);scene.environment=environment.texture;pmrem.dispose();
@@ -275,7 +283,7 @@ async function start3D(){try{
  {const tex=clothTexture(state.fabric==='reed'?'reed':state.fabric);normalFromHeight(tex);}
  await yieldUI();
  // First build, split across tasks (rebuild() does the same steps in one go for later changes).
- mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66,height:1.30});
+ mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66*winK,height:1.30});
  await yieldUI();
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();
  await yieldUI();
@@ -305,22 +313,31 @@ $('outside-toggle').addEventListener('click',()=>{state.breeze=!state.breeze;ref
 for(const id of['ceiling-toggle','ceiling-hotspot'])$(id).addEventListener('click',()=>{state.ceiling=!state.ceiling;engaged('ceiling');lighting();refresh();});
 $('ceiling-brightness').addEventListener('input',e=>{state.ceilingBrightness=Number(e.target.value)/100;lighting();refresh();});
 function setRoomHotspot(room){
- const place=(el,x,y)=>{el.style.left=(x/1536*100)+'%';el.style.top=(y/1024*100)+'%';};place($('lamp-hotspot'),...room.lamp);place($('ceiling-hotspot'),room.fixture[0],room.fixture[1]);
+ const place=(el,x,y)=>{el.style.left=(x/1536*100)+'%';el.style.top=(y/1024*100)+'%';};
+ const lit=!!room.lamp;for(const id of['lamp-hotspot','lamp-toggle'])$(id).hidden=!lit;for(const id of['ceiling-hotspot','ceiling-toggle'])$(id).hidden=!room.fixture;
+ if(!lit)state.lamp=false;if(!room.fixture)state.ceiling=false;
+ if(room.lamp)place($('lamp-hotspot'),...room.lamp);if(room.fixture)place($('ceiling-hotspot'),room.fixture[0],room.fixture[1]);
  $('room-description').textContent=room.note;
 }
 requestAnimationFrame(()=>document.querySelector('.rooms [aria-pressed=true]')?.scrollIntoView({inline:'center',block:'nearest'}));
-for(const room of ROOMS){
- const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(${site('rooms/frontal-v2/'+room.id+'.webp')})"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));$('room-choices').append(b);
+function roomButton(room,first){
+ const b=document.createElement('button');b.innerHTML=`<span class="thumb" style="background-image:url(${room.src||site('rooms/frontal-v2/'+room.id+'.webp')})"></span><span>${room.label}</span>`;b.dataset.room=room.id;b.setAttribute('aria-pressed',String(room.id===state.room));first?$('room-choices').prepend(b):$('room-choices').append(b);
  b.addEventListener('click',async()=>{
-  if(!roomPlate||!installation){state.room=room.id;const l=$('loading');if(l)l.style.backgroundImage=`url(${site('rooms/frontal-v2/'+room.id+'.webp')})`;refresh();return;}
+  if(!roomPlate||!installation){state.room=room.id;const l=$('loading');if(l)l.style.backgroundImage=`url(${room.src||site('rooms/frontal-v2/'+room.id+'.webp')})`;refresh();return;}
   const ticket=++roomRequest;$('room-status').textContent='Opening '+room.label.toLowerCase()+'…';$('viewport').setAttribute('aria-busy','true');
   try{
    const texture=await roomPlate.load(room);if(ticket!==roomRequest||!texture)return;
-   installation.setExterior(texture);state.room=room.id;setRoomHotspot(room);lighting();refresh();$('room-status').textContent='';
+   installation.setExterior(texture);state.room=room.id;applyWindow(room);setRoomHotspot(room);lighting();refresh();$('room-status').textContent='';
   }catch(error){if(ticket===roomRequest)$('room-status').textContent='This room could not load. Tap its name to retry.';console.error(error);}
   finally{if(ticket===roomRequest)$('viewport').setAttribute('aria-busy','false');}
  });
 }
+for(const room of ROOMS)roomButton(room);
+function addMyRoomButton(){
+ if(!myRoom||document.querySelector('[data-room="mine"]'))return;roomButton(myRoom,true);
+ const li=document.createElement('li');li.innerHTML='<button type="button" role="option" data-room-pick="mine">Your room</button>';$('room-menu').children[0].after(li);
+}
+myRoomReady.then(addMyRoomButton);
 $('inspect-toggle').addEventListener('click',()=>showInspect(!state.inspect));
 $('play').addEventListener('click',()=>{state.playing=!state.playing;playTime=Math.acos(THREE.MathUtils.clamp((.5-state.drop)/.48,-1,1))/.95;refresh();});
 function inspectZoom(factor){inspectCamera.position.sub(controls.target).multiplyScalar(factor).add(controls.target);controls.update();}
@@ -338,7 +355,7 @@ document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(frame);if
 
 
 /* ---------- Direct manipulation ---------- */
-const OPEN={x0:504,x1:1040,y0:154,y1:535},SPAN=1.38;
+let OPEN={x0:504,x1:1040,y0:154,y1:535};const SPAN=1.38;
 const BOTTOM={roller:[.006,1.30],roman:[.15,1.30],zebra:[.063,1.30]};
 function placeHandle(){if(!mechanism)return;const y=mechanism.state.bottomY??-1.3,my=OPEN.y0+(.07-y)/SPAN*(OPEN.y1-OPEN.y0);
  const h=$('shade-handle');h.style.top=(Math.min(my,OPEN.y1-6)/1024*100)+'%';h.style.left=((OPEN.x0+OPEN.x1)/2/1536*100)+'%';}
@@ -346,7 +363,7 @@ function setDropFromY(clientY){const r=$('composition').getBoundingClientRect(),
  const bottom=(my-OPEN.y0)/(OPEN.y1-OPEN.y0)*SPAN-.07,[b0,b1]=BOTTOM[state.style];
  state.drop=THREE.MathUtils.clamp((bottom-b0)/(b1-b0),0,1);state.playing=false;$('drop').value=state.drop*100;refresh();}
 {const grab=$('shade-grab'),handle=$('shade-handle');let active=null;
- grab.style.left=(OPEN.x0/1536*100)+'%';grab.style.top=(OPEN.y0/1024*100)+'%';grab.style.width=((OPEN.x1-OPEN.x0)/1536*100)+'%';grab.style.height=((OPEN.y1-OPEN.y0)/1024*100)+'%';
+ placeGrab();
  for(const el of[grab,handle]){
   el.addEventListener('pointerdown',e=>{if(state.inspect||active!==null)return;e.preventDefault();e.stopPropagation();active=e.pointerId;el.setPointerCapture(e.pointerId);document.body.classList.add('dragging-shade');setDropFromY(e.clientY);engaged('drag');});
   el.addEventListener('pointermove',e=>{if(e.pointerId!==active)return;e.stopPropagation();setDropFromY(e.clientY);});
@@ -366,7 +383,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if
 const touched=new Set();
 {const hide=()=>{const el=document.getElementById('intro-line');if(el)el.classList.add('gone');};['pointerdown','keydown','wheel'].forEach(t=>addEventListener(t,hide,{once:true,passive:true}));}
 function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classList.add('swiped');if(kind==='drag')document.body.classList.add('dragged');if(kind==='lamp'||kind==='ceiling')document.body.classList.add('lit');danaSays();}
-function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
+function danaSays(){const room=curRoom().label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
   `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed.`,
   `<strong>Dana</strong> · Want to feel it first? I'll mail you samples: up to 5 fabrics for $10, and the $10 comes off your order.`];
@@ -375,7 +392,7 @@ let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').clas
 $('dana').addEventListener('click',()=>$('dana').classList.remove('show'));
 document.addEventListener('click',e=>{const pk=e.target.closest('[data-family],[data-pick],[data-style],[data-fold]');if(pk)engaged('pick:'+(pk.dataset.pick||pk.dataset.family||pk.dataset.style||pk.dataset.fold));});
 /* Share the look (spouse approval is a real step) */
-$('share-look')?.addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${ROOMS.find(r=>r.id===state.room).label.toLowerCase()}? ${summary()}`;
+$('share-look')?.addEventListener('click',async()=>{const url=lookURL(),text=`What do you think of this for our ${curRoom().label.toLowerCase()}? ${summary()}`;
  try{if(navigator.share){await navigator.share({title:'Hello Shade',text,url});return;}await navigator.clipboard.writeText(text+' '+url);toast('<strong>Link copied</strong> · send it to whoever gets a vote.');}catch{}});
 /* Intro: the shade lowers itself once so visitors see it's alive */
 (function intro(){if(reduced||new URLSearchParams(location.search).has('s'))return;const target=state.drop,t0=performance.now()+700;state.drop=.04;
@@ -406,3 +423,15 @@ setTimeout(()=>document.body.classList.add('settled'),7000);
 {const pick=document.querySelector('.pick'),foot=document.querySelector('.panel-foot'),set=()=>document.documentElement.style.setProperty('--panel-h',Math.ceil((pick?.offsetHeight||0)+(foot?.offsetHeight||0))+'px');
  set();if(window.ResizeObserver){const ro=new ResizeObserver(set);pick&&ro.observe(pick);foot&&ro.observe(foot);}addEventListener('resize',set);}
 window.__tl={setTod,setDrop:d=>{state.drop=d;state.playing=false;$('drop').value=d*100;refresh();}};
+
+/* ---------- Any window size: stock rooms or the customer's own photo ---------- */
+function placeGrab(){const grab=$('shade-grab'),pct=(v,t)=>(v/t*100)+'%';
+ grab.style.left=pct(OPEN.x0,1536);grab.style.top=pct(OPEN.y0,1024);grab.style.width=pct(OPEN.x1-OPEN.x0,1536);grab.style.height=pct(OPEN.y1-OPEN.y0,1024);
+ const g=$('window-glow');g.style.left=pct(OPEN.x0,1536);g.style.top=pct(OPEN.y0,1024);g.style.width=pct(OPEN.x1-OPEN.x0,1536);}
+function applyWindow(room){
+ const w=roomWindow(room),[x0,y0,x1,y1]=w.outer;OPEN={x0,y0,x1,y1};placeGrab();
+ const k=installation.setWindow(windowCorners(room),w.glass,{ownPhoto:room.id==='mine'});
+ $('viewport').classList.toggle('own-room',room.id==='mine');
+ if(Math.abs(k-winK)>1e-3){winK=k;if(mechanism)rebuild();}
+ if(inspectCamera)size();
+}

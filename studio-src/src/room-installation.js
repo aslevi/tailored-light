@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { MOUNT_CORNERS, homography } from './room-response.js';
 import {createWindowAssembly,addRecessParallax} from './window-assembly.js';
 
-export function fitShadeCanvas(host,viewport){
- const scale=viewport.clientWidth/1536,w=400*scale,h=330*scale,m=homography(MOUNT_CORNERS.map(p=>p.map(x=>x*scale)));
+// k = how much wider (or narrower) this window is than the stock one, relative to its height.
+export const aspectFactor=corners=>((corners[1][0]-corners[0][0])/(corners[3][1]-corners[0][1]))/(536/381);
+export function fitShadeCanvas(host,viewport,corners=MOUNT_CORNERS){
+ const k=aspectFactor(corners),scale=viewport.clientWidth/1536,w=400*k*scale,h=330*scale,m=homography(corners.map(p=>p.map(x=>x*scale)));
  host.style.width=w+'px';host.style.height=h+'px';host.style.transformOrigin='0 0';
  host.style.transform=`matrix3d(${m[0]/w},${m[3]/w},0,${m[6]/w},${m[1]/h},${m[4]/h},0,${m[7]/h},0,0,1,0,${m[2]},${m[5]},0,1)`;
 }
@@ -14,16 +16,16 @@ export async function createRoomInstallation(initialTexture){
  const assembly=createWindowAssembly(),headbox=assembly.headbox;group.add(assembly.root);
  const textures=[initialTexture,initialTexture,initialTexture];
  const m=homography(MOUNT_CORNERS),transform=new THREE.Matrix3().set(...m);
- const material=new THREE.ShaderMaterial({depthWrite:false,toneMapped:false,uniforms:{day:{value:textures[0]},sun:{value:textures[1]},night:{value:textures[2]},mood:{value:1},clock:{value:0},breeze:{value:1},registration:{value:transform}},
+ const material=new THREE.ShaderMaterial({depthWrite:false,toneMapped:false,uniforms:{day:{value:textures[0]},sun:{value:textures[1]},night:{value:textures[2]},mood:{value:1},clock:{value:0},breeze:{value:1},registration:{value:transform},guard:{value:new THREE.Vector4(526,180,1016,512)}},
  vertexShader:'varying vec2 st; void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);st=gl_Position.xy/gl_Position.w*.5+.5;}',
- fragmentShader:`uniform sampler2D day,sun,night;uniform float mood,clock,breeze;uniform mat3 registration;varying vec2 st;
+ fragmentShader:`uniform sampler2D day,sun,night;uniform float mood,clock,breeze;uniform mat3 registration;uniform vec4 guard;varying vec2 st;
  float oval(vec2 p,vec2 c,vec2 r){return 1.-smoothstep(.62,1.,length((p-c)/r));}
  void main(){vec3 q=registration*vec3(st.x,1.-st.y,1.);vec2 p=q.xy/q.z;
   // Only leaf clusters move. House, fence, sky and the window reveal stay fixed.
   vec3 sampleColor=texture2D(day,vec2(p.x/1536.,1.-p.y/1024.)).rgb;
   float leaves=smoothstep(.015,.10,min(sampleColor.g,sampleColor.r)-sampleColor.b);
   // Guard band wider than maximum displacement: no moving sample can reach trim.
-  float glass=smoothstep(526.,542.,p.x)*(1.-smoothstep(1000.,1016.,p.x))*smoothstep(180.,196.,p.y)*(1.-smoothstep(495.,512.,p.y));
+  float glass=smoothstep(guard.x,guard.x+16.,p.x)*(1.-smoothstep(guard.z-16.,guard.z,p.x))*smoothstep(guard.y,guard.y+16.,p.y)*(1.-smoothstep(guard.w-17.,guard.w,p.y));
   float strength=leaves*breeze*glass;
   p+=strength*vec2(3.0*sin(clock*.91+p.y*.017)+.8*sin(clock*1.57+p.x*.023),1.2*sin(clock*1.13+p.x*.018));
   vec2 uv=vec2(p.x/1536.,1.-p.y/1024.);
@@ -36,7 +38,20 @@ export async function createRoomInstallation(initialTexture){
  }`});
  const outside=new THREE.Mesh(new THREE.PlaneGeometry(2.0,1.6),material);outside.name='Living_exterior';outside.position.set(0,-.62,-.27);outside.renderOrder=-5;group.add(outside);
  let windTime=0,lastTime=null;
- return {group,camera,headbox,outside,lightField:material.uniforms,setExterior(texture){
+ const sash=[];assembly.root.traverse(o=>{if(/^(Rear_sash|Jamb_board|Sill_depth)/.test(o.name))sash.push(o);});
+ return {group,camera,headbox,outside,lightField:material.uniforms,
+ // Fit the installation to a window rectangle in plate pixels. Height stays 1.38 m of model space;
+ // width follows the window's proportions so fabric is never stretched. Own photos already show
+ // their sash, so the modelled rear sash is hidden there.
+ setWindow(corners,glass,{ownPhoto=false}={}){
+  const k=aspectFactor(corners);
+  material.uniforms.registration.value.set(...homography(corners));
+  material.uniforms.guard.value.set(glass[0]-10,glass[1]-2,glass[2]+8,glass[3]+4);
+  camera.left=-.85*k;camera.right=.85*k;addRecessParallax(camera);
+  assembly.root.scale.x=k;outside.scale.x=k;sash.forEach(o=>o.visible=!ownPhoto);
+  return k;
+ },
+ setExterior(texture){
   material.uniforms.day.value=material.uniforms.sun.value=material.uniforms.night.value=texture;
  },update({mood,tod,breeze,time,inspect}){
   if(breeze&&lastTime!==null)windTime+=Math.min(.1,Math.max(0,time-lastTime));lastTime=time;

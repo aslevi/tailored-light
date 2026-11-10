@@ -13,9 +13,29 @@ POST /            Content-Type: image/jpeg, raw JPEG body, <= 300 KB
 - Best window first (largest and most confident), at most 6. `windows: []` means none found.
 - Errors: `403 origin_not_allowed`, `405`, `413 too_large`, `415 send_image_jpeg`, `400 not_a_jpeg`, `502 upstream`, `504 upstream_timeout` (8 s). The page falls back to manual dots on any error, or after 4 s.
 
+## /restyle: "See it in your room"
+
+The same Worker also restyles a customer's room so Try on can open it (`RESTYLE_URL` in `/flow/config.js` follows `DETECT_URL`, so deploying this Worker turns it on).
+
+```
+POST /restyle     Content-Type: image/jpeg, raw JPEG body, <= 1.5 MB (the 1536 × 1024 room plate the phone builds)
+200 {"image":"data:image/png;base64,...","windows":[...as above...],"floor":0.82,"ms":21000}
+```
+
+1. The phone straightens the photo so the window faces the camera and places it where Try on expects windows (`/flow/room-plate.js`).
+2. The Worker sends that to an image model (`RESTYLE_MODEL`, default `google/gemini-3-pro-image-preview`) with a prompt that keeps the window, its trim and the view exactly where they are, keeps it bare, removes clutter and fills the edges.
+3. Image models nudge the window a few percent, so the Worker finds it again in the result (same detector as above, plus the floor line).
+4. The phone squares that window up, saves the room on the phone (`/flow/my-room.js`, IndexedDB) and opens `/studio/?room=mine`. The shade is sized to that window.
+
+Any failure falls back to the straightened photo, so the customer always gets their room. Takes about 15-30 s. Cost is the image model's price per image (check OpenRouter; Gemini 3 Pro Image is roughly 10-15 cents) plus a fraction of a cent for detection. Set a spend limit on the key and a rate limit on the route (for example 5 restyles per hour per IP).
+
+| Var | Default | Notes |
+|---|---|---|
+| `RESTYLE_MODEL` | `google/gemini-3-pro-image-preview` | Any OpenRouter model that takes an image in and returns an image (`modalities: ["image","text"]`). |
+
 ## Privacy
 
-The photo goes to OpenRouter and on to the model provider for this one request. The Worker does not store it, log it or put it in any URL. It sends no `console.log`. If you turn on Workers Logs or Logpush, request bodies are not included, but keep it off anyway. The page copy says: "Your photo is only used to find your window. We don't keep it."
+The photo goes to OpenRouter and on to the model provider for this one request. The Worker does not store it, log it or put it in any URL. It sends no `console.log`. If you turn on Workers Logs or Logpush, request bodies are not included, but keep it off anyway. The page copy says: "Your photo is only used to find your window and restyle your room. We don't keep it." The restyled room comes back to the phone and is saved there only.
 
 ## Deploy (about 5 minutes)
 
