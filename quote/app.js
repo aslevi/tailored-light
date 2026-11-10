@@ -116,7 +116,7 @@ function render(q) {
   const yes = approvalText(q, t), yesHref = smsHref(DANA_SMS, yes);
   $('send-yes').href = yesHref;
   $('yes-text').textContent = yes;
-  $('dana-num').textContent = prettyPhone(DANA_SMS);
+  if (DANA_SMS) $('dana-num').textContent = prettyPhone(DANA_SMS); else $('dana-num').closest('p').hidden = true;
   document.querySelectorAll('.dana-pretty').forEach(n => n.textContent = prettyPhone(DANA_SMS));
   $('confirm-summary').textContent = `You're approving ${q.lines.length} custom ${q.lines.length === 1 ? 'shade' : 'shades'} for ${money(t.total)}, quote ${q.code}. Nothing is charged now.`;
 

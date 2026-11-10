@@ -1,13 +1,9 @@
 {
   "name": "Hello Shade",
   "url": "https://helloshade.co/",
-  "updated": "2026-10-30",
+  "updated": "2026-11-10",
   "currency": "USD",
   "about": "Custom window shades made to measure and shipped to your door. Designer help by text instead of a home visit.",
-  "contact": {
-    "text_a_designer": "+1-201-745-3300",
-    "hours": "New texts 9am–8pm local time, Monday to Saturday"
-  },
   "policies": {
     "sizes_in": {
       "width": [
@@ -20,16 +16,16 @@
       ],
       "outside_range": "quoted by text"
     },
-    "ships": "2–4 weeks after you order",
-    "install": "About 15–20 minutes a shade with a drill; we don’t install",
+    "delivery": "at your house in 2–3 weeks",
+    "install": "Two brackets and a drill; we don’t install",
     "samples": {
       "price": 10,
       "max_fabrics": 5,
       "credited_to_order": true,
       "url": "https://helloshade.co/swatch-kit/"
     },
-    "fit_guarantee": "Measure wrong and we remake it free, once per shade, within 30 days of delivery, when a designer checked your numbers and photos first.",
-    "returns": "Custom shades can’t be returned for a change of mind. Measuring mistakes are remade free; defects are fixed or replaced; shipping damage is replaced.",
+    "measuring": "Customers measure; a designer checks every number before anything is made.",
+    "returns": "Custom shades can’t be returned for a change of mind. Defects are fixed or replaced; shipping damage is replaced.",
     "pricing": "Price by type and width × height; fabric and color don’t change it. Zebra prices are an estimate until confirmed by text. Prices are the same for everyone."
   },
   "types": {

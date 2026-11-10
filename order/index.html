@@ -56,7 +56,7 @@
 <header class="site-header">
  <div class="wrap bar">
   <a class="brand" href="../"><span class="wordmark" role="img" aria-label="Hello Shade">hello shade<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="3.5" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg></span></a>
-  <a class="btn gold sm" id="hdr-text" href="sms:+12017453300">Text a designer</a>
+  <a class="btn gold sm" id="hdr-text" href="/contact.html">Text a designer</a>
  </div>
 </header>
 
@@ -151,12 +151,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (cur === -1) { headline = 'All done. Enjoy your shades!'; }
     else if (curKey === 'installed') { headline = 'Delivered ' + HS.date(o.deliveredDate); eta = 'Time to hang them. The install guide walks you through it.'; }
     else if (curKey === 'shipped') { headline = 'Shipped ' + HS.date(o.shippedDate); eta = 'On its way to you.'; }
-    else if (curKey === 'prod') { headline = o.orderedDate ? 'In production' : 'Paid \u2014 ordering now'; if (shipFrom) eta = 'Estimated ship window: <b>' + esc(HS.date(shipFrom)) + ' \u2013 ' + esc(HS.date(shipTo)) + '</b><br><span style="font-size:14px">2\u20134 weeks from payment</span>'; }
-    else { headline = steps[cur].name === 'Paid' ? 'Ready to pay' : 'Getting ready'; eta = 'Ships 2–4 weeks after payment.'; }
+    else if (curKey === 'prod') { headline = o.orderedDate ? 'In production' : 'Paid \u2014 ordering now'; if (shipFrom) eta = 'Estimated ship window: <b>' + esc(HS.date(shipFrom)) + ' \u2013 ' + esc(HS.date(shipTo)) + '</b>'; }
+    else { headline = steps[cur].name === 'Paid' ? 'Ready to pay' : 'Getting ready'; eta = 'At your house about 2–3 weeks after payment.'; }
 
-    var fit = remakeUntil
-      ? 'Fit guarantee until ' + esc(HS.date(remakeUntil, { month: 'long', day: 'numeric', year: 'numeric' })) + '. If a checked shade doesn’t fit, we remake it free.'
-      : 'Once your shades arrive, you have 30 days for a free remake if a checked shade doesn’t fit.';
+    var fit = 'Open each box and check every shade before you hang it. If anything arrived damaged or doesn’t match your order, text us a photo and we’ll fix it.';
 
     main.innerHTML =
       '<div class="page-head"><p class="eyebrow">' + esc(o.name || 'Your order') + (c.designCode ? ' · ' + esc(c.designCode) : '') + '</p><h1>Order status</h1></div>' +
@@ -166,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         (o.projectToken ? '<a href="../my-windows/?t=' + encodeURIComponent(o.projectToken) + '">See my windows</a>' : '') + '</div></section>' +
       '<ol class="timeline" aria-label="Order progress">' + tl + '</ol>' +
       '<aside class="note" aria-labelledby="fit-h"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 3l9 3.5v6.8c0 5.6-3.8 10-9 11.7-5.2-1.7-9-6.1-9-11.7V6.5L14 3z" fill="#F3DCD3" stroke="#A9594A" stroke-width="1.6"/><path d="M9.5 14.2l3.1 3 5.9-6" stroke="#4E8B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-        '<div><h2 id="fit-h">Fit guarantee</h2><p>' + fit + ' <a href="../how-it-works/#fit">Details</a></p></div></aside>' +
+        '<div><h2 id="fit-h">When your shades arrive</h2><p>' + fit + '</p></div></aside>' +
       '<div class="cta"><a class="btn ghost" href="../how-to-install/">Install guide</a><a class="btn gold" href="' + esc(sms) + '">Text Dana</a></div>';
     main.setAttribute('aria-busy', 'false');
   }

@@ -220,7 +220,7 @@ function setupLead(){const form=$('lead-form');if(!form||!SITE.LEAD_FORM_URL)ret
 for(const id of['size-w','size-h'])$(id).addEventListener('input',updatePrice);
 function textDana(kind){
  const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase(),tag=ref?` (via ${ref})`:'';const z=sizeInfo(),sz=z.ok?` Window: ${z.text}, ${mount.toLowerCase()} mount.`+(z.price?` Shown price ${SITE.money(z.price)}${z.estimate?' (estimate)':''}.`:''):'';
- if(kind==='self'){location.href=smsHref('',`My Hello Shade design for the ${room}: ${summary()}. ${lookURL()}`);return;}
+ if(kind==='self'){location.href=(b=>`sms:${/iPhone|iPad|Macintosh/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(b)}`)(`My Hello Shade design for the ${room}: ${summary()}. ${lookURL()}`);return;}
  const code=designCode(lookQuery());
  const body=kind==='kit'?`Hi Dana! Can I get samples? I'm leaning toward ${summary()} (${code}) for my ${room}. ${lookURL()}`:`Hi Dana! Here's my design for my ${room}: ${summary()} (${code}).${sz} ${z.price?'I\'d like to order.':'Can you help me measure and price it?'} ${lookURL()}`;
  location.href=smsHref(SITE.DANA_SMS||DANA_SMS,body+tag);

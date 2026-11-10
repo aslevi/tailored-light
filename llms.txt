@@ -1,6 +1,6 @@
 # Hello Shade (custom window shades)
 
-> Hello Shade (helloshade.co) is an online store for custom window shades. Not to be confused with other businesses using the name. Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and shipped to the customer's door 2–4 weeks after ordering. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at $209; a 36×60″ Roller is $229. Facts on this page were updated 2026-10-30. Live prices and products as JSON: https://helloshade.co/feed.json
+> Hello Shade (helloshade.co) is an online store for custom window shades. Not to be confused with other businesses using the name. Hello Shade sells custom window shades online (Roller, Roman, Zebra, Woven), made to measure for each window and at the customer's house in 2–3 weeks. No showroom and no home visit: customers try shades on in a room on the site, then text a designer who helps them pick, measure and order. Shades start at $209; a 36×60″ Roller is $229. Facts on this page were updated 2026-11-10. Live prices and products as JSON: https://helloshade.co/feed.json
 
 Key facts:
 - Types and From prices (24×24″): Roller $209, Zebra $239 (estimate), Roman $259, Woven $269.
@@ -8,9 +8,8 @@ Key facts:
 - Price is set by type and size; fabric and color don't change it. Each window is priced separately. Same prices for everyone.
 - Sizes: 12–96″ wide, 12–120″ high. Larger or unusual windows are quoted by text.
 - Samples: up to 5 fabrics for $10, credited to the shade order.
-- Fit guarantee: measure wrong and the shade is remade free, once per shade, within 30 days of delivery, when a designer checked the numbers and photos first.
-- Customers measure themselves (about 7 minutes) and install themselves (about 15–20 minutes a shade). Hello Shade doesn't install.
-- Text a designer: (201) 745-3300.
+- Customers measure themselves with a regular tape, and a designer checks every number before anything is made.
+- Customers install themselves with two brackets and a drill. Hello Shade doesn't install.
 
 ## Guides
 - [How much do custom shades cost?](https://helloshade.co/prices/): full price table by type and window size
@@ -56,4 +55,4 @@ Key facts:
 - [How it works](https://helloshade.co/how-it-works/): try on, text a designer, we make it and ship it
 - [Samples](https://helloshade.co/swatch-kit/): $10 for up to 5 fabrics
 - [About](https://helloshade.co/about/): who we are
-- [Terms of sale](https://helloshade.co/terms.html): returns, Fit guarantee, payment
+- [Terms of sale](https://helloshade.co/terms.html): returns, payment, shipping

@@ -65,7 +65,7 @@ details.nums[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 <header class="site-header">
  <div class="wrap bar">
   <a class="brand" href="../"><span class="wordmark" role="img" aria-label="Hello Shade">hello shade<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M32 12V4M43 14.9L47 8M21 14.9L17 8M51 23L58 19M13 23L6 19" stroke="#E8AE45" stroke-width="3.5" stroke-linecap="round"/><path d="M14 34A18 18 0 0 1 50 34Z" fill="#E8AE45"/><rect x="2" y="34" width="60" height="3" rx="1.5" fill="#A9594A"/></svg></span></a>
-  <a class="btn gold sm" id="hdr-text" href="sms:+12017453300">Text a designer</a>
+  <a class="btn gold sm" id="hdr-text" href="/contact.html">Text a designer</a>
  </div>
 </header>
 
@@ -197,11 +197,11 @@ document.addEventListener('DOMContentLoaded', function () {
       html += '<div class="card next"><h2>No windows yet</h2><p>Start with one window. It takes about 10 minutes.</p><div class="actions"><a class="btn" href="../how-to-measure/">How to measure</a></div></div>';
     } else {
       html += '<ul class="list">' + ws.map(card).join('') + '</ul>';
-      html += '<div class="card total"><span class="lbl">Your price<span class="sub">' + ws.length + ' shade' + (ws.length === 1 ? '' : 's') + ', free shipping</span></span><span class="amt">' + esc(HS.money(d.total)) + '</span></div>';
+      html += '<div class="card total"><span class="lbl">Your price<span class="sub">' + ws.length + ' shade' + (ws.length === 1 ? '' : 's') + '</span></span><span class="amt">' + esc(HS.money(d.total)) + '</span></div>';
     }
     html += nextStep(d);
     html += '<aside class="note" aria-labelledby="fit-h"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 3l9 3.5v6.8c0 5.6-3.8 10-9 11.7-5.2-1.7-9-6.1-9-11.7V6.5L14 3z" fill="#F3DCD3" stroke="#A9594A" stroke-width="1.6"/><path d="M9.5 14.2l3.1 3 5.9-6" stroke="#4E8B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-      '<div><h2 id="fit-h">Fit guarantee</h2><p>Send your numbers and photos, and once Dana checks them, the fit is on us. If a checked shade doesn’t fit, we remake it free within 30 days of delivery. <a href="../how-it-works/#fit">How it works</a></p></div></aside>';
+      '<div><h2 id="fit-h">We check your numbers</h2><p>Send your numbers and photos, and Dana checks every one before anything is made. <a href="../how-to-measure/">How to measure</a></p></div></aside>';
     main.innerHTML = html;
     main.setAttribute('aria-busy', 'false');
   }

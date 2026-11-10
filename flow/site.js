@@ -12,10 +12,12 @@ const danaHref = body => smsHref(DANA_SMS, body || DEFAULT_BODY);
 
 // Every "Text a designer" link: number and prefilled message come from config.js.
 document.querySelectorAll('[data-dana]').forEach(a => {
-  a.href = a.dataset.body ? danaHref(a.dataset.body) : `sms:${DANA_SMS}`;
-  if (a.hasAttribute('data-dana-number')) a.textContent = pretty(DANA_SMS);
+  a.href = danaHref(a.dataset.body);
+  if (a.hasAttribute('data-dana-number')) { if (DANA_SMS) a.textContent = pretty(DANA_SMS); else (a.closest('p') || a).hidden = true; }
 });
-document.querySelectorAll('[data-dana-text]').forEach(el => { el.textContent = pretty(DANA_SMS); });
+document.querySelectorAll('[data-dana-text]').forEach(el => { if (DANA_SMS) el.textContent = pretty(DANA_SMS); else el.hidden = true; });
+// Texting line not live yet: show the "opening soon" notes.
+document.querySelectorAll('[data-no-texting]').forEach(el => { el.hidden = !!DANA_SMS; });
 
 // Samples: an order form when SWATCH_KIT_URL is set, otherwise a text to Dana.
 document.querySelectorAll('[data-swatch-kit]').forEach(a => {
@@ -67,7 +69,7 @@ function openSheet(body) {
     sheet.innerHTML = `<div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <button class="sheet-close" type="button" aria-label="Close">&times;</button>
       <h2 id="sheet-title">Text a designer</h2>
-      <div class="designer" data-designer><span class="d-avatar" data-designer-avatar aria-hidden="true">D</span><div><b data-designer-name>Dana</b><span>Your designer · usually replies within minutes</span></div></div>
+      <div class="designer" data-designer><span class="d-avatar" data-designer-avatar aria-hidden="true">D</span><div><b data-designer-name>Dana</b><span>Your designer</span></div></div>
       <p>Send a photo of your window or a look you like. We'll help you pick, measure and order.</p>
       <a class="btn gold" data-sheet-go href="#">Open Messages</a>
     </div>`;
@@ -83,7 +85,7 @@ function openSheet(body) {
 }
 document.addEventListener('click', e => {
   const a = e.target.closest('[data-text-sheet]');
-  if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  if (!a || !DANA_SMS || e.metaKey || e.ctrlKey || e.shiftKey) return;
   e.preventDefault();
   openSheet(a.dataset.body);
 });

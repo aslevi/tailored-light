@@ -252,7 +252,7 @@ function quoteText(q) {
   const lines = q.lines.map(x => `${x.label || x.room}: ${designSummary(x).replace(/^./, c => c.toUpperCase())}, ${fmtIn(x.w)}" x ${fmtIn(x.h)}" ${x.mount || ''}: ${money(Math.round(+x.price * 100))}`.replace(/\s+:/, ':'));
   return [`Here's your quote${q.name ? ', ' + q.name : ''}:`, ...lines,
     `Subtotal ${money(t.subtotal)} · shipping ${t.shipping ? money(t.shipping) : 'free'} · tax ${money(t.tax)}`,
-    `Total ${money(t.total)}, ships in 2–4 weeks. Measurements checked, so the fit guarantee applies.`].join('\n');
+    `Total ${money(t.total)}, at your house in about 2–3 weeks. Measurements checked.`].join('\n');
 }
 function readback(l) {
   const ws = (l.windows || []).map((w, i) => { const o = orderSize(w); return o ? `${windowName(w, i)}: ${w.mount || 'inside'}, ${fmtIn(o.w)}" x ${fmtIn(o.h)}"${w.mount === 'outside' ? '' : ' (exact opening, we make the adjustments)'}` : null; }).filter(Boolean);
@@ -483,7 +483,7 @@ function renderQuote(l) {
       <button class="btn primary" type="button" id="q-build">Save quote &amp; copy link</button>
       <button class="btn ghost sm" type="button" id="q-reset">Reset from windows</button>
     </div>
-    ${l.windows.length && !l.windows.every(isGuaranteed) ? '<p class="warn-line">Not every window has passed Dana\'s check. The quote page says the fit guarantee applies, so check first.</p>' : ''}
+    ${l.windows.length && !l.windows.every(isGuaranteed) ? '<p class="warn-line">Not every window has passed Dana\'s check. The quote says measurements are checked, so check first.</p>' : ''}
     ${l.quotes.length ? `<h3>Sent quotes</h3><ul class="quotes">${[...l.quotes].reverse().map(q => `<li>
       <span><b>${money(quoteTotals(q.json).total)}</b> · ${q.json.lines.length} shade${q.json.lines.length > 1 ? 's' : ''} · ${fmtDate(q.sentAt)} · <span class="code">TLQ1:${quoteHash(q.json)}</span></span>
       ${q.approvedAt ? `<span class="badge good">Approved ${fmtDate(q.approvedAt)}</span>` : `<button class="btn sm ghost" type="button" data-qapprove="${esc(q.id)}">Mark approved</button>`}

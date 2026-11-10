@@ -18,7 +18,7 @@ export const GROUPS = [
     ['Window count', 'How many windows in the [room]? Roughly how big, like "standard" or "big picture window"?'],
     ['How dark', 'How dark do you want it in there? Soft and filtered, or pitch black for naps and sleeping in?'],
     ['Privacy / glare', 'For the [room], is it more about privacy, glare, or just looking finished?'],
-    ['Timeline', 'Any timing you\'re working toward? Shades ship 2–4 weeks after you order.'],
+    ['Timeline', 'Any timing you\'re working toward? Shades are at your house in about 2–3 weeks.'],
     ['Photo', 'Can you send me a photo of the window? Stand back so I can see the whole frame and a bit of wall around it.'],
     ['Rec: bedroom', "For a [room], I'd go with a roller. Deep Sleep is our blackout fabric. Mounted on the wall above the frame, it blocks the most light. Nursery parents love it."],
     ['Rec: kitchen', 'For a kitchen I love woven wood. Natural Reed in [Honey/Natural/Driftwood] adds warmth, filters light nicely, and doesn\'t look fussy.'],
@@ -34,7 +34,7 @@ export const GROUPS = [
     ['Inside: width', 'Step 1, width: measure inside the frame, side to side, at the top, middle and bottom. Text me all three, to the nearest 1/8".'],
     ['Inside: height', 'Step 2, height: measure from the top inside of the frame down to the sill, on the left, middle and right. Text me all three.'],
     ['Inside: depth', 'Step 3, depth: how deep is the frame, from the glass (or window crank) out to the front edge?'],
-    ['Tape photo', 'Last thing: a photo of the tape in place for one width and one height. That\'s how I double-check it for your fit guarantee.'],
+    ['Tape photo', 'Last thing: a photo of the tape in place for one width and one height. That\'s how I double-check it.'],
     ["Don't subtract", "Don't subtract anything. I take care of the deductions."],
     ['Outside: width', 'Step 1: measure the width of the outside of the frame (trim to trim). Text it to me.'],
     ['Outside: height', 'Step 2: measure from where you want the top of the shade (usually 3–4" above the frame) down to the sill, or to where you want it to end.'],
@@ -42,12 +42,12 @@ export const GROUPS = [
   { id: 'check', title: "Dana's check", stages: ['measuring', 'ready_to_quote'], items: [
     ['Read back', '[readback]'],
     ['Re-measure one', 'One quick check: [window] came out a bit wider than [other window]. Mind re-measuring the width on that one? Want to make sure it\'s perfect.'],
-    ['Missing photo', 'Got the numbers, thank you! Can you send a close-up of a top corner with the tape showing the depth? That\'s the one I need for your fit guarantee.'],
+    ['Missing photo', 'Got the numbers, thank you! Can you send a close-up of a top corner with the tape showing the depth? That\'s the one I need to check the fit.'],
     ['Did you deduct?', 'Did you take anything off these numbers? I just need the exact opening, wall to wall. I make the adjustments.'],
-    ['All good', "Your measurements look great. I've checked them, so you're covered: measure wrong and we remake it free (one remake per shade, within 30 days of delivery). Putting your quote together now."],
+    ['All good', "Your measurements look great. I've checked them. Putting your quote together now."],
   ] },
   { id: 'quote', title: 'Quote & price', stages: ['ready_to_quote', 'quoted'], items: [
-    ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked, so the fit guarantee applies. Want me to lock it in?"],
+    ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked. Want me to lock it in?"],
     ['Quote as text', '[quote text]'],
     ['Why not $209?', "Fair question! $209 is our smallest roller (24 × 24). Yours is a [size] [type] in [fabric], and the size and [fabric/lining/fold] are what bring it to $[ ]. Every shade is cut to your exact window."],
     ['More than expected', 'Totally get it. Thanks for telling me. Want me to show you a couple of ways to bring it down? Same look, different trade-offs.'],
@@ -55,14 +55,14 @@ export const GROUPS = [
     ['Amazon is cheaper', "For stock sizes they can be, and for a rental that might be the right call, honestly. Ours are cut to your exact window, and I check your measurements myself so the fit is guaranteed. If it doesn't fit, we remake it. Stock shades usually leave gaps or need trimming."],
   ] },
   { id: 'close', title: 'Close & pay', stages: ['quoted', 'paid'], items: [
-    ['Lock it in', 'Want me to lock this in? Once you pay, it goes into production and ships in 2–4 weeks.'],
+    ['Lock it in', 'Want me to lock this in? Once you pay, it goes into production and it's at your house in about 2–3 weeks.'],
     ['Anything to change', 'Anything you want to change before I send it to production, like fabric, color or a window?'],
     ['Order confirmed', "You're all set! Order #[#] for [n] shades is in. I'll text you when it ships. Thank you, [name]!"],
   ] },
   { id: 'after', title: 'After the order', stages: ['paid', 'ordered', 'shipped', 'delivered', 'review_asked'], items: [
     ['In production', 'Your [room] shades are being made! Still on track to ship by [date].'],
     ['Shipped', "They're on the way! Tracking: [link]."],
-    ['Delivered', "Your shades should be there! Here's a quick install guide: [link — TBD]. Any handyman can do it in about 15–20 min a shade. Text me with any questions."],
+    ['Delivered', "Your shades should be there! Here's a quick install guide: [link — TBD]. Any handyman can do it too. Text me with any questions."],
     ['A week later', "How do the [room] shades look? I'd love a photo if you're up for it."],
   ] },
   { id: 'follow', title: 'Follow-ups (max 3)', stages: [], items: [
@@ -71,10 +71,10 @@ export const GROUPS = [
     ['Nudge 3 (7 days)', "I don't want to bug you, so this is my last text. Your design is saved here: [look link] Whenever you're ready, just reply and I'll pick right up."],
   ] },
   { id: 'obj', title: 'Objections', stages: [], items: [
-    ['Do you install?', "We don't install, but it's easy: two brackets, a few screws, a drill. Most people do it in 15–20 min a shade, and any handyman can too. I'll send you a how-to when they arrive."],
+    ['Do you install?', "We don't install, but it's easy: two brackets, a few screws, a drill. Most people do it themselves, and any handyman can too. I'll send you a how-to when they arrive."],
     ['Scared to measure', "Totally normal, and it's exactly why I'm here. I walk you through it one step at a time, then I check every number and photo. If I've checked it and it doesn't fit, we remake it."],
     ['Spouse needs to see', 'Of course! Here\'s your design to forward to whoever gets a vote: [look link]'],
-    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements: and if you measured wrong, we remake it free (one remake per shade, within 30 days of delivery). Defects and shipping damage are covered too."],
+    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements. Defects and shipping damage are covered too."],
     ['Just looking', "No rush at all. Want me to mail swatches so you have them when you're ready? Otherwise I'll be here."],
   ] },
 ];

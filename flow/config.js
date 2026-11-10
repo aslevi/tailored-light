@@ -1,5 +1,5 @@
 // Shared settings for Hello Shade flow pages. Change Dana's number here only.
-export const DANA_SMS = '+12017453300';
+export const DANA_SMS = ''; // business texting line goes here; '' = not live yet (buttons go to the contact page)
 // Public contact email for policy pages. Leave '' to hide the email line.
 export const CONTACT_EMAIL = '';
 // Samples ($10 for up to 5 fabrics, credited to the shade order). Leave '' and the samples button texts a designer,
@@ -15,7 +15,7 @@ export const LEAD_FORM_URL = '';
 // there to find the window corners, then lets the customer nudge them. See server/detect-window/README.md.
 export const DETECT_URL = '';
 // Reply-time line (used in the studio if shown).
-export const REPLY_PROMISE = 'We usually reply within minutes.';
+export const REPLY_PROMISE = '';
 // The designer card next to "Text a designer". DESIGNER_PHOTO: path or URL of a real team photo.
 // Leave '' to show a monogram (gold circle, first initial).
 export const DESIGNER_NAME = 'Dana';
@@ -34,6 +34,7 @@ export const PEOPLE_PHOTOS = {
 };
 export const BRAND = { name:'Hello Shade', cream:'#FBF6F0', surface:'#FFFDFB', blush:'#F3DCD3', rose:'#A9594A', roseHover:'#8E4A3D', honey:'#E8AE45', cocoa:'#4A3530', muted:'#7A5F57' };
 export const isIOS = () => /iPhone|iPad|Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document || /iPhone|iPad/i.test(navigator.userAgent);
-export const smsHref = (num, body) => `sms:${num}${isIOS() ? '&' : '?'}body=${encodeURIComponent(body)}`;
+// No texting line yet: every "Text a designer" goes to the contact page.
+export const smsHref = (num, body) => num ? `sms:${num}${isIOS() ? '&' : '?'}body=${encodeURIComponent(body)}` : new URL('/contact.html', location.href).href;
 export const b64urlEncode = obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 export const b64urlDecode = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));

@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var DANA_PHONE = '+12017453300';
+  var DANA_PHONE = ''; // business texting line; '' = not live yet
   var DAY = 86400000;
 
   function iso(offsetDays) {
@@ -132,6 +132,7 @@
   }
 
   function smsHref(body) {
+    if (!DANA_PHONE) return '/contact.html';
     return 'sms:' + DANA_PHONE + '?&body=' + encodeURIComponent(body || '');
   }
 

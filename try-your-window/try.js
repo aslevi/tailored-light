@@ -5,7 +5,7 @@ import { CATALOG } from './catalog-lite.js';
 import { fromPrice, money, ESTIMATE_NOTE } from '../flow/pricing.js';
 import { DETECT_URL } from '../flow/config.js';
 
-const PHONE = '+12017453300';
+const PHONE = ''; // business texting line; '' = not live yet
 const DEFAULT_CORNERS = [[0.24, 0.2], [0.76, 0.2], [0.76, 0.72], [0.24, 0.72]];
 const DETECT_PX = 768;          // long side of the copy we send (enough for ~2-3% corner accuracy, ~40-90 KB)
 const DETECT_TIMEOUT_MS = 4000; // after this, keep the default dots and let the customer drag
@@ -99,7 +99,7 @@ function renderPrice() {
   const body = state.photo && !state.sample
     ? `Hi! I tried on the ${productName()} in ${state.color.name} (${state.level}) on my window with Try on. Can you help me with size and price? I'm attaching a photo of my window.`
     : `Hi! I tried on the ${productName()} in ${state.color.name} (${state.level}) with Try on. Can you help me with size and price? I'll attach a photo of my window.`;
-  $('textBtn').href = `sms:${PHONE}?body=${encodeURIComponent(body)}`;
+  $('textBtn').href = PHONE ? `sms:${PHONE}?body=${encodeURIComponent(body)}` : '/contact.html';
 }
 function setRangeFill(el) { el.style.setProperty('--p', el.value + '%'); }
 const dropEl = $('drop'), nightEl = $('night');
