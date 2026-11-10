@@ -12,7 +12,8 @@
     "export:mechanisms": "node scripts/verify-mechanisms.mjs --export",
     "prepare:hybrid": "node scripts/prepare-hybrid-assets.mjs",
     "verify:hybrid": "node scripts/verify-hybrid-build.mjs",
-    "verify:room": "node scripts/verify-room-response.mjs"
+    "verify:room": "node scripts/verify-room-response.mjs",
+    "publish": "vite build && node scripts/publish.mjs"
   },
   "dependencies": { "three": "0.180.0" },
   "devDependencies": { "@napi-rs/canvas": "0.1.80", "gltf-validator": "2.0.0-dev.3.10", "vite": "8.3.5" }

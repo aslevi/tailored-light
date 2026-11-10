@@ -461,3 +461,31 @@ header.sh{display:none!important}
 
 .room-menu .own-win{display:flex;align-items:center;min-height:44px;padding:0 12px;border-bottom:1px solid #EAD7CE;margin-bottom:4px;color:#A9594A;font:600 15px DM Sans,sans-serif;text-decoration:none;border-radius:10px}.room-menu .own-win:hover{background:#fbf6f0}
 .room-menu{max-height:min(60vh,310px);overflow-y:auto}
+
+/* ---------- Calm pass (Nov 2026): fewer floating pills, one accent, quieter panel ---------- */
+/* Stage: drop the duplicate logo pill and the tagline bubble; the X already goes home. */
+.topbar .tb-brand,.topbar .intro-line{display:none!important}
+.stage{background:#FBF6F0}
+#viewport{border-radius:14px}
+.room-pill,.close-btn,.dtn{box-shadow:0 1px 6px #4A35301a!important;background:#FFFDFBf2!important}
+.dtn{padding:5px 12px!important;gap:6px!important}
+.dtn label{font:500 13px 'DM Sans',sans-serif!important}
+.dtn svg{width:16px!important;height:16px!important}
+.swipe-hint{display:none!important}
+/* Panel */
+.panel{background:#FBF6F0!important;border-left:1px solid #4A353014!important}
+.rec{background:transparent!important;border:0!important;border-bottom:1px solid #4A35301f!important;border-radius:0!important;padding:0 0 14px!important}
+.rec p{font-size:13.5px!important;color:#7A5F57!important}
+.rec p b{color:#4A3530;font-weight:600!important}
+#rec-apply{background:transparent!important;color:#4A3530!important;border:1px solid #4A3530!important;font-weight:500!important}
+#rec-apply[aria-pressed=true]{border-color:#4A353033!important;color:#7A5F57!important}
+#rec-apply[aria-pressed=true]::before{border-color:#7A5F57!important}
+.step h3{font:600 11.5px 'DM Sans',sans-serif!important;letter-spacing:.1em;text-transform:uppercase;color:#7A5F57!important}
+.step h3 span span{display:none}
+.step h3 em{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500!important;color:#4A3530!important}
+.style-chips button{font-weight:500!important}
+.style-chips button[aria-pressed=true],.bo-chip[aria-pressed=true],.chips button[aria-pressed=true]{background:#4A3530!important;color:#FFF8EE!important;border-color:#4A3530!important}
+/* One primary action: rose-clay pill */
+.cta{background:#A9594A!important;color:#FFFFFF!important;border-radius:999px!important;box-shadow:none!important}
+.cta small,.cta .cta-text small{color:#FFFFFF!important;opacity:.85!important}
+.size-link{color:#4A3530!important;font-weight:500!important;text-decoration:underline;text-decoration-color:#4A353059;text-underline-offset:4px}

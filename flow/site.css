@@ -901,3 +901,19 @@ h1 em,main h2 em{font-style:italic;font-weight:350;color:var(--ink);font-variati
 .chip-btn[aria-pressed="true"],.style-nav a[aria-current]{background:var(--ink);border-color:var(--ink);color:#FFF8EE}
 .aeo-about h2{font-size:clamp(26px,3.4vw,34px)}
 .seg button[aria-pressed=true]{background:var(--ink);color:#FFF8EE}
+
+/* ---------- Consistency pass: rose-clay only on primary buttons ---------- */
+.eyebrow,.band.light .eyebrow,.pinfo .badge{color:var(--muted)}
+.crumbs a,.list-hero .crumbs a{color:var(--muted);text-decoration-color:rgba(74,53,48,.3)}
+.text-link,.optin a,.answer a,.doc a:not(.btn),.see-room,.try.text-link{color:var(--ink)}
+.checks li::before{background:var(--ink)}
+.stile[aria-pressed=true] i{background:var(--ink)}
+.type-chips button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#FFF8EE}
+.seg button[aria-pressed=true]{background:var(--ink);color:#FFF8EE;font-weight:600}
+.tag{color:var(--muted);border-color:rgba(74,53,48,.18)}
+.tag.dark{background:var(--ink);color:#FFF8EE;border-color:var(--ink)}
+/* "Want a hand?" bands: calm card, outlined secondary */
+.band{background:var(--paper);border:1px solid rgba(74,53,48,.1);border-radius:14px}
+.band .btn.gold{background:transparent;color:var(--ink);border-color:var(--ink)}
+.band .btn.gold:hover{background:var(--ink);color:#FFF8EE}
+.fit-band svg{color:var(--ink)}

@@ -66,3 +66,9 @@ h1,h2,h3{font-family:var(--serif);font-weight:500;font-variation-settings:'SOFT'
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (min-width:640px){.page-head h1{font-size:42px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Consistency pass (Nov 2026): rose-clay for the main action only; secondary actions outlined in cocoa. */
+.btn.gold{background:transparent;color:var(--cocoa);box-shadow:inset 0 0 0 1.5px var(--cocoa)}
+.btn.gold:hover{background:var(--cocoa);color:#FFF8EE}
+.btn.ghost{color:var(--cocoa);box-shadow:inset 0 0 0 1.5px var(--cocoa)}
+.btn.ghost:hover{background:var(--cocoa);color:#FFF8EE}

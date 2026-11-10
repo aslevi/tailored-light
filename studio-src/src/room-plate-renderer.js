@@ -51,24 +51,33 @@ export function createRoomPlateRenderer(host){
  void main(){
   vec2 p=vec2(st.x*1536.,(1.-st.y)*1024.);
   vec3 b=texture2D(base,st).rgb;
-  vec3 bb=blurred(base,st);
-  vec3 weights=vec3(.2126,.7152,.0722);
-  float baseline=max(dot(bb,weights),.06);
-  float cg=clamp(dot(blurred(ceilingMap,st)-bb,weights)/baseline,0.,1.3);
-  float lg=clamp(dot(blurred(lampMap,st)-bb,weights)/baseline,0.,1.6);
+  // Artificial light is synthesized from the base plate only. The separately generated lamp/ceiling plates
+  // don't line up pixel-for-pixel with the base, and blending them caused a doubled "ghost" lamp and pole.
+  vec2 dl=(p-lampPosition)*vec2(1.,.82);
+  float lg=1.25*pow(1.-smoothstep(0.,640.,length(dl)),1.6);
+  // brighter wash on the wall straight above and below the shade
+  float ady=abs(p.y-lampPosition.y);
+  float cone=exp(-abs(p.x-lampPosition.x)/85.)*(1.-smoothstep(60.,420.,ady))*smoothstep(20.,110.,ady);
+  lg+=.55*cone;
+  vec2 dc=(p-fixture.xy)*vec2(.62,1.);
+  float cg=1.05*pow(1.-smoothstep(0.,980.,length(dc)),1.3);
   // Keep artificial light out of the exterior and confine lamp illumination.
   float outside=step(504.,p.x)*step(p.x,1040.)*step(154.,p.y)*step(p.y,535.);
-  float nearLamp=1.-smoothstep(190.,570.,length((p-lampPosition)*vec2(1.,.75)));
+  float nearLamp=1.-smoothstep(190.,620.,length((p-lampPosition)*vec2(1.,.75)));
   vec3 daylightTint=mix(vec3(.88,.95,1.08),vec3(1.04,1.,.94),warm);
   daylightTint=mix(daylightTint,vec3(1.24,.80,.55),dusk*.9);
   daylightTint=mix(daylightTint,vec3(.48,.62,.90),night);
   vec3 color=b*dayLevel*daylightTint;
   color+=b*(cg+.22)*vec3(1.,.88,.70)*ceilingLevel*(1.-outside);
   color+=b*(lg+.12)*vec3(1.,.79,.52)*lampLevel*nearLamp*(1.-outside);
+  // Glowing lamp shade and fixture: brighten the base plate's own pixels (no second image, so no ghost).
+  vec2 ld=abs(p-lampPosition)/vec2(60.,46.);
+  float lampMask=(1.-smoothstep(.82,1.04,ld.x))*(1.-smoothstep(.82,1.04,ld.y))*(1.-outside);
   float fixtureMask=(1.-smoothstep(.85,1.05,length((p-fixture.xy)/fixture.zw)))*(1.-outside);
-  float lampMask=(1.-smoothstep(.75,1.1,length((p-lampPosition)/vec2(60.,48.))))*(1.-outside);
-  color=mix(color,max(color,texture2D(ceilingMap,st).rgb),fixtureMask*ceilingLevel);
-  color=mix(color,max(color,texture2D(lampMap,st).rgb),lampMask*lampLevel);
+  vec3 glowL=b*vec3(2.05,1.70,1.18)+vec3(.10,.07,.03);
+  vec3 glowC=b*vec3(1.85,1.65,1.30)+vec3(.08,.07,.05);
+  color=mix(color,max(color,glowL),lampMask*lampLevel);
+  color=mix(color,max(color,glowC),fixtureMask*ceilingLevel);
   // Sunlight through the window, traced with simple perspective. Wall plane = image plane (px).
   // Camera distance D, eye line E. Sun elevation tan sunElev, sideways drift sunAz per px of depth.
   // Sharp light only through the open part of the window; the shade blocks it, a light-filtering
@@ -120,12 +129,12 @@ export function createRoomPlateRenderer(host){
  return {
   async load(room){
    const ticket=++generation;
-   const result=await Promise.allSettled(['day','ceiling','lamp'].map(kind=>loadPlate(new URL(roomAsset(room.id,kind),document.baseURI).href)));
+   const result=await Promise.allSettled(['day'].map(kind=>loadPlate(new URL(roomAsset(room.id,kind),document.baseURI).href)));
    const loaded=result.filter(x=>x.status==='fulfilled').map(x=>x.value);
    if(ticket!==generation||result.some(x=>x.status==='rejected')){loaded.forEach(t=>t.dispose());if(ticket===generation)throw new Error('Room artwork failed to load');return false;}
    loaded.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;});
    textures.forEach(t=>t.dispose());textures=loaded;
-   [u.base.value,u.ceilingMap.value,u.lampMap.value]=loaded;
+   [u.base.value]=loaded;u.ceilingMap.value=loaded[0];u.lampMap.value=loaded[0];
    u.fixture.value.set(...room.fixture);u.floorY.value=room.floor||660;u.lampPosition.value.set(...room.lamp);ready=true;return loaded[0];
   },
   update(state,response){
