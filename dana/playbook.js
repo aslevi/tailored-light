@@ -11,7 +11,7 @@ export const GROUPS = [
     ['Kit: address', "I'll put in [color] plus 2–3 that I think would also work in a [room]. What's the best mailing address?"],
     ['Kit offer', "Want to feel it first? I'll mail you samples: up to 5 fabrics for $10, and the $10 comes off your order. I'll include [color] plus a couple I think you'll like."],
     ['Ready buyer', "You can skip swatches if you're happy with [color]. Or I can send them and we measure while they're in the mail, no time lost."],
-    ['Kit shipped', "Your swatches are on the way! Tip: tape them to the window and look at them morning and evening. While you wait, want to measure? Takes about 10 minutes and I'll walk you through it."],
+    ['Kit shipped', "Your swatches are on the way! Tip: tape them to the window and look at them morning and evening. While you wait, want to measure? I'll walk you through it."],
   ] },
   { id: 'qualify', title: 'Qualify & recommend', stages: ['new', 'qualified'], items: [
     ['Rooms', 'Which rooms are you thinking about?'],
@@ -29,12 +29,12 @@ export const GROUPS = [
   ] },
   { id: 'measure', title: 'Measuring', stages: ['swatches', 'measuring'], items: [
     ['Send the form', "Here's a quick guide that walks you through measuring your [room] window, one step at a time: [measure link] When you hit send it comes right back to me, and I'll check every number."],
-    ['Set up', "Great, let's measure! You'll need a metal tape measure (not a sewing tape). Takes about 10 minutes for [n] windows. Ready?"],
+    ['Set up', "Great, let's measure! You'll need a metal tape measure (not a sewing tape). Ready?"],
     ['Inside or outside', 'First choice: inside the window frame (clean, built-in look) or on the wall above it (blocks more light, makes the window look bigger)?'],
     ['Inside: width', 'Step 1, width: measure inside the frame, side to side, at the top, middle and bottom. Text me all three, to the nearest 1/8".'],
     ['Inside: height', 'Step 2, height: measure from the top inside of the frame down to the sill, on the left, middle and right. Text me all three.'],
     ['Inside: depth', 'Step 3, depth: how deep is the frame, from the glass (or window crank) out to the front edge?'],
-    ['Tape photo', 'Last thing: a photo of the tape in place for one width and one height. That\'s how I double-check it.'],
+    ['Tape photo', 'Last thing: a photo of the tape in place for one width and one height. That\'s how I double-check it for your fit guarantee.'],
     ["Don't subtract", "Don't subtract anything. I take care of the deductions."],
     ['Outside: width', 'Step 1: measure the width of the outside of the frame (trim to trim). Text it to me.'],
     ['Outside: height', 'Step 2: measure from where you want the top of the shade (usually 3–4" above the frame) down to the sill, or to where you want it to end.'],
@@ -42,12 +42,12 @@ export const GROUPS = [
   { id: 'check', title: "Dana's check", stages: ['measuring', 'ready_to_quote'], items: [
     ['Read back', '[readback]'],
     ['Re-measure one', 'One quick check: [window] came out a bit wider than [other window]. Mind re-measuring the width on that one? Want to make sure it\'s perfect.'],
-    ['Missing photo', 'Got the numbers, thank you! Can you send a close-up of a top corner with the tape showing the depth? That\'s the one I need to check the fit.'],
+    ['Missing photo', 'Got the numbers, thank you! Can you send a close-up of a top corner with the tape showing the depth? That\'s the one I need for your fit guarantee.'],
     ['Did you deduct?', 'Did you take anything off these numbers? I just need the exact opening, wall to wall. I make the adjustments.'],
-    ['All good', "Your measurements look great. I've checked them. Putting your quote together now."],
+    ['All good', "Your measurements look great. I've checked them, so you're covered: measure wrong and we remake it free (one remake per shade, within 30 days of delivery). Putting your quote together now."],
   ] },
   { id: 'quote', title: 'Quote & price', stages: ['ready_to_quote', 'quoted'], items: [
-    ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked. Want me to lock it in?"],
+    ['Send quote link', "Here's your quote, [name]: [quote link] Measurements checked, so the fit guarantee applies. Want me to lock it in?"],
     ['Quote as text', '[quote text]'],
     ['Why not $209?', "Fair question! $209 is our smallest roller (24 × 24). Yours is a [size] [type] in [fabric], and the size and [fabric/lining/fold] are what bring it to $[ ]. Every shade is cut to your exact window."],
     ['More than expected', 'Totally get it. Thanks for telling me. Want me to show you a couple of ways to bring it down? Same look, different trade-offs.'],
@@ -74,7 +74,7 @@ export const GROUPS = [
     ['Do you install?', "We don't install, but it's easy: two brackets, a few screws, a drill. Most people do it themselves, and any handyman can too. I'll send you a how-to when they arrive."],
     ['Scared to measure', "Totally normal, and it's exactly why I'm here. I walk you through it one step at a time, then I check every number and photo. If I've checked it and it doesn't fit, we remake it."],
     ['Spouse needs to see', 'Of course! Here\'s your design to forward to whoever gets a vote: [look link]'],
-    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements. Defects and shipping damage are covered too."],
+    ['Returns', "Because each shade is made for your exact window, we can't take returns for a change of mind. That's why I send swatches and check your measurements: and if you measured wrong, we remake it free (one remake per shade, within 30 days of delivery). Defects and shipping damage are covered too."],
     ['Just looking', "No rush at all. Want me to mail swatches so you have them when you're ready? Otherwise I'll be here."],
   ] },
 ];

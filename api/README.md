@@ -45,4 +45,4 @@ Never put an Airtable token here. Everything in this folder is public.
 }
 ```
 
-All dates are `YYYY-MM-DD` or `null`. The estimated ship window is worked out on the page from `paidDate`. (`freeRemakeUntil` is no longer shown.) If that's empty.
+All dates are `YYYY-MM-DD` or `null`. The estimated ship window is worked out on the page as 2–3 weeks from `paidDate`. Fit guarantee runs to `freeRemakeUntil`, or `deliveredDate` + 30 days if that's empty.

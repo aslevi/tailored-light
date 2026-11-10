@@ -368,7 +368,7 @@ const touched=new Set();
 function engaged(kind){touched.add(kind);if(kind==='swipe')document.body.classList.add('swiped');if(kind==='drag')document.body.classList.add('dragged');if(kind==='lamp'||kind==='ceiling')document.body.classList.add('lit');danaSays();}
 function danaSays(){const room=ROOMS.find(r=>r.id===state.room).label.toLowerCase();
  const lines=[`<strong>Dana</strong> · Ooh, ${state.family} in ${state.colorName} would be lovely in a ${room}. Text me a photo of your window and I'll show you.`,
-  `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed. Takes about two minutes.`,
+  `<strong>Dana</strong> · Measure with me by text and your fit is guaranteed.`,
   `<strong>Dana</strong> · Want to feel it first? I'll mail you samples: up to 5 fabrics for $10, and the $10 comes off your order.`];
  const i=Math.min(lines.length-1,Math.floor((touched.size-1)/3));}
 let toastTimer;function toast(html){$('dana-line').innerHTML=html;$('dana').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('dana').classList.remove('show'),6500);}

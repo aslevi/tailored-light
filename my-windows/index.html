@@ -194,14 +194,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var html = '<div class="page-head"><p class="eyebrow">' + esc(name ? name + '’s project' : 'Your project') + (d.customer && d.customer.designCode ? ' · ' + esc(d.customer.designCode) : '') + '</p>' +
       '<h1>My windows</h1><p>' + ws.length + ' window' + (ws.length === 1 ? '' : 's') + ' · ' + checked + ' checked by Dana</p></div>';
     if (!ws.length) {
-      html += '<div class="card next"><h2>No windows yet</h2><p>Start with one window. It takes about 10 minutes.</p><div class="actions"><a class="btn" href="../how-to-measure/">How to measure</a></div></div>';
+      html += '<div class="card next"><h2>No windows yet</h2><p>Start with one window.</p><div class="actions"><a class="btn" href="../how-to-measure/">How to measure</a></div></div>';
     } else {
       html += '<ul class="list">' + ws.map(card).join('') + '</ul>';
       html += '<div class="card total"><span class="lbl">Your price<span class="sub">' + ws.length + ' shade' + (ws.length === 1 ? '' : 's') + '</span></span><span class="amt">' + esc(HS.money(d.total)) + '</span></div>';
     }
     html += nextStep(d);
     html += '<aside class="note" aria-labelledby="fit-h"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 3l9 3.5v6.8c0 5.6-3.8 10-9 11.7-5.2-1.7-9-6.1-9-11.7V6.5L14 3z" fill="#F3DCD3" stroke="#A9594A" stroke-width="1.6"/><path d="M9.5 14.2l3.1 3 5.9-6" stroke="#4E8B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-      '<div><h2 id="fit-h">We check your numbers</h2><p>Send your numbers and photos, and Dana checks every one before anything is made. <a href="../how-to-measure/">How to measure</a></p></div></aside>';
+      '<div><h2 id="fit-h">Fit guarantee</h2><p>Send your numbers and photos, and once Dana checks them, the fit is on us. If a checked shade doesn’t fit, we remake it free within 30 days of delivery. <a href="../how-it-works/#fit">How it works</a></p></div></aside>';
     main.innerHTML = html;
     main.setAttribute('aria-busy', 'false');
   }

@@ -111,12 +111,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var panels = {
       samples: 'Your samples are on the way. Hold them up to the window in daylight and at night.',
-      measured: 'Measure each window and text Dana your numbers and a photo of the tape. It takes about 10 minutes a window.',
+      measured: 'Measure each window and text Dana your numbers and a photo of the tape.',
       checked: 'Dana is checking every number and photo before anything is made. You’ll get a text when she’s done.',
       paid: 'Everything’s checked. Pay when you’re ready and we’ll start making your shades.',
       prod: 'Your shades are being made to your exact size.' + (shipFrom ? ' Estimated to ship <b>' + esc(HS.date(shipFrom)) + ' \u2013 ' + esc(HS.date(shipTo)) + '</b>.' : ''),
       shipped: 'Your shades are on the way.' + (trackHref ? '' : ' Tracking will show here as soon as the carrier scans the box.'),
-      installed: 'Your shades have arrived. Most go up in about 15 minutes with a drill and a pencil.'
+      installed: 'Your shades have arrived. All you need is a drill and a pencil.'
     };
     var curKey = cur >= 0 ? steps[cur].key : null;
 
@@ -154,7 +154,9 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (curKey === 'prod') { headline = o.orderedDate ? 'In production' : 'Paid \u2014 ordering now'; if (shipFrom) eta = 'Estimated ship window: <b>' + esc(HS.date(shipFrom)) + ' \u2013 ' + esc(HS.date(shipTo)) + '</b>'; }
     else { headline = steps[cur].name === 'Paid' ? 'Ready to pay' : 'Getting ready'; eta = 'At your house about 2–3 weeks after payment.'; }
 
-    var fit = 'Open each box and check every shade before you hang it. If anything arrived damaged or doesn’t match your order, text us a photo and we’ll fix it.';
+    var fit = remakeUntil
+      ? 'Fit guarantee until ' + esc(HS.date(remakeUntil, { month: 'long', day: 'numeric', year: 'numeric' })) + '. If a checked shade doesn’t fit, we remake it free.'
+      : 'Once your shades arrive, you have 30 days for a free remake if a checked shade doesn’t fit.';
 
     main.innerHTML =
       '<div class="page-head"><p class="eyebrow">' + esc(o.name || 'Your order') + (c.designCode ? ' · ' + esc(c.designCode) : '') + '</p><h1>Order status</h1></div>' +
@@ -164,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         (o.projectToken ? '<a href="../my-windows/?t=' + encodeURIComponent(o.projectToken) + '">See my windows</a>' : '') + '</div></section>' +
       '<ol class="timeline" aria-label="Order progress">' + tl + '</ol>' +
       '<aside class="note" aria-labelledby="fit-h"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 3l9 3.5v6.8c0 5.6-3.8 10-9 11.7-5.2-1.7-9-6.1-9-11.7V6.5L14 3z" fill="#F3DCD3" stroke="#A9594A" stroke-width="1.6"/><path d="M9.5 14.2l3.1 3 5.9-6" stroke="#4E8B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-        '<div><h2 id="fit-h">When your shades arrive</h2><p>' + fit + '</p></div></aside>' +
+        '<div><h2 id="fit-h">Fit guarantee</h2><p>' + fit + ' <a href="../how-it-works/#fit">Details</a></p></div></aside>' +
       '<div class="cta"><a class="btn ghost" href="../how-to-install/">Install guide</a><a class="btn gold" href="' + esc(sms) + '">Text Dana</a></div>';
     main.setAttribute('aria-busy', 'false');
   }
