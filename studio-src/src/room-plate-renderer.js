@@ -98,7 +98,7 @@ export function createRoomPlateRenderer(host){
    float inXs=smoothstep(536.-sx,536.+sx,xw)*(1.-smoothstep(1008.-sx,1008.+sx,xw));
    float inCloth=smoothstep(182.-sx,182.+sx,yw)*(1.-smoothstep(top-sx,top+sx,yw));
    float fade=1.-smoothstep(700.,1700.,Z);
-   float lit=(inX*inOpen+inXs*inCloth*trans*.35)*fade;
+   float lit=(inX*inOpen+inXs*inCloth*trans*.62)*fade;
    // light adds in proportion to the surface it lands on (rugs and wood brighten, shadows stay)
    color+=b*lit*sunAmt*sunCol*(.6+.3*smoothstep(.1,.5,lum));
   }
@@ -118,8 +118,8 @@ export function createRoomPlateRenderer(host){
   // a little bounce light around the window when the sun is in
   if(sunAmt>0.){
    vec2 wc=vec2(772.,(top+508.)*.5);
-   float halo=(1.-smoothstep(140.,520.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
-   color+=b*halo*sunAmt*(.07*openFrac+.03*trans)*sunCol;
+   float halo=(1.-smoothstep(120.,640.,length((p-wc)*vec2(.8,1.))))*(1.-outside);
+   color+=b*halo*sunAmt*(.07*openFrac+.13*trans)*sunCol;
   }
   gl_FragColor=vec4(color,1.);
   #include <colorspace_fragment>

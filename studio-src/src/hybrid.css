@@ -489,3 +489,22 @@ header.sh{display:none!important}
 .cta{background:#A9594A!important;color:#FFFFFF!important;border-radius:999px!important;box-shadow:none!important}
 .cta small,.cta .cta-text small{color:#FFFFFF!important;opacity:.85!important}
 .size-link{color:#4A3530!important;font-weight:500!important;text-decoration:underline;text-decoration-color:#4A353059;text-underline-offset:4px}
+
+/* Warm glow on light-filtering fabric (opacity set from time of day and fabric openness) */
+#window-glow{position:absolute;left:32.8%;top:15.04%;width:34.9%;height:0;pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen;
+ background:radial-gradient(ellipse 70% 85% at 50% 40%,rgba(255,240,214,.55),rgba(255,226,180,.22) 55%,rgba(255,226,180,0) 80%);transition:opacity .4s,height .2s}
+/* Desktop: frame the room a little tighter so the window sits front and center */
+@media (min-width:900px){
+ #composition{inset:auto!important;top:0;left:-9%;width:118%;height:118%}
+}
+
+#window-glow{background:radial-gradient(ellipse 95% 110% at 50% 35%,rgba(255,236,200,.58),rgba(255,224,176,.28) 55%,rgba(255,224,176,0) 85%)}
+.zoomctl{position:absolute;right:10px;bottom:10px;z-index:7;display:flex;gap:2px;padding:4px;border-radius:999px;background:#FFFDFBf2;box-shadow:0 1px 6px #4A35301a}
+.zoomctl button{width:36px;height:36px;border-radius:50%;background:transparent;display:grid;place-items:center}
+.zoomctl button:hover{background:#4A35300f}
+.zoomctl button:disabled{opacity:.35;cursor:default}
+.zoomctl svg{width:18px;height:18px;fill:none;stroke:#4A3530;stroke-width:2;stroke-linecap:round}
+/* Phones and portrait tablets: a little tighter on the window too */
+@media(max-width:700px),(orientation:portrait) and (max-width:1100px){
+ #composition{height:112%!important;width:calc(var(--room-h,58dvh) * 1.68)!important;left:calc(50% - var(--room-h,58dvh) * .84)!important}
+}

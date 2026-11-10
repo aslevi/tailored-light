@@ -74,6 +74,10 @@ function lighting(){
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
  const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4:.3;
  roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:154+(.07-by)/1.38*381},response);
+ {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
+  const g=$('window-glow'),cover=mechanism.state.actualDrop??state.drop,shadeBottom=154+(.07-by)/1.38*381;
+  g.style.height=((Math.max(shadeBottom,160)-154)/1024*100)+'%';
+  g.style.opacity=String(Math.min(.95,clothTrans*sun*2.1*Math.min(1,cover*3)));}
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
  ambient.intensity=response.ambient;key.intensity=response.bounce;fill.intensity=response.lampIntensity;
@@ -87,7 +91,7 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  m.emissive.copy(m.color).lerp(new THREE.Color('#fff2df'),.12);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
+  m.emissive.copy(m.color).lerp(new THREE.Color('#ffe9c6'),.24);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
@@ -325,7 +329,7 @@ $('zoom-out').addEventListener('click',()=>state.inspect?inspectZoom(1.15):setZo
 $('window-zoom').addEventListener('click',()=>{if(state.inspect)showInspect(false);setZoom(2.5);pan={x:0,y:.16*$('viewport').clientHeight*zoom};renderZoom();});
 $('reset-view').addEventListener('click',()=>{if(state.inspect)showInspect(false);setZoom(1);});
 const pointers=new Map();let pinchStart=null;
-$('viewport').addEventListener('pointerdown',e=>{if(state.inspect||e.target.closest('button'))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const p=[...pointers.values()];pinchStart=null&&{distance:Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),zoom};}else if(zoom>1){drag={x:e.clientX,y:e.clientY,pan:{...pan}};$('viewport').setPointerCapture(e.pointerId);$('viewport').classList.add('dragging');}});
+$('viewport').addEventListener('pointerdown',e=>{if(state.inspect||e.target.closest('button'))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const p=[...pointers.values()];pinchStart={distance:Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y),zoom};}else if(zoom>1){drag={x:e.clientX,y:e.clientY,pan:{...pan}};$('viewport').setPointerCapture(e.pointerId);$('viewport').classList.add('dragging');}});
 $('viewport').addEventListener('pointermove',e=>{if(state.inspect)return;if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&pinchStart){const p=[...pointers.values()];setZoom(pinchStart.zoom*Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y)/pinchStart.distance);}else if(drag){pan={x:drag.pan.x+e.clientX-drag.x,y:drag.pan.y+e.clientY-drag.y};renderZoom();}});
 for(const type of['pointerup','pointercancel'])$('viewport').addEventListener(type,e=>{pointers.delete(e.pointerId);drag=null;pinchStart=null;$('viewport').classList.remove('dragging');});
 $('viewport').addEventListener('wheel',e=>{if(state.inspect)return;if(e.ctrlKey||zoom>1){e.preventDefault();setZoom(zoom-e.deltaY*.003);}},{passive:false});

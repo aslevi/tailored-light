@@ -39,6 +39,6 @@ export function roomResponse({coverage=0,style='roman',fabric='linen',color='#d7
   environment:evening?.025:.06+.20*daylight,
   lampIntensity:lamp?5.8:0,
   // Mild diffuse cloth scattering, independent of the room-facing lamp.
-  backscatter:evening||opacity==='blackout'?0:(style==='zebra'?.035:clothTransmission*1.9)
+  backscatter:evening||opacity==='blackout'?0:(style==='zebra'?.06:clothTransmission*2.5)
  };
 }
