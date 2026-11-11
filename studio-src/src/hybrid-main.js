@@ -291,7 +291,7 @@ async function start3D(){try{
  await yieldUI();
  await warmShaders();
  await yieldUI();
- const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
+ const ro=new ResizeObserver(()=>{size();renderZoom();});ro.observe($('viewport'));size();refresh();setRoomHotspot(startRoom);frameWindow(startRoom);$('loading').remove();frame=requestAnimationFrame(frameLoop);
 }catch(error){$('loading').textContent='The shade viewer could not load. Please refresh or try a current browser.';console.error(error);}}
 start3D();
 document.addEventListener('click',e=>{
@@ -433,5 +433,15 @@ function applyWindow(room){
  const k=installation.setWindow(windowCorners(room),w.glass,{ownPhoto:room.id==='mine'});
  $('viewport').classList.toggle('own-room',room.id==='mine');
  if(Math.abs(k-winK)>1e-3){winK=k;if(mechanism)rebuild();}
- if(inspectCamera)size();
+ if(inspectCamera){size();frameWindow(room);}
+}
+// On phones the room view is small, so open "Your room" zoomed onto the window (pinch or − to see the room).
+function frameWindow(room){
+ const vp=$('viewport'),comp=$('composition');
+ if(room.id!=='mine'||vp.clientWidth>=700||state.inspect){if(zoom!==1)setZoom(1);return;}
+ setZoom(1);
+ const v=vp.getBoundingClientRect(),c=comp.getBoundingClientRect(),s=c.width/1536;
+ const want=.72*v.height/((OPEN.y1-OPEN.y0)*s);setZoom(want);
+ const ccx=c.left+c.width/2,ccy=c.top+c.height/2,wx=c.left+(OPEN.x0+OPEN.x1)/2*s,wy=c.top+(OPEN.y0+OPEN.y1)/2*s;
+ pan={x:v.left+v.width/2-ccx-(wx-ccx)*zoom,y:v.top+v.height/2-ccy-(wy-ccy)*zoom};renderZoom();
 }

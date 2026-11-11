@@ -23,15 +23,23 @@ POST /restyle     Content-Type: image/jpeg, raw JPEG body, <= 1.5 MB (the 1536 Ã
 ```
 
 1. The phone straightens the photo so the window faces the camera and places it where Try on expects windows (`/flow/room-plate.js`).
-2. The Worker sends that to an image model (`RESTYLE_MODEL`, default `google/gemini-3-pro-image-preview`) with a prompt that keeps the window, its trim and the view exactly where they are, keeps it bare, removes clutter and fills the edges.
+2. The Worker sends that to an image model (`RESTYLE_MODEL`, default `google/gemini-3.1-flash-lite-image`) with a prompt that keeps the window, its trim and the view exactly where they are, keeps it bare, removes clutter and fills the edges.
 3. Image models nudge the window a few percent, so the Worker finds it again in the result (same detector as above, plus the floor line).
 4. The phone squares that window up, saves the room on the phone (`/flow/my-room.js`, IndexedDB) and opens `/studio/?room=mine`. The shade is sized to that window.
 
-Any failure falls back to the straightened photo, so the customer always gets their room. Takes about 15-30 s. Cost is the image model's price per image (check OpenRouter; Gemini 3 Pro Image is roughly 10-15 cents) plus a fraction of a cent for detection. Set a spend limit on the key and a rate limit on the route (for example 5 restyles per hour per IP).
+Any failure falls back to the straightened photo, so the customer always gets their room. Takes about 15-30 s. Cost per room (OpenRouter prices, Nov 2026; one 1K image is about 1,120 output tokens):
+
+| Model | â‰ˆ per room | Notes |
+|---|---|---|
+| `google/gemini-3.1-flash-lite-image` (default) | $0.034 | Cheapest Gemini; same family as the one we tested. |
+| `openai/gpt-5-image-mini` | ~$0.01 | Cheapest overall; tends to redraw more of the room, so check the window stays the same. |
+| `google/gemini-3-pro-image-preview` | $0.13 | Tested on a real cluttered photo: best result. |
+
+Detection on the result adds well under a tenth of a cent. A rate limit (3 per minute per visitor) is in `wrangler.toml`, and the page never restyles the same photo twice. Also set a monthly spend limit on the OpenRouter key.
 
 | Var | Default | Notes |
 |---|---|---|
-| `RESTYLE_MODEL` | `google/gemini-3-pro-image-preview` | Any OpenRouter model that takes an image in and returns an image (`modalities: ["image","text"]`). |
+| `RESTYLE_MODEL` | `google/gemini-3.1-flash-lite-image` | Comma-separated; tried in order if one fails. Any OpenRouter model that takes an image in and returns one. |
 
 ## Privacy
 

@@ -9,7 +9,8 @@
 //   again in the result, because image models move things a little.
 //   200 {"image":"data:image/...;base64,...","windows":[...same as above...],"floor":0.82|null,"ms":21000}
 //
-// Env (restyle): RESTYLE_MODEL (optional, default google/gemini-3-pro-image-preview)
+// Env (restyle): RESTYLE_MODEL (optional, comma-separated, tried in order; default google/gemini-3.1-flash-lite-image)
+//                RESTYLE_LIMITER (optional rate-limit binding, see wrangler.toml)
 //
 // Env: OPENROUTER_API_KEY (secret, required), MODEL (optional), ALLOWED_ORIGINS (optional, comma separated),
 //      PROVIDER_ORDER (optional, comma separated OpenRouter provider slugs to try first; falls back to any other).
@@ -21,7 +22,9 @@ const UPSTREAM_TIMEOUT_MS = 8000;
 const MAX_WINDOWS = 6;
 const RESTYLE_MAX_BYTES = 1536 * 1024;
 const RESTYLE_TIMEOUT_MS = 90000;
-const DEFAULT_RESTYLE_MODEL = 'google/gemini-3-pro-image-preview';
+// Cheapest Google image model on OpenRouter (Nov 2026): ~1,120 image tokens × $30/M ≈ $0.034 per room.
+// Gemini 3 Pro Image (tested, best) is ≈ $0.13; openai/gpt-5-image-mini is ≈ $0.01 but redraws more of the scene.
+const DEFAULT_RESTYLE_MODEL = 'google/gemini-3.1-flash-lite-image';
 // Tested Nov 2026 on a cluttered, angled bedroom photo: keeps the window and its view, removes clutter,
 // fills the edges, squares up the room. The window still drifts a few percent, so we re-detect it after.
 const RESTYLE_PROMPT = "This is a customer's photo of their room, already straightened so the window faces the camera. " +
@@ -84,6 +87,12 @@ export default {
 
     const t0 = Date.now();
     if (restyle) {
+      // Spend guard: a few restyles per minute per visitor (binding is optional).
+      if (env.RESTYLE_LIMITER) {
+        const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+        const { success } = await env.RESTYLE_LIMITER.limit({ key: ip });
+        if (!success) return reply(429, { error: 'slow_down' });
+      }
       const img = await restyleImage('data:image/jpeg;base64,' + toBase64(bytes), env);
       if (img.error) return reply(img.status, { error: img.error });
       const found = await detect(img.url, env, true);
@@ -157,6 +166,15 @@ async function detect(imageUrl, env, withFloor) {
 
 // Image model via OpenRouter: returns {url: data URL} or {error, status}.
 async function restyleImage(dataUrl, env) {
+  const models = (env.RESTYLE_MODEL || DEFAULT_RESTYLE_MODEL).split(',').map(s => s.trim()).filter(Boolean);
+  let last = { error: 'not_configured', status: 500 };
+  for (const model of models) {
+    last = await restyleWith(model, dataUrl, env);
+    if (last.url || last.error === 'upstream_timeout') return last;
+  }
+  return last;
+}
+async function restyleWith(model, dataUrl, env) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), RESTYLE_TIMEOUT_MS);
   try {
@@ -170,7 +188,7 @@ async function restyleImage(dataUrl, env) {
         'X-Title': 'Hello Shade your room',
       },
       body: JSON.stringify({
-        model: env.RESTYLE_MODEL || DEFAULT_RESTYLE_MODEL,
+        model,
         modalities: ['image', 'text'],
         image_config: { aspect_ratio: '3:2' },
         messages: [{ role: 'user', content: [

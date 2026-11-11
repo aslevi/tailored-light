@@ -615,6 +615,7 @@ async function restyle(plate, win, setText) {
   } finally { clearTimeout(timer); clearTimeout(slow); }
 }
 let ROOMPLATE = null;
+let lastRestyle = null; // { photo, key, out }: never pay to restyle the same photo and corners twice
 $('roomBtn').addEventListener('click', async () => {
   if (!state.photo || $('working').hidden === false) return;
   const btn = $('roomBtn'), err = $('roomErr'), setText = t => { $('workingText').textContent = t; };
@@ -627,8 +628,12 @@ $('roomBtn').addEventListener('click', async () => {
     const base = rp.buildPlate(state.photo, state.corners);
     let out = { canvas: base.canvas, win: base.win, floor: null };
     if (RESTYLE_URL) {
-      try { out = await restyle(base.canvas, base.win, setText); }
-      catch (e) { setText('Using your photo as is…'); }
+      const key = state.corners.flat().map(v => v.toFixed(3)).join(',');
+      if (lastRestyle && lastRestyle.photo === state.photo && lastRestyle.key === key) out = lastRestyle.out;
+      else {
+        try { out = await restyle(base.canvas, base.win, setText); lastRestyle = { photo: state.photo, key, out }; }
+        catch (e) { setText('Using your photo as is…'); }
+      }
     }
     const [x0, y0, x1, y1] = out.win;
     const floor = typeof out.floor === 'number' && out.floor > 0.3 ? Math.round(out.floor * rp.PLATE_H) : Math.round(y1 + (rp.PLATE_H - y1) * 0.55);

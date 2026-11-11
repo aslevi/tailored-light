@@ -7,4 +7,13 @@ compatibility_date = "2026-10-01"
 [vars]
 ALLOWED_ORIGINS = "https://helloshade.co"
 MODEL = "google/gemma-4-26b-a4b-it"
-# RESTYLE_MODEL = "google/gemini-3-pro-image-preview"   # image model for /restyle ("See it in your room")
+# Image model(s) for /restyle ("See it in your room"), tried in order. Default ≈ 3.4¢ per room.
+# RESTYLE_MODEL = "google/gemini-3.1-flash-lite-image,openai/gpt-5-image-mini"
+
+# Spend guard for /restyle: 3 per minute per visitor.
+[[ratelimits]]
+name = "RESTYLE_LIMITER"
+namespace_id = "1101"
+  [ratelimits.simple]
+  limit = 3
+  period = 60
