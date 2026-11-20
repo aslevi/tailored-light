@@ -8,6 +8,9 @@ export const COLORS = {
 const cache = new Map();
 let sourceImages={};
 export function configureTextureImages(images){sourceImages={...images};cache.clear();}
+// Scanned fabric tiles (woven): one image per color, registered when first needed.
+export function registerTextureImage(kind,image){sourceImages[kind]=image;cache.delete('weave-'+kind);cache.delete('weave-'+kind+'-normal');}
+export const hasTextureImage=kind=>!!sourceImages[kind];
 export function seedRandom(seed=17) { let n=seed; return () => { n=(Math.imul(1664525,n)+1013904223)>>>0;return n/4294967296; }; }
 function canvas(size=256) {const c=document.createElement('canvas');c.width=size;c.height=size;return c;}
 function texture(key, painter, size=256){
@@ -18,6 +21,7 @@ function texture(key, painter, size=256){
 }
 export function clothTexture(kind='linen') {
   return texture('weave-'+kind,(ctx,s)=>{
+    if(/^w-/.test(kind)){if(sourceImages[kind])ctx.drawImage(sourceImages[kind],0,0,s,s);else{ctx.fillStyle='#d8c6a4';ctx.fillRect(0,0,s,s);}return;}
     if(kind==='linen'&&sourceImages.linen){ctx.drawImage(sourceImages.linen,0,0,s,s);return;}
     if(kind==='stripe'&&sourceImages.linen){ctx.drawImage(sourceImages.linen,0,0,s,s);ctx.fillStyle='#5d6a7a66';for(let x=0;x<s;x+=128)ctx.fillRect(x,0,20,s);ctx.fillStyle='#5d6a7a2a';for(let x=0;x<s;x+=128)ctx.fillRect(x+24,0,6,s);return;}
     const r=seedRandom(109);ctx.fillStyle='#e9e5dc';ctx.fillRect(0,0,s,s);
@@ -31,7 +35,7 @@ export function clothTexture(kind='linen') {
       if(kind==='reed')k=(r()-.5)*14+((y%21)<4?-62:(y%21)<8?-20:10)+Math.sin(x*.09+y*.7)*9+((x%85)<2?-40:0);
       const i=(y*s+x)*4;d[i]=Math.max(0,Math.min(255,233+k));d[i+1]=Math.max(0,Math.min(255,229+k));d[i+2]=Math.max(0,Math.min(255,220+k));d[i+3]=255;
     }ctx.putImageData(image,0,0);
-  },512);
+  },/^w-/.test(kind)?1024:512);
 }
 export function woodTexture(){return texture('oak-grain',(ctx,s)=>{
   if(sourceImages.oak){ctx.drawImage(sourceImages.oak,0,0,s,s);return;}

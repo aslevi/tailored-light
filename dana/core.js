@@ -74,7 +74,7 @@ export function parseText(raw) {
 // Samples text from /swatch-kit/: "Hi Dana! I'd like samples of: Raw Linen in Flax, Soft Cotton in Sage."
 // No design link: the lead gets the first pick as its design, so it still has a code and a look link.
 export const FAMILY_STYLE = { 'Daylight Weave': 'roller', 'Morning Haze': 'roller', 'Deep Sleep': 'roller', 'Clear View': 'roller',
-  'Raw Linen': 'roman', 'Soft Cotton': 'roman', 'Ticking Stripe': 'roman', 'Sheer Voile': 'roman', 'Blackout Linen': 'roman', 'Natural Reed': 'roman',
+  'Raw Linen': 'roman', 'Soft Cotton': 'roman', 'Ticking Stripe': 'roman', 'Sheer Voile': 'roman', 'Blackout Linen': 'roman', 'Grasscloth': 'roman', 'Natural Jute': 'roman', 'Reed': 'roman', 'Bamboo': 'roman', 'Lattice': 'roman', 'Textured Linen': 'roman',
   'Twin Light': 'zebra', 'Sand Stripe': 'zebra', 'Twin Shade': 'zebra' };
 export function parseSamples(text) {
   const m = /(?:free )?samples? of:\s*([^\n]+)/i.exec(text);

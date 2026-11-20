@@ -21,7 +21,7 @@ export const GROUPS = [
     ['Timeline', 'Any timing you\'re working toward? Shades are at your house in about 2–3 weeks.'],
     ['Photo', 'Can you send me a photo of the window? Stand back so I can see the whole frame and a bit of wall around it.'],
     ['Rec: bedroom', "For a [room], I'd go with a roller. Deep Sleep is our blackout fabric. Mounted on the wall above the frame, it blocks the most light. Nursery parents love it."],
-    ['Rec: kitchen', 'For a kitchen I love woven wood. Natural Reed in [Honey/Natural/Driftwood] adds warmth, filters light nicely, and doesn\'t look fussy.'],
+    ['Rec: kitchen', 'For a kitchen I love woven wood. Grasscloth in Warm Tan or Natural Jute in Warm Oat adds warmth, filters light nicely, and doesn\'t look fussy.'],
     ['Rec: living, polish', 'For the [room], a Roman feels the most finished. [Fabric] in [color] looks great with [what\'s in their photo].'],
     ['Rec: zebra', 'If you want to fine-tune light during the day, a zebra is great. Two layers slide to go from open view to privacy without raising it.'],
     ['Rec: bathroom', 'For a bathroom you want privacy without making it dark. A semi-opaque fabric like [Daylight Weave roller] does exactly that.'],

@@ -10,12 +10,12 @@ assert.equal(LOWEST_FROM, 209);
 // Typical window, 36 x 60.
 assert.equal(p('roller', 'Daylight Weave', 36, 60), 229);
 assert.equal(p('roman', 'Raw Linen', 36, 60), 329);   // 9.25 * 15 sq ft = 138.75 cost -> 319.13 -> 329
-assert.equal(p('roman', 'Natural Reed', 36, 60), 399);
+assert.equal(p('roman', 'Grasscloth', 36, 60), 399);
 assert.equal(p('zebra', 'Twin Light', 36, 60), 259);
 // Lining +10% on Romans; folds don't change price (not an input).
 assert.equal(p('roman', 'Raw Linen', 36, 60, true), retailFromCost(138.75 * 1.1));
 // Rounding: always ends in 9 and never below cost * 2.3.
-for (const [s, f] of [['roller', 'x'], ['roman', 'Raw Linen'], ['roman', 'Natural Reed'], ['zebra', 'x']])
+for (const [s, f] of [['roller', 'x'], ['roman', 'Raw Linen'], ['roman', 'Grasscloth'], ['zebra', 'x']])
   for (let w = 12; w <= 96; w += 7) for (let h = 12; h <= 120; h += 11) {
     const q = p(s, f, w, h), c = costFor({ style: s, family: f, width: w, height: h });
     assert.equal(q % 10, 9); assert.ok(q >= c * 2.3, `${s} ${w}x${h}`); assert.ok(q >= 149);
@@ -25,4 +25,4 @@ assert.equal(quote({ style: 'roller', width: 97, height: 60 }).outOfRange, true)
 assert.equal(quote({ style: 'roller', width: 36, height: 121 }).outOfRange, true);
 assert.equal(quote({ style: 'roller', width: 11, height: 60 }).outOfRange, true);
 assert.equal(quote({ style: 'zebra', width: 36, height: 60 }).estimate, true);
-console.log('pricing ok', FROM, { roller: p('roller', '', 36, 60), roman: p('roman', 'Raw Linen', 36, 60), woven: p('roman', 'Natural Reed', 36, 60), zebra: p('zebra', '', 36, 60) });
+console.log('pricing ok', FROM, { roller: p('roller', '', 36, 60), roman: p('roman', 'Raw Linen', 36, 60), woven: p('roman', 'Grasscloth', 36, 60), zebra: p('zebra', '', 36, 60) });

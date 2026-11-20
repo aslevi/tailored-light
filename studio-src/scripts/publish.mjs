@@ -22,6 +22,8 @@ for (const a of assets.filter(a => a.endsWith('.css'))) {
 }
 if (src.includes('../fonts/fonts.css') && !html.includes('../fonts/fonts.css'))
   html = html.replace('<link rel="apple-touch-icon"', '<link rel="stylesheet" href="../fonts/fonts.css">\n<link rel="apple-touch-icon"');
+// Coming-soon gate (remove at launch, with the gate tag on every other page).
+if (!html.includes('flow/gate.js')) html = html.replace('<head>', '<head>\n<script src="/flow/gate.js"></script>');
 if (!html.includes('flow/analytics.js')) html = html.replace('</head>', '<script defer src="../flow/analytics.js"></script>\n</head>');
 const leftover = [...html.matchAll(/\.\/assets\/([^"')\s]+)/g)].map(m => m[1]).filter(a => !/\.(js|css)$/.test(a));
 if (leftover.length) throw new Error('unmapped assets: ' + leftover.join(', '));

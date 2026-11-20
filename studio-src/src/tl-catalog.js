@@ -169,25 +169,173 @@ export const CATALOG={
     ]
    },
    {
-    "name": "Natural Reed",
-    "weave": true,
-    "blackout": false,
-    "tex": "basket",
-    "colors": [
-     {
-      "name": "Natural",
-      "hex": "#C9A877"
-     },
-     {
-      "name": "Honey",
-      "hex": "#A9783F"
-     },
-     {
-      "name": "Driftwood",
-      "hex": "#9C968A"
-     }
-    ]
-   }
+ "name": "Grasscloth",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "Soft Cream",
+   "hex": "#E9E1CB"
+  },
+  {
+   "name": "Light Ivory",
+   "hex": "#EAE4D5"
+  },
+  {
+   "name": "Soft Wheat",
+   "hex": "#E5CBA5"
+  },
+  {
+   "name": "Light Ash",
+   "hex": "#C5BEB2"
+  },
+  {
+   "name": "Warm Tan",
+   "hex": "#CDB18C"
+  },
+  {
+   "name": "Charcoal",
+   "hex": "#9A9A8F"
+  }
+ ]
+},
+{
+ "name": "Natural Jute",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "Pale Ivory",
+   "hex": "#D3CDC2"
+  },
+  {
+   "name": "Creamy White",
+   "hex": "#D0B693"
+  },
+  {
+   "name": "Warm Oat",
+   "hex": "#BC9E78"
+  },
+  {
+   "name": "Natural Straw",
+   "hex": "#BFA27D"
+  },
+  {
+   "name": "Natural Hemp",
+   "hex": "#CDB291"
+  },
+  {
+   "name": "Mixed Stripe",
+   "hex": "#A38360"
+  },
+  {
+   "name": "Dark Ash",
+   "hex": "#494037"
+  }
+ ]
+},
+{
+ "name": "Reed",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "White Reed",
+   "hex": "#DBDAD8"
+  },
+  {
+   "name": "Straw White",
+   "hex": "#DBC7A9"
+  },
+  {
+   "name": "Light Beige",
+   "hex": "#C8B399"
+  },
+  {
+   "name": "Raw Hay",
+   "hex": "#CBB391"
+  },
+  {
+   "name": "Bright Straw",
+   "hex": "#B7AA91"
+  },
+  {
+   "name": "Honey",
+   "hex": "#CEA87E"
+  },
+  {
+   "name": "Ebony",
+   "hex": "#343433"
+  }
+ ]
+},
+{
+ "name": "Bamboo",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "Straw Beige",
+   "hex": "#D1BB9A"
+  },
+  {
+   "name": "Linen Stripe",
+   "hex": "#CDC0A5"
+  }
+ ]
+},
+{
+ "name": "Lattice",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "Bright White",
+   "hex": "#D5D2CB"
+  },
+  {
+   "name": "Pale Grey",
+   "hex": "#BDB8B0"
+  },
+  {
+   "name": "Beige Stripe",
+   "hex": "#D3C9BB"
+  },
+  {
+   "name": "Grey Stripe",
+   "hex": "#C7C0B6"
+  },
+  {
+   "name": "Neutral Stripe",
+   "hex": "#97928A"
+  }
+ ]
+},
+{
+ "name": "Textured Linen",
+ "weave": true,
+ "blackout": false,
+ "tex": "basket",
+ "colors": [
+  {
+   "name": "Dune",
+   "hex": "#B49C84"
+  },
+  {
+   "name": "Clay",
+   "hex": "#998274"
+  },
+  {
+   "name": "Moss Grey",
+   "hex": "#79756C"
+  }
+ ]
+}
   ]
  },
  "zebra": {

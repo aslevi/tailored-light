@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { configureTextureImages, clothTexture, normalFromHeight } from './materials.js';
+import { configureTextureImages, clothTexture, normalFromHeight, registerTextureImage, hasTextureImage } from './materials.js';
 import { CATALOG, FOLDS } from './tl-catalog.js';
 import { DANA_SMS, smsHref } from './dana.js';
 import { SWATCH } from './swatch-map.js';
@@ -26,7 +26,7 @@ const $=id=>document.getElementById(id),cap=s=>s[0].toUpperCase()+s.slice(1),W=1
 const state={tod:.5,room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
 let roomPlate,ceilingLight,roomRequest=0,winK=1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-state.breeze=!reduced;
+state.breeze=false; // trees outside stay still: the moving leaves made the window look wavy
 let renderer,scene,camera,roomCamera,inspectCamera,controls,mechanism,installation,key,fill,ambient,environment,frame=0,last=0,actualDrop=.65,actualOpen=1,playTime=0,zoom=1,pan={x:0,y:0},drag=null;
 const descriptions={roller:'Clean, simple, rolls up tight',roman:'Soft folds, tailored look',zebra:'Sheer + solid bands you can align'};
 const FOLD_SHORT={flat:'Stacks into neat folds',hobbled:'Folds even when lowered',relaxed:'Gentle curve at the hem'};
@@ -36,7 +36,7 @@ const hex=()=>col().hex;
 const foldsApply=()=>state.style==='roman'&&!fam().weave;
 // Room-darkening lining: Roman fabrics only, not the sheer, the blackout or the woven (same rule as flow/pricing.js).
 const liningOK=()=>state.style==='roman'&&!fam().weave&&!fam().blackout&&!/Sheer/.test(fam().name);
-function syncFamily(reset){const f=fam();state.family=f.name;state.fabric=f.weave?'reed':/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
+function syncFamily(reset){const f=fam();state.family=f.name;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;state.fabric=f.weave?(SWATCH[f.name+'|'+state.colorName]?'w-'+SWATCH[f.name+'|'+state.colorName]:'reed'):/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
  if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';
  if(!f.blackout&&!liningOK())state.opacity='filtering';}
 function renderOptions(){
@@ -66,10 +66,19 @@ function refresh(){
 function positionModel(){
  mechanism.root.position.set(0,0,0);mechanism.root.scale.setScalar(1);mechanism.root.rotation.set(0,0,0);
 }
+const wovenLoading=new Set();
+function ensureWoven(kind){
+ if(!/^w-/.test(kind)||hasTextureImage(kind)||wovenLoading.has(kind))return;
+ wovenLoading.add(kind);const i=new Image();
+ i.onload=()=>{registerTextureImage(kind,i);wovenLoading.delete(kind);if(state.fabric===kind)rebuild();};
+ i.onerror=()=>wovenLoading.delete(kind);i.src=site('textures/woven/'+kind.slice(2)+'.webp');
+}
+const shadeColor=()=>/^w-/.test(state.fabric)&&hasTextureImage(state.fabric)?'#f3efe8':hex();
 function rebuild(){
  if(!installation){refresh();return;}
+ ensureWoven(state.fabric);
  if(mechanism){scene.remove(mechanism.root);mechanism.dispose();}
- mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66*winK,height:1.30});
+ mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),width:1.66*winK,height:1.30});
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();lighting();
 }
 function lighting(){
@@ -77,7 +86,7 @@ function lighting(){
  const even=state.mood==='evening',afternoon=state.mood==='afternoon',alignment=mechanism.state.bandAlignment??1;
  const response=roomResponse({...state,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4:.3;
+ const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})()):.3;
  const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
  roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:shadeBottomY},response);
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
@@ -87,9 +96,10 @@ function lighting(){
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
  ambient.intensity=response.ambient;key.intensity=response.bounce;fill.intensity=response.lampIntensity;
- ambient.color.set(even?'#b7c8e9':'#f6eee0');ambient.groundColor.set(even?'#50566d':'#b8b2a7');
- key.color.set(even?'#b7c9ee':afternoon?'#fff0dc':'#e4ecf4');
- $('inspect-stage').style.background=even?'radial-gradient(ellipse at 40% 35%,#454951,#20252d)':'radial-gradient(ellipse at 40% 35%,#fbf7ef,#e6dccb)';
+ {const w=response.evening??(even?1:0),lerp=(a,b)=>new THREE.Color(a).lerp(new THREE.Color(b),w);
+  ambient.color.copy(lerp('#f6eee0','#b7c8e9'));ambient.groundColor.copy(lerp('#b8b2a7','#50566d'));
+  key.color.copy(lerp(afternoon||even?'#fff0dc':'#e4ecf4','#b7c9ee'));}
+ $('inspect-stage').style.background=(response.evening??0)>.5?'radial-gradient(ellipse at 40% 35%,#454951,#20252d)':'radial-gradient(ellipse at 40% 35%,#fbf7ef,#e6dccb)';
  key.position.set(-1.5,2.5,3.5);key.target.position.set(0,-.6,0);
  // Lamp sits to the left and below the window head, in front of the fabric.
  // A point source gives a warm left-to-right falloff, not a uniform yellow fill.
@@ -101,7 +111,7 @@ function lighting(){
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
-   m.roughness=.98;m.sheen=.28;m.normalScale?.set(state.fabric==='reed'?.9:state.fabric==='stripe'?.5:.36,state.fabric==='reed'?.9:state.fabric==='stripe'?.5:.36);
+   m.roughness=.98;m.sheen=.28;m.normalScale?.set(/^(reed|w-)/.test(state.fabric)?.9:state.fabric==='stripe'?.5:.36,/^(reed|w-)/.test(state.fabric)?.9:state.fabric==='stripe'?.5:.36);
    const transparent=response.clothOpacity<1;
    if(m.transparent!==transparent){m.transparent=transparent;m.needsUpdate=true;}
    m.opacity=response.clothOpacity;m.depthWrite=!transparent;
@@ -162,13 +172,13 @@ const chipOf=()=>state.style==='roman'&&fam().weave?'woven':state.style;
 const lightOf=()=>fam().blackout?'blackout':'filtering';
 const typeFams=(chip,light)=>{const style=chip==='woven'?'roman':chip;return CATALOG[style].families.filter(x=>(chip==='woven'?x.weave:!x.weave)&&(light==null||(light==='blackout')===!!x.blackout));};
 const slugify=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):/Reed/.test(f)?site('images/p/natural-reed-'+slugify(c)+'-swatch.webp'):'';
+const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):'';
 // Dana's pick for each room: type, light, fabric, color.
 const RECS={'living-room':{text:'a <b>Roman in Raw Linen</b> for living rooms',chip:'roman',f:'Raw Linen',c:'Flax'},
  mine:{text:'a <b>Roman in Raw Linen</b> for your room',chip:'roman',f:'Raw Linen',c:'Flax'},
  bedroom:{text:'a <b>blackout Roller</b> for bedrooms',chip:'roller',f:'Deep Sleep',c:'Oat'},
  nursery:{text:'a <b>blackout Roller</b> for nurseries',chip:'roller',f:'Deep Sleep',c:'Oat'},
- kitchen:{text:'a <b>Woven</b> shade for kitchens',chip:'woven',f:'Natural Reed',c:'Honey'},
+ kitchen:{text:'a <b>Woven</b> shade for kitchens',chip:'woven',f:'Grasscloth',c:'Warm Tan'},
  'home-office':{text:'a <b>light-filtering Roller or Zebra</b> for home offices',chip:'roller',f:'Clear View',c:'White'},
  bathroom:{text:'a <b>Daylight Weave Roller</b> for bathrooms',chip:'roller',f:'Daylight Weave',c:'Oat'},
  'dining-room':{text:'a <b>Roman</b> for dining rooms',chip:'roman',f:'Raw Linen',c:'Cream'}};
@@ -283,7 +293,7 @@ async function start3D(){try{
  {const tex=clothTexture(state.fabric==='reed'?'reed':state.fabric);normalFromHeight(tex);}
  await yieldUI();
  // First build, split across tasks (rebuild() does the same steps in one go for later changes).
- mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:hex(),width:1.66*winK,height:1.30});
+ ensureWoven(state.fabric);mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),width:1.66*winK,height:1.30});
  await yieldUI();
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();
  await yieldUI();
@@ -299,7 +309,7 @@ document.addEventListener('click',e=>{
  const d=b.dataset;
  if(d.style){state.style=d.style;state.family=CATALOG[d.style].families[0].name;syncFamily(true);renderOptions();rebuild();}
  else if(d.family){const ch=d.family!==state.family;state.family=d.family;syncFamily(ch);renderOptions();rebuild();}
- else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed){rebuild();}else mechanism?.update({color:hex()});}
+ else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed||fam().weave){rebuild();}else mechanism?.update({color:hex()});}
  else if(d.fold){state.fold=d.fold;rebuild();}
  else if(d.mood)state.mood=d.mood;
  else if(d.opacity)state.opacity=d.opacity;
@@ -308,7 +318,7 @@ document.addEventListener('click',e=>{
 
 $('drop').addEventListener('input',e=>{state.drop=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;mechanism?.update({drop:actualDrop});lighting();refresh();});
 $('alignment').addEventListener('input',e=>{state.openness=Number(e.target.value)/100;state.playing=false;actualDrop=state.drop;actualOpen=state.openness;mechanism?.update({drop:actualDrop,openness:actualOpen,align:true});lighting();refresh();});
-for(const id of['lamp-toggle','lamp-hotspot'])$(id).addEventListener('click',()=>{state.lamp=!state.lamp;engaged('lamp');lighting();refresh();});
+for(const id of['lamp-toggle','lamp-hotspot'])$(id).addEventListener('click',()=>{state.lamp=!state.lamp;state.lampFade=1;engaged('lamp');lighting();refresh();});
 $('outside-toggle').addEventListener('click',()=>{state.breeze=!state.breeze;refresh();});
 for(const id of['ceiling-toggle','ceiling-hotspot'])$(id).addEventListener('click',()=>{state.ceiling=!state.ceiling;engaged('ceiling');lighting();refresh();});
 $('ceiling-brightness').addEventListener('input',e=>{state.ceilingBrightness=Number(e.target.value)/100;lighting();refresh();});
@@ -412,7 +422,7 @@ document.addEventListener('click',e=>{
 goStep('fabric');
 /* Day / Night: night shows privacy and the room lit from inside */
 const PHASES=['Morning','Midday','Evening','Night'];let dayAnim=null;
-function setTod(t){state.tod=t;state.mood=t<.5?'morning':t<1.5?'afternoon':'evening';state.lamp=t>1.45;const i=t<.45?0:t<1.2?1:t<1.85?2:3;$('day-label').textContent=PHASES[i];lighting();refresh();}
+function setTod(t){state.tod=t;state.mood=t<.5?'morning':t<1.5?'afternoon':'evening';state.lamp=t>1.15;state.lampFade=Math.min(1,Math.max(0,(t-1.15)/.55));const i=t<.45?0:t<1.2?1:t<1.85?2:3;$('day-label').textContent=PHASES[i];lighting();refresh();}
 $('play-day').addEventListener('click',()=>{if(dayAnim)return;const from=(state.tod??1)>1.9?2:0,to=from===0?2:1,t0=performance.now(),dur=from===0?1500:700;
  $('play-day').classList.add('playing');engaged('day');
  const step=now=>{const k=Math.min(1,(now-t0)/dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setTod(from+(to-from)*e);

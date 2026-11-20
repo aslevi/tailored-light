@@ -5,8 +5,8 @@
 //   sqft = W * H / 144
 //   roller     cost = 90 + 1.0 * max(0, sqft - 8) + 1.2 * max(0, W - 40)
 //   roman      cost = max(110, 9.25 * sqft)          (+10% with a room-darkening lining; folds don't change it;
-//              no lining for Sheer Voile, Blackout Linen or Natural Reed)
-//   woven wood cost = max(115, 60 + 7.5 * sqft)       (Natural Reed, made as a Roman)
+//              no lining for Sheer Voile, Blackout Linen or woven families)
+//   woven wood cost = max(115, 60 + 7.5 * sqft)       (woven families, made as a Roman)
 //   zebra      cost = 1.15 * roller cost              (shown as an estimate until confirmed by text)
 //
 //   retail = cost * 2.3, rounded UP to the next price ending in 9:  ceil((p + 1) / 10) * 10 - 1, minimum $149.
@@ -22,11 +22,11 @@ export const MULTI_WINDOW_NOTE = 'Each window is priced separately; text a desig
 export const ESTIMATE_NOTE = 'Zebra prices are an estimate until we confirm by text.';
 export const OUT_OF_RANGE_NOTE = 'For this size, text a designer for your price.';
 
-const WOVEN = new Set(['Natural Reed']);
+const WOVEN = new Set(['Grasscloth', 'Natural Jute', 'Reed', 'Bamboo', 'Lattice', 'Textured Linen']);
 // The pricing line for a product: roller, roman, woven or zebra.
 export const priceLine = (style, family) => (style === 'roman' && WOVEN.has(family)) ? 'woven' : style;
 // Room-darkening lining: Roman fabrics only, not the sheer, the blackout or the woven.
-const NO_LINING = new Set(['Sheer Voile', 'Blackout Linen', 'Natural Reed']);
+const NO_LINING = new Set(['Sheer Voile', 'Blackout Linen', 'Grasscloth', 'Natural Jute', 'Reed', 'Bamboo', 'Lattice', 'Textured Linen']);
 export const liningAvailable = (style, family) => style === 'roman' && !NO_LINING.has(family);
 
 const rollerCost = (w, h) => { const sq = w * h / 144; return 90 + 1.0 * Math.max(0, sq - 8) + 1.2 * Math.max(0, w - 40); };
@@ -60,7 +60,7 @@ export const priceFor = args => quote(args).price;
 
 // "From" price for a product or style, at the smallest standard size.
 export const fromPrice = (style, family) => retailFromCost(costFor({ style, family, ...FROM_SIZE }));
-export const FROM = { roller: fromPrice('roller'), roman: fromPrice('roman'), woven: fromPrice('roman', 'Natural Reed'), zebra: fromPrice('zebra') };
+export const FROM = { roller: fromPrice('roller'), roman: fromPrice('roman'), woven: fromPrice('roman', 'Grasscloth'), zebra: fromPrice('zebra') };
 export const LOWEST_FROM = Math.min(...Object.values(FROM));
 
 // Parses 34, 34.5, 34 3/8, 34-3/8, 3/8, with or without " or in. Returns inches, '' for empty, or null if unreadable.

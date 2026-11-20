@@ -13,10 +13,16 @@ export function projectPoint(m,u,v){const w=m[6]*u+m[7]*v+1;return [(m[0]*u+m[1]
 const clamp=x=>Math.min(1,Math.max(0,x));
 export function roomLightingLevels(state,response){
  return {day:state.mood==='evening'?.065:Math.max(.055,Math.pow(response.daylight,.65)),
- ceiling:state.ceiling?clamp(state.ceilingBrightness):0,lamp:state.lamp?1:0};
+ ceiling:state.ceiling?clamp(state.ceilingBrightness):0,lamp:state.lamp?(state.lampFade??1):0};
 }
-export function roomResponse({coverage=0,style='roman',fabric='linen',color='#d7c5a2',opacity='filtering',alignment=1,mood='afternoon',lamp=true}={}){
- coverage=clamp(coverage);alignment=clamp(alignment);
+// 0 = full day, 1 = full evening. Follows the day/night slider continuously so the
+// shade darkens gradually instead of flipping when the mood label changes.
+export function eveningWeight({tod,mood}={}){
+ if(Number.isFinite(tod)){const k=clamp((tod-1.05)/.8);return k*k*(3-2*k);}
+ return mood==='evening'?1:0;
+}
+export function roomResponse({coverage=0,style='roman',fabric='linen',color='#d7c5a2',opacity='filtering',alignment=1,mood='afternoon',lamp=true,tod,lampFade}={}){
+ coverage=clamp(coverage);alignment=clamp(alignment);const scanned=/^w-/.test(fabric);if(scanned)fabric='reed';
  const rgb=color.replace('#','').match(/../g).map(x=>parseInt(x,16)/255);
  const luma=.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
  // Diffuse light transmission is independent of image/view transmission.
@@ -27,18 +33,19 @@ export function roomResponse({coverage=0,style='roman',fabric='linen',color='#d7
  const daylight=clamp(1-coverage+coverage*transmission);
  // Uncovered glass admits a sun patch; filtering fabric primarily scatters it.
  const direct=clamp(1-coverage+coverage*(style==='zebra'?.42*alignment:opacity==='blackout'?0:.012));
- const evening=mood==='evening';
- return {transmission,daylight,direct,
+ const w=eveningWeight({tod,mood}),mix=(day,eve)=>day+(eve-day)*w;
+ const sunK=Number.isFinite(tod)?(tod<1?.18+.78*Math.min(1,tod/.8):.96):(mood==='afternoon'?.96:.18);
+ return {transmission,daylight,direct,evening:w,
   clothOpacity:1,
-  sun:evening?0:(mood==='afternoon'?.96:.18)*direct,
-  dimming:evening?.12*coverage:.74*(1-Math.pow(daylight,.34)),
-  diffuse:evening?0:coverage*transmission,
-  reveal:evening?0:.035+.16*daylight,
-  ambient:evening?.10:.13+.62*daylight,
-  bounce:evening?.10:.18+1.3*daylight,
-  environment:evening?.025:.06+.20*daylight,
-  lampIntensity:lamp?5.8:0,
+  sun:mix(sunK*direct,0),
+  dimming:mix(.74*(1-Math.pow(daylight,.34)),.12*coverage),
+  diffuse:mix(coverage*transmission,0),
+  reveal:mix(.035+.16*daylight,0),
+  ambient:mix(.13+.62*daylight,.10),
+  bounce:mix(.18+1.3*daylight,.10),
+  environment:mix(.06+.20*daylight,.025),
+  lampIntensity:lamp?5.8*(lampFade??1):0,
   // Mild diffuse cloth scattering, independent of the room-facing lamp.
-  backscatter:evening||opacity==='blackout'?0:(style==='zebra'?.06:clothTransmission*2.5)
+  backscatter:opacity==='blackout'?0:mix(style==='zebra'?.06:clothTransmission*(scanned?.9:2.5),0)
  };
 }

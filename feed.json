@@ -19,8 +19,8 @@
       ],
       "outside_range": "quoted by text"
     },
-    "delivery": "At your house in 2–3 weeks",
-    "install": "Two brackets and a drill; we don’t install",
+    "delivery": "At your house in 2\u20133 weeks",
+    "install": "Two brackets and a drill; we don\u2019t install",
     "samples": {
       "price": 10,
       "max_fabrics": 5,
@@ -28,8 +28,8 @@
       "url": "https://helloshade.co/swatch-kit/"
     },
     "fit_guarantee": "Measure wrong and we remake it free, once per shade, within 30 days of delivery, when a designer checked your numbers and photos first.",
-    "returns": "Custom shades can’t be returned for a change of mind. Measuring mistakes are remade free; defects are fixed or replaced; shipping damage is replaced.",
-    "pricing": "Price by type and width × height; fabric and color don’t change it. Zebra prices are an estimate until confirmed by text. Prices are the same for everyone."
+    "returns": "Custom shades can\u2019t be returned for a change of mind. Measuring mistakes are remade free; defects are fixed or replaced; shipping damage is replaced.",
+    "pricing": "Price by type and width \u00d7 height; fabric and color don\u2019t change it. Zebra prices are an estimate until confirmed by text. Prices are the same for everyone."
   },
   "types": {
     "roller": {
@@ -369,14 +369,17 @@
       "image": "https://helloshade.co/images/p/blackout-linen-cream-room.webp"
     },
     {
-      "name": "Natural Reed Woven",
+      "name": "Grasscloth Woven",
       "type": "woven",
-      "url": "https://helloshade.co/shades/woven/natural-reed/",
+      "url": "https://helloshade.co/shades/woven/grasscloth/",
       "light": "Light filtering",
       "colors": [
-        "Natural",
-        "Honey",
-        "Driftwood"
+        "Soft Cream",
+        "Light Ivory",
+        "Soft Wheat",
+        "Light Ash",
+        "Warm Tan",
+        "Charcoal"
       ],
       "best_rooms": [
         "bedroom",
@@ -388,7 +391,126 @@
       "price_36x60": 399,
       "price_36x60_with_lining": null,
       "price_is_estimate": false,
-      "image": "https://helloshade.co/images/p/natural-reed-natural-room.webp"
+      "image": "https://helloshade.co/images/p/grasscloth-soft-cream-room.webp"
+    },
+    {
+      "name": "Natural Jute Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/natural-jute/",
+      "light": "Light filtering",
+      "colors": [
+        "Pale Ivory",
+        "Creamy White",
+        "Warm Oat",
+        "Natural Straw",
+        "Natural Hemp",
+        "Mixed Stripe",
+        "Dark Ash"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/natural-jute-pale-ivory-room.webp"
+    },
+    {
+      "name": "Reed Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/reed/",
+      "light": "Light filtering",
+      "colors": [
+        "White Reed",
+        "Straw White",
+        "Light Beige",
+        "Raw Hay",
+        "Bright Straw",
+        "Honey",
+        "Ebony"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/reed-white-reed-room.webp"
+    },
+    {
+      "name": "Bamboo Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/bamboo/",
+      "light": "Light filtering",
+      "colors": [
+        "Straw Beige",
+        "Linen Stripe"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/bamboo-straw-beige-room.webp"
+    },
+    {
+      "name": "Lattice Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/lattice/",
+      "light": "Light filtering",
+      "colors": [
+        "Bright White",
+        "Pale Grey",
+        "Beige Stripe",
+        "Grey Stripe",
+        "Neutral Stripe"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/lattice-bright-white-room.webp"
+    },
+    {
+      "name": "Textured Linen Woven",
+      "type": "woven",
+      "url": "https://helloshade.co/shades/woven/textured-linen/",
+      "light": "Light filtering",
+      "colors": [
+        "Dune",
+        "Clay",
+        "Moss Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "kitchen",
+        "living room",
+        "home office"
+      ],
+      "from_price": 269,
+      "price_36x60": 399,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/textured-linen-dune-room.webp"
     }
   ]
 }

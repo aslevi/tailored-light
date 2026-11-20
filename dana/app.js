@@ -450,7 +450,7 @@ function renderQuote(l) {
   // Drafts saved before prices filled in automatically: keep the prices Dana typed.
   if (!d.auto) { d.lines.forEach(x => { if (String(x.price ?? '').trim()) x.priceManual = true; else autoPrice(x); }); d.auto = 1; delete d.swatchCredit; }
   const t = quoteTotals({ ...d, lines: d.lines.map(x => ({ price: x.price })) });
-  const famOpts = (style, cur) => { const set = { roller: ['Daylight Weave', 'Morning Haze', 'Deep Sleep', 'Clear View'], roman: ['Raw Linen', 'Soft Cotton', 'Ticking Stripe', 'Sheer Voile', 'Blackout Linen', 'Natural Reed'], zebra: ['Twin Light', 'Sand Stripe', 'Twin Shade'] }[style] || []; if (cur && !set.includes(cur)) set.unshift(cur); return set.map(f => `<option ${f === cur ? 'selected' : ''}>${esc(f)}</option>`).join(''); };
+  const famOpts = (style, cur) => { const set = { roller: ['Daylight Weave', 'Morning Haze', 'Deep Sleep', 'Clear View'], roman: ['Raw Linen', 'Soft Cotton', 'Ticking Stripe', 'Sheer Voile', 'Blackout Linen', 'Grasscloth', 'Natural Jute', 'Reed', 'Bamboo', 'Lattice', 'Textured Linen'], zebra: ['Twin Light', 'Sand Stripe', 'Twin Shade'] }[style] || []; if (cur && !set.includes(cur)) set.unshift(cur); return set.map(f => `<option ${f === cur ? 'selected' : ''}>${esc(f)}</option>`).join(''); };
   box.innerHTML = `
     <h3>Quote</h3>
     <p class="fine">Prices fill in from the site's price formula for each size and option. Type over one to set your own.</p>
@@ -477,7 +477,7 @@ function renderQuote(l) {
       <label><span class="lbl">Tax %</span><input data-qt="taxRate" inputmode="decimal" value="${esc(+(d.taxRate * 100).toFixed(4))}"></label>
       <label><span class="lbl">Valid days</span><input data-qt="validDays" inputmode="numeric" value="${esc(d.validDays)}"></label>
     </div>
-    <label><span class="lbl">Notes for the customer</span><textarea data-qt="notes" rows="2" placeholder="e.g. Natural Reed is woven by hand; that's why it costs a little more.">${esc(d.notes)}</textarea></label>
+    <label><span class="lbl">Notes for the customer</span><textarea data-qt="notes" rows="2" placeholder="e.g. Woven shades are natural fiber; that's why it costs a little more.">${esc(d.notes)}</textarea></label>
     <p class="totals">Subtotal ${money(t.subtotal)} · ship ${money(t.shipping)} · tax ${money(t.tax)} · <b>Total ${money(t.total)}</b></p>
     <div class="btn-row">
       <button class="btn primary" type="button" id="q-build">Save quote &amp; copy link</button>
@@ -553,7 +553,7 @@ $('import-file').addEventListener('change', async e => {
 // ---------- sample ----------
 $('load-sample').onclick = async () => {
   const look = new URL('../studio/?room=kitchen&s=roman&f=Natural+Reed&c=Honey&ref=sample', BASE).href;
-  const p = parseText(`Hi Dana! Here's my design for my kitchen: Natural Reed roman in Honey. Can you help me measure and price it? ${look}`);
+  const p = parseText(`Hi Dana! Here's my design for my kitchen: Grasscloth woven in Warm Tan. Can you help me measure and price it? ${look}`);
   const lead = newLead({ ...p.lead, name: 'Jamie Sample', phone: '', sample: true, notes: 'SAMPLE LEAD: fake customer for trying the board. Delete any time.' });
   lead.windows = [normalizeWindow({ id: 'w1', room: 'Kitchen', label: 'Kitchen 1', style: 'roman', mount: 'inside', w: [34.5, 34.375, 34.5], h: [52.375, 52.5, 52.375], depth: 3.25, photosReceived: true, measuredAt: now() })];
   logEvent(lead, 'created', 'Sample lead loaded');

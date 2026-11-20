@@ -16,14 +16,14 @@ const TYPES = [
   { id: 'zebra', label: 'Zebra' }, { id: 'woven', label: 'Woven' },
 ];
 const LEVELS = ['Light filtering', 'Blackout', 'Sheer'];
-const WOVEN = 'Natural Reed';
+const WOVEN = new Set(["Grasscloth", "Natural Jute", "Reed", "Bamboo", "Lattice", "Textured Linen"]);
 const slug = s => s.toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const $ = id => document.getElementById(id);
 
 const familiesFor = type =>
-  type === 'woven' ? CATALOG.roman.filter(f => f.family === WOVEN)
-  : type === 'roman' ? CATALOG.roman.filter(f => f.family !== WOVEN)
+  type === 'woven' ? CATALOG.roman.filter(f => WOVEN.has(f.family))
+  : type === 'roman' ? CATALOG.roman.filter(f => !WOVEN.has(f.family))
   : CATALOG[type] || [];
 const levelOf = f => f.block >= 0.95 ? 'Blackout' : f.family === 'Sheer Voile' ? 'Sheer' : 'Light filtering';
 
@@ -90,7 +90,7 @@ function productName() {
   return `${state.family.family} ${t}`;
 }
 function renderPrice() {
-  const p = state.type === 'woven' ? fromPrice('roman', WOVEN) : fromPrice(state.type, state.family.family);
+  const p = state.type === 'woven' ? fromPrice('roman', 'Grasscloth') : fromPrice(state.type, state.family.family);
   $('price').textContent = 'From ' + money(p);
   $('pick').textContent = `${productName()} in ${state.color.name} · ${state.level}`;
   $('priceNote').textContent = state.type === 'zebra' ? ESTIMATE_NOTE
