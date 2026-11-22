@@ -23,7 +23,7 @@ const curRoom=()=>roomById(state.room)||ROOMS[0];
 import { createRoomPlateRenderer } from './room-plate-renderer.js';
 
 const $=id=>document.getElementById(id),cap=s=>s[0].toUpperCase()+s.slice(1),W=1536,H=1024;
-const state={tod:.5,room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
+const state={tod:.5,room:'living-room',style:'roman',family:'Raw Linen',colorName:'Flax',fold:'flat',fabric:'linen',color:'flax',drop:.65,openness:1,opacity:'filtering',mood:'afternoon',liner:'none',lamp:false,ceiling:false,ceilingBrightness:.75,inspect:false,playing:false};
 let roomPlate,ceilingLight,roomRequest=0,winK=1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 state.breeze=false; // trees outside stay still: the moving leaves made the window look wavy
@@ -84,9 +84,12 @@ function rebuild(){
 function lighting(){
  if(!mechanism)return;
  const even=state.mood==='evening',afternoon=state.mood==='afternoon',alignment=mechanism.state.bandAlignment??1;
- const response=roomResponse({...state,color:hex(),coverage:mechanism.state.actualDrop,alignment});
+ const wl=fam().weave?state.liner:null;
+ const response=roomResponse({...state,opacity:wl==='dark'?'blackout':state.opacity,color:hex(),coverage:mechanism.state.actualDrop,alignment});
+ // No liner: you can see out through the weave. Any liner makes the shade opaque.
+ response.clothOpacity=wl==='none'?.74:1;
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||(state.style==='roman'&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})()):.3;
+ const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):.3;
  const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
  roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:shadeBottomY},response);
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
@@ -153,13 +156,13 @@ function frameLoop(now){
  if(Math.abs(actualDrop-mechanism.state.drop)>.00001||Math.abs(actualOpen-mechanism.state.openness)>.00001){mechanism.update({drop:actualDrop,openness:actualOpen,time:now/1000});lighting();}
  installation.update({...state,time:now/1000});placeHandle();if(state.inspect)controls.update();renderer.render(scene,camera);frame=requestAnimationFrame(frameLoop);
 }
-function summary(){const st=fam().weave?'Woven':CATALOG[state.style].label,fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(liningOK()&&state.opacity==='blackout'?' with room-darkening lining':'');}
-function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
+function summary(){const st=fam().weave?'Woven':CATALOG[state.style].label,fold=foldsApply()&&state.fold!=='flat'?FOLDS[state.fold].label.toLowerCase()+' ':'';return `${fold}${state.family} ${st} in ${state.colorName}`+(liningOK()&&state.opacity==='blackout'?' with room-darkening lining':'')+(linerName()?' with '+linerName():'');}
+function lookQuery(){const q=new URLSearchParams({room:state.room,s:state.style,f:state.family,c:state.colorName});if(foldsApply())q.set('r',state.fold);if(fam().weave&&state.liner!=='none')q.set('l',state.liner);else if(state.opacity==='blackout'&&state.style==='roman')q.set('l','dark');return q;}
 function lookURL(){return location.origin+location.pathname+'?'+lookQuery();}
 let ref='';try{ref=new URLSearchParams(location.search).get('ref')||sessionStorage.getItem('tl-ref')||'';if(!/^[\w.-]{1,30}$/.test(ref))ref='';if(ref)sessionStorage.setItem('tl-ref',ref);}catch{}
 let mount='Inside';
 function sizeInfo(){const w=SITE.parseInches($('size-w').value),h=SITE.parseInches($('size-h').value);const ok=!!(w&&h);
- const q=ok?SITE.quote({style:state.style,family:state.family,width:w,height:h,lining:liningOK()&&state.opacity==='blackout'}):{price:null};
+ const q=ok?SITE.quote({style:state.style,family:state.family,width:w,height:h,lining:liningOK()&&state.opacity==='blackout',liner:fam().weave?state.liner:''}):{price:null};
  return{w,h,ok,bad:w===null||h===null,price:q.price,estimate:!!q.estimate,outOfRange:!!q.outOfRange,text:ok?`${SITE.formatInches(w)} wide x ${SITE.formatInches(h)} high`:''};}
 function updatePrice(){const out=$('price-out');const z=sizeInfo();
  if(out){if(z.price)out.innerHTML=`<b>${SITE.money(z.price)}</b>${z.estimate?' <span class="est">estimate</span>':''} <span>${SITE.PRICE_HOLD_NOTE||''}</span>`;
@@ -169,7 +172,10 @@ function updatePrice(){const out=$('price-out');const z=sizeInfo();
  updatePick();}
 /* ---------- Simple picker: style chips, one row of swatches, one action ---------- */
 const chipOf=()=>state.style==='roman'&&fam().weave?'woven':state.style;
-const lightOf=()=>fam().blackout?'blackout':'filtering';
+// Woven: see-through by default; a light-filtering liner stops the view, a blackout liner stops the light.
+const LINER_LIGHT={none:'sheer',filter:'filtering',dark:'blackout'},LIGHT_LINER={sheer:'none',filtering:'filter',blackout:'dark'};
+const lightOf=()=>fam().weave?LINER_LIGHT[state.liner]||'sheer':fam().blackout?'blackout':'filtering';
+const linerName=()=>fam().weave?{none:'',filter:'light-filtering liner',dark:'blackout liner'}[state.liner]||'':'';
 const typeFams=(chip,light)=>{const style=chip==='woven'?'roman':chip;return CATALOG[style].families.filter(x=>(chip==='woven'?x.weave:!x.weave)&&(light==null||(light==='blackout')===!!x.blackout));};
 const slugify=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):'';
@@ -187,12 +193,12 @@ function updatePick(){
  const f=fam(),c=col(),chip=chipOf(),light=lightOf();
  document.querySelectorAll('[data-chip]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chip===chip)));
  const hasBo=typeFams(chip,'blackout').length>0;
- document.querySelectorAll('[data-light]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.light===light));if(b.dataset.light==='blackout')b.hidden=!hasBo;});
+ const wv=chip==='woven';document.querySelectorAll('[data-light]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.light===light));if(b.dataset.light==='blackout')b.hidden=!(hasBo||wv);if(b.dataset.light==='sheer')b.hidden=!wv;b.textContent=wv?{sheer:'No liner',filtering:'Light filtering',blackout:'Blackout'}[b.dataset.light]:{sheer:'See-through',filtering:'Light filtering',blackout:'Blackout'}[b.dataset.light];});
  $('pick-fabric').textContent=f.name;$('pick-color').textContent=c.name;
- const row=$('swatch-row'),fams=typeFams(chip,light),key=chip+'|'+light;
+ const row=$('swatch-row'),fams=typeFams(chip,wv?null:light),key=chip+'|'+(wv?'':light);
  if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>{const u=tileURL(x.name,cc.name);return `<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="background-color:${cc.hex}">${u?`<img src="${u}" alt="" loading="lazy" decoding="async">`:''}</button>`;}).join('')).join('');}
  row.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===f.name+'|'+c.name)));
- const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label,name=`${f.name} ${label} in ${c.name}`;
+ const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label,name=`${f.name} ${label} in ${c.name}`+(linerName()?`, ${linerName()}`:'');
  const from=SITE.fromPrice(state.style,f.name);
  $('cta-sub').textContent=name+(z.price?` · ${SITE.money(z.price)}${z.estimate?' est.':''}`:from?` · from ${SITE.money(from)}`:'');
  $('size-open').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','')} · ${SITE.money(z.price)} · edit size`:'Add your window size';
@@ -205,8 +211,9 @@ function updatePick(){
 }
 document.addEventListener('click',e=>{
  const ch=e.target.closest('[data-chip]');
- if(ch){const k=ch.dataset.chip,list=typeFams(k,lightOf()),fams=list.length?list:typeFams(k,'filtering');setLook(k,fams[0].name,fams[0].colors[0].name);engaged('pick:'+k);return;}
+ if(ch){const k=ch.dataset.chip,list=typeFams(k,k==='woven'?null:lightOf()),fams=list.length?list:typeFams(k,'filtering');setLook(k,fams[0].name,fams[0].colors[0].name);engaged('pick:'+k);return;}
  const li=e.target.closest('[data-light]');
+ if(li&&chipOf()==='woven'){state.liner=LIGHT_LINER[li.dataset.light]||'none';engaged('pick:liner-'+state.liner);lighting();refresh();return;}
  if(li){const fams=typeFams(chipOf(),li.dataset.light);if(fams.length){setLook(chipOf(),fams[0].name,fams[0].colors[0].name);engaged('pick:'+li.dataset.light);}return;}
  if(e.target.closest('#rec-apply')){const rec=RECS[state.room]||RECS['living-room'];setLook(rec.chip,rec.f,rec.c);engaged('pick:rec');return;}
 });
@@ -246,7 +253,7 @@ document.querySelectorAll('[data-text]').forEach(b=>b.addEventListener('click',(
 {const q=new URLSearchParams(location.search);
  if(CATALOG[q.get('s')])state.style=q.get('s');
  if(CATALOG[state.style].families.some(f=>f.name===q.get('f')))state.family=q.get('f');else if(q.get('s'))state.family=CATALOG[state.style].families[0].name;
- if(q.get('c'))state.colorName=q.get('c');if(FOLDS[q.get('r')])state.fold=q.get('r');if(q.get('l')==='dark')state.opacity='blackout';
+ if(q.get('c'))state.colorName=q.get('c');if(FOLDS[q.get('r')])state.fold=q.get('r');if(q.get('l')==='dark'){state.opacity='blackout';state.liner='dark';}if(q.get('l')==='filter')state.liner='filter';
  if(ROOMS.some(r=>r.id===q.get('room'))||q.get('room')==='mine')state.room=q.get('room');
  syncFamily();renderOptions();}
 const yieldUI=()=>new Promise(r=>setTimeout(r,0));

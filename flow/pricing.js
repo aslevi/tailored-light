@@ -6,7 +6,8 @@
 //   roller     cost = 90 + 1.0 * max(0, sqft - 8) + 1.2 * max(0, W - 40)
 //   roman      cost = max(110, 9.25 * sqft)          (+10% with a room-darkening lining; folds don't change it;
 //              no lining for Sheer Voile, Blackout Linen or woven families)
-//   woven wood cost = max(115, 60 + 7.5 * sqft)       (woven families, made as a Roman)
+//   woven wood cost = max(115, 60 + 7.5 * sqft)       (woven families, made as a Roman; see-through with no liner)
+//              +12% with a light-filtering liner, +18% with a blackout liner (placeholder until the supplier quotes liners)
 //   zebra      cost = 1.15 * roller cost              (shown as an estimate until confirmed by text)
 //
 //   retail = cost * 2.3, rounded UP to the next price ending in 9:  ceil((p + 1) / 10) * 10 - 1, minimum $149.
@@ -31,12 +32,14 @@ export const liningAvailable = (style, family) => style === 'roman' && !NO_LININ
 
 const rollerCost = (w, h) => { const sq = w * h / 144; return 90 + 1.0 * Math.max(0, sq - 8) + 1.2 * Math.max(0, w - 40); };
 
-export function costFor({ style, family, width, height, lining = false }) {
+export const WOVEN_LINER = { '': 1, none: 1, filter: 1.12, dark: 1.18 };
+export const isWoven = family => WOVEN.has(family);
+export function costFor({ style, family, width, height, lining = false, liner = '' }) {
   const w = +width, h = +height, sq = w * h / 144, line = priceLine(style, family);
   let c;
   if (line === 'roller') c = rollerCost(w, h);
   else if (line === 'roman') c = Math.max(110, 9.25 * sq) * (lining && liningAvailable(style, family) ? 1.1 : 1);
-  else if (line === 'woven') c = Math.max(115, 60 + 7.5 * sq);
+  else if (line === 'woven') c = Math.max(115, 60 + 7.5 * sq) * (WOVEN_LINER[liner] || 1);
   else if (line === 'zebra') c = 1.15 * rollerCost(w, h);
   else return null;
   return c;
@@ -47,11 +50,11 @@ export const retailFromCost = c => Math.max(MIN_PRICE, Math.ceil((c * MARKUP + 1
 export const inRange = (w, h) => w >= LIMITS.minW && w <= LIMITS.maxW && h >= LIMITS.minH && h <= LIMITS.maxH;
 
 // Full answer for the price modules: { price, estimate, outOfRange }.
-export function quote({ style, family, width, height, lining = false }) {
+export function quote({ style, family, width, height, lining = false, liner = '' }) {
   const w = +width, h = +height;
   if (!(w > 0) || !(h > 0)) return { price: null, estimate: false, outOfRange: false };
   if (!inRange(w, h)) return { price: null, estimate: false, outOfRange: true };
-  const c = costFor({ style, family, width: w, height: h, lining });
+  const c = costFor({ style, family, width: w, height: h, lining, liner });
   return { price: c == null ? null : retailFromCost(c), estimate: priceLine(style, family) === 'zebra', outOfRange: false };
 }
 

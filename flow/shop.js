@@ -1,7 +1,7 @@
 // Store behavior for Hello Shade: listing filters, product pages and swatch-kit picks.
 // Plain ES module, no build step. Dana's number comes from flow/config.js.
 import { DANA_SMS, SWATCH_KIT_URL, SWATCH_KIT_MAX, smsHref } from './config.js';
-import { parseInches, formatInches, quote, fromPrice, money, PRICE_HOLD_NOTE, OUT_OF_RANGE_NOTE } from './pricing.js';
+import { parseInches, formatInches, quote, fromPrice, money, PRICE_HOLD_NOTE, OUT_OF_RANGE_NOTE, isWoven } from './pricing.js';
 import { designCode } from './code.js';
 
 const root = document.querySelector('meta[name="tl-root"]')?.content || './';
@@ -47,7 +47,7 @@ if (dataEl) {
   const look = () => {
     const q = new URLSearchParams({ room: P.room, s: P.style, f: P.family, c: st.color.name });
     if (P.style === 'roman' && document.querySelector('[data-fold]')) q.set('r', st.fold);
-    if (st.lining) q.set('l', 'dark');
+    if (st.lining) q.set('l', st.lining);
     return q;
   };
   const render = () => {
@@ -67,10 +67,10 @@ if (dataEl) {
     document.querySelector('[data-size-hint]')?.classList.toggle('warn', bad);
     const opts = [];
     if (document.querySelector('[data-fold]') && st.fold !== 'flat') opts.push(`${st.fold} fold`);
-    if (st.lining) opts.push('room-darkening lining');
+    if (st.lining) opts.push(isWoven(P.family) ? (st.lining === 'filter' ? 'light-filtering liner' : 'blackout liner') : 'room-darkening lining');
     const size = w && h ? `${w} wide x ${h} high` : w ? `${w} wide (height not measured yet)` : h ? `${h} high (width not measured yet)` : "I haven't measured yet";
     const wn = parseInches($('[data-size="w"]').value), hn = parseInches($('[data-size="h"]').value);
-    const qt = wn && hn ? quote({ style: P.style, family: P.family, width: wn, height: hn, lining: !!st.lining }) : { price: null };
+    const qt = wn && hn ? quote({ style: P.style, family: P.family, width: wn, height: hn, lining: st.lining === 'dark', liner: isWoven(P.family) ? st.lining : '' }) : { price: null };
     const price = qt.price;
     const out = $('[data-price-out]');
     if (price) out.innerHTML = `<b>${money(price)}</b>${qt.estimate ? ' <span class="est">estimate</span>' : ''}`;
