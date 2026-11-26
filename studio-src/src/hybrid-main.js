@@ -92,7 +92,7 @@ function lighting(){
  const response=roomResponse({...state,opacity:(wl==='dark'||fam().light==='blackout')?'blackout':state.opacity,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  // No liner: you can see out through the weave. Any liner makes the shade opaque.
  const fl=fam().weave?null:fam().light,op=(fam().open||[]);
- response.clothOpacity=wl==='none'?.74:fl==='sheer'?.8:fl==='screen'?(op.length?Math.max(.62,.9-.025*op[Math.floor(op.length/2)]):.8):1;
+ response.clothOpacity=wl==='none'?.999:fl==='sheer'?.8:fl==='screen'?(op.length?Math.max(.62,.9-.025*op[Math.floor(op.length/2)]):.8):1;
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
  const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||f_.light==='blackout'||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):f_.light==='sheer'?.55:f_.light==='screen'?.45:.3;
  const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
@@ -100,7 +100,7 @@ function lighting(){
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
   const g=$('window-glow'),cover=mechanism.state.actualDrop??state.drop,shadeBottom=shadeBottomY;
   g.style.height=((Math.max(shadeBottom,OPEN.y0+6)-OPEN.y0)/1024*100)+'%';
-  g.style.opacity=String(Math.min(.95,clothTrans*sun*2.1*Math.min(1,cover*3)));}
+  g.style.opacity=String(Math.min(.95,clothTrans*sun*2.1*Math.min(1,cover*3)*(fam().weave?.25:1)));}
  ceilingLight.intensity=state.ceiling?state.ceilingBrightness*5.5:0;
  scene.environmentIntensity=response.environment;
  ambient.intensity=response.ambient;key.intensity=response.bounce;fill.intensity=response.lampIntensity;
@@ -115,7 +115,20 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  if(installation.lightField.backlit)installation.lightField.backlit.value=(fam().light==='blackout'||state.liner==='dark')?0:1;m.emissive.copy(m.color).lerp(new THREE.Color('#ffe9c6'),.24);m.emissiveMap=m.map;m.emissiveIntensity=Math.max(response.backscatter,/^(r|rp)-/.test(state.fabric)?.30*(1-(response.evening||0)):0);
+  if(installation.lightField.backlit)installation.lightField.backlit.value=(fam().light==='blackout'||state.liner==='dark')?0:1;const LF=installation.lightField;LF.gaps??={value:0};LF.meanLum??={value:.6};LF.backlit??={value:1};
+  const day=1-(response.evening||0),woven=!!fam().weave&&/^w-/.test(state.fabric);
+  if(woven){
+   // Sunlit woven woods glow: light passing through the reeds picks up a deeper, warmer version of their colour.
+   const v=hex().slice(1).match(/../g).map(x=>Math.pow(parseInt(x,16)/255,1.7)),mx=Math.max(...v,.05);
+   const glow=new THREE.Color(v[0]/mx,v[1]/mx,v[2]/mx).lerp(new THREE.Color('#ffc978'),.3);
+   m.emissive.copy(glow);m.emissiveMap=m.map;
+   const lum=(()=>{const q=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*q[0]+.7152*q[1]+.0722*q[2];})();
+   m.emissiveIntensity=wl==='dark'?0:day*(wl==='filter'?1.15:1.25)*(.55+.6*lum);
+   installation.lightField.gaps.value=wl==='none'?.45:0;installation.lightField.meanLum.value=Math.pow(lum,2.2);
+  }else{
+   if(installation.lightField.gaps)installation.lightField.gaps.value=0;
+   m.emissive.copy(m.color).lerp(new THREE.Color('#ffe9c6'),.24);m.emissiveMap=m.map;m.emissiveIntensity=Math.max(response.backscatter,/^(r|rp)-/.test(state.fabric)?.30*day:0);
+  }
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);

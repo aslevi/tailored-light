@@ -4,17 +4,18 @@ export function prepareClothLighting(material,lightField){
  if(material.userData.diffuseCloth)return;
  material.userData.diffuseCloth=true;
  if(!lightField.backlit)lightField.backlit={value:1};
+ if(!lightField.gaps)lightField.gaps={value:0};if(!lightField.meanLum)lightField.meanLum={value:.6};
  material.onBeforeCompile=shader=>{
   Object.assign(shader.uniforms,{
    clothDay:lightField.day,clothSun:lightField.sun,clothMood:lightField.mood,
-   clothClock:lightField.clock,clothBreeze:lightField.breeze,clothRegistration:lightField.registration,clothBacklit:lightField.backlit
+   clothClock:lightField.clock,clothBreeze:lightField.breeze,clothRegistration:lightField.registration,clothBacklit:lightField.backlit,clothGaps:lightField.gaps,clothMeanLum:lightField.meanLum
   });
   shader.vertexShader=shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 clothPosition;');
   shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nclothPosition = position;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>', `#include <common>
    varying vec3 clothPosition;
    uniform sampler2D clothDay,clothSun;
-   uniform float clothMood,clothClock,clothBreeze,clothBacklit;
+   uniform float clothMood,clothClock,clothBreeze,clothBacklit,clothGaps,clothMeanLum;
    uniform mat3 clothRegistration;
    float leafOval(vec2 p,vec2 c,vec2 r){return 1.-smoothstep(.62,1.,length((p-c)/r));}
    vec3 outdoorSample(vec2 p){
@@ -43,6 +44,15 @@ export function prepareClothLighting(material,lightField){
     return 1.-clamp(c/16.*.95,0.,.65);
    }
   `);
+  shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>', `
+   #include <map_fragment>
+   #ifdef USE_MAP
+   if(clothGaps>0.){
+    float tl=dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722))/max(clothMeanLum,.04);
+    diffuseColor.a=mix(1.-clothGaps,1.,smoothstep(.6,1.4,tl));
+   }
+   #endif
+  `);
   shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>', `
    #include <color_fragment>
    // Low-contrast irregular yarn bundles remain legible at room scale.
@@ -70,6 +80,6 @@ export function prepareClothLighting(material,lightField){
    totalEmissiveRadiance *= (0.65+0.35*edge)*(.55+.45*head)*pocket*broadLight*weave;
   `);
  };
- material.customProgramCacheKey=()=> 'frontal-room-diffuse-cloth-v5';
+ material.customProgramCacheKey=()=> 'frontal-room-diffuse-cloth-v6';
  material.needsUpdate=true;
 }
