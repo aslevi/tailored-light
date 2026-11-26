@@ -73,7 +73,7 @@ export function parseText(raw) {
 }
 // Samples text from /swatch-kit/: "Hi Dana! I'd like samples of: Raw Linen in Flax, Soft Cotton in Sage."
 // No design link: the lead gets the first pick as its design, so it still has a code and a look link.
-export const FAMILY_STYLE = { 'Daylight Weave': 'roller', 'Morning Haze': 'roller', 'Deep Sleep': 'roller', 'Clear View': 'roller',
+export const FAMILY_STYLE = { 'Linen Fleck': 'roller', 'Smooth Blackout': 'roller', 'Heathered Weave': 'roller', 'Ribbed Stripe': 'roller', 'Canvas': 'roller', 'Rain Texture': 'roller', 'Matte': 'roller', 'Tweed': 'roller', 'Fine Stripe': 'roller', 'Brushed Slub': 'roller', 'Soft Linen': 'roller', 'Shantung': 'roller', 'Cord': 'roller', 'Raw Silk': 'roller', 'Heather Linen': 'roller', 'Wisp': 'roller', 'Satin Sheer': 'roller', 'Drift': 'roller', 'Rib Sheer': 'roller', 'Shimmer': 'roller', 'Muslin': 'roller', 'Sheer Stripe': 'roller', 'Ribbed Sheer': 'roller', 'Linen Gauze': 'roller', 'Flax': 'roller', 'Slate Slub': 'roller', 'Haze': 'roller', 'Tweed Sheer': 'roller', 'Clear View': 'roller', 'Hexagon Screen': 'roller', 'Fine Screen': 'roller', 'Dense Screen': 'roller', 'Classic Screen': 'roller', 'Linen Screen': 'roller', 'Dense Weave': 'roller', 'Geo Screen': 'roller', 'Crosshatch Screen': 'roller', 'Palm Screen': 'roller', 'Open Screen': 'roller',
   'Raw Linen': 'roman', 'Soft Cotton': 'roman', 'Ticking Stripe': 'roman', 'Sheer Voile': 'roman', 'Blackout Linen': 'roman', 'Grasscloth': 'roman', 'Natural Jute': 'roman', 'Reed': 'roman', 'Bamboo': 'roman', 'Lattice': 'roman', 'Textured Linen': 'roman',
   'Twin Light': 'zebra', 'Sand Stripe': 'zebra', 'Twin Shade': 'zebra' };
 export function parseSamples(text) {

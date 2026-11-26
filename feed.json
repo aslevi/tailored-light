@@ -130,87 +130,848 @@
   },
   "products": [
     {
-      "name": "Daylight Weave Roller",
+      "name": "Linen Fleck Roller",
       "type": "roller",
-      "url": "https://helloshade.co/shades/roller/daylight-weave/",
-      "light": "Light filtering",
-      "colors": [
-        "White",
-        "Oat",
-        "Mocha"
-      ],
-      "best_rooms": [
-        "kitchen",
-        "living room",
-        "home office"
-      ],
-      "from_price": 209,
-      "price_36x60": 229,
-      "price_36x60_with_lining": null,
-      "price_is_estimate": false,
-      "image": "https://helloshade.co/images/p/daylight-weave-white-room.webp"
-    },
-    {
-      "name": "Morning Haze Roller",
-      "type": "roller",
-      "url": "https://helloshade.co/shades/roller/morning-haze/",
-      "light": "Light filtering",
-      "colors": [
-        "Cream",
-        "Oat",
-        "Harbor Blue"
-      ],
-      "best_rooms": [
-        "kitchen",
-        "bathroom"
-      ],
-      "from_price": 209,
-      "price_36x60": 229,
-      "price_36x60_with_lining": null,
-      "price_is_estimate": false,
-      "image": "https://helloshade.co/images/p/morning-haze-cream-room.webp"
-    },
-    {
-      "name": "Deep Sleep Roller",
-      "type": "roller",
-      "url": "https://helloshade.co/shades/roller/deep-sleep/",
+      "url": "https://helloshade.co/shades/roller/linen-fleck/",
       "light": "Blackout",
       "colors": [
-        "White",
-        "Oat",
-        "Latte",
-        "Fog"
+        "Beige",
+        "Cream"
       ],
       "best_rooms": [
         "bedroom",
-        "nursery"
+        "nursery",
+        "media room"
       ],
       "from_price": 209,
       "price_36x60": 229,
       "price_36x60_with_lining": null,
       "price_is_estimate": false,
-      "image": "https://helloshade.co/images/p/deep-sleep-white-room.webp"
+      "image": "https://helloshade.co/images/p/linen-fleck-beige-room.webp"
+    },
+    {
+      "name": "Smooth Blackout Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/smooth-blackout/",
+      "light": "Blackout",
+      "colors": [
+        "Off White",
+        "White",
+        "Cool White",
+        "Navy",
+        "Onyx",
+        "Black"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/smooth-blackout-off-white-room.webp"
+    },
+    {
+      "name": "Heathered Weave Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/heathered-weave/",
+      "light": "Blackout",
+      "colors": [
+        "Beige",
+        "Khaki",
+        "Dark Grey",
+        "Linen Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/heathered-weave-beige-room.webp"
+    },
+    {
+      "name": "Ribbed Stripe Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/ribbed-stripe/",
+      "light": "Blackout",
+      "colors": [
+        "White",
+        "Beige",
+        "Coffee",
+        "Espresso"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/ribbed-stripe-white-room.webp"
+    },
+    {
+      "name": "Canvas Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/canvas/",
+      "light": "Blackout",
+      "colors": [
+        "Moonlight",
+        "Alabaster",
+        "Dune",
+        "Cinder"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/canvas-moonlight-room.webp"
+    },
+    {
+      "name": "Rain Texture Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/rain-texture/",
+      "light": "Blackout",
+      "colors": [
+        "Off White",
+        "White",
+        "Latte",
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/rain-texture-off-white-room.webp"
+    },
+    {
+      "name": "Matte Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/matte/",
+      "light": "Blackout",
+      "colors": [
+        "Off White",
+        "White",
+        "Beige",
+        "White Grey",
+        "Light Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/matte-off-white-room.webp"
+    },
+    {
+      "name": "Tweed Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/tweed/",
+      "light": "Blackout",
+      "colors": [
+        "Almond",
+        "Marshmallow",
+        "Soba",
+        "Ash",
+        "Steel"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/tweed-almond-room.webp"
+    },
+    {
+      "name": "Fine Stripe Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/fine-stripe/",
+      "light": "Blackout",
+      "colors": [
+        "White",
+        "Beige",
+        "Khaki",
+        "Grey",
+        "White Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/fine-stripe-white-room.webp"
+    },
+    {
+      "name": "Brushed Slub Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/brushed-slub/",
+      "light": "Blackout",
+      "colors": [
+        "Beige",
+        "Khaki",
+        "Light Grey",
+        "White"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/brushed-slub-beige-room.webp"
+    },
+    {
+      "name": "Soft Linen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/soft-linen/",
+      "light": "Blackout",
+      "colors": [
+        "Beige",
+        "Khaki",
+        "Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/soft-linen-beige-room.webp"
+    },
+    {
+      "name": "Shantung Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/shantung/",
+      "light": "Blackout",
+      "colors": [
+        "White",
+        "Beige",
+        "Silver",
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/shantung-white-room.webp"
+    },
+    {
+      "name": "Cord Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/cord/",
+      "light": "Blackout",
+      "colors": [
+        "Off White",
+        "Beige",
+        "Latte",
+        "Chocolate",
+        "White"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/cord-off-white-room.webp"
+    },
+    {
+      "name": "Raw Silk Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/raw-silk/",
+      "light": "Blackout",
+      "colors": [
+        "Soft White",
+        "Cream Beige",
+        "Latte"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/raw-silk-soft-white-room.webp"
+    },
+    {
+      "name": "Heather Linen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/heather-linen/",
+      "light": "Blackout",
+      "colors": [
+        "White",
+        "Light Brown",
+        "Grey",
+        "Beige"
+      ],
+      "best_rooms": [
+        "bedroom",
+        "nursery",
+        "media room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/heather-linen-white-room.webp"
+    },
+    {
+      "name": "Wisp Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/wisp/",
+      "light": "Sheer",
+      "colors": [
+        "White",
+        "Beige",
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/wisp-white-room.webp"
+    },
+    {
+      "name": "Satin Sheer Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/satin-sheer/",
+      "light": "Sheer",
+      "colors": [
+        "Soft White",
+        "Cream Beige",
+        "Latte"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/satin-sheer-soft-white-room.webp"
+    },
+    {
+      "name": "Drift Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/drift/",
+      "light": "Light filtering",
+      "colors": [
+        "Light Grey",
+        "Dark Grey",
+        "Off White",
+        "White",
+        "Latte"
+      ],
+      "best_rooms": [
+        "bathroom",
+        "kitchen",
+        "living room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/drift-light-grey-room.webp"
+    },
+    {
+      "name": "Rib Sheer Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/rib-sheer/",
+      "light": "Sheer",
+      "colors": [
+        "White",
+        "Beige",
+        "Coffee",
+        "Chocolate"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/rib-sheer-white-room.webp"
+    },
+    {
+      "name": "Shimmer Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/shimmer/",
+      "light": "Sheer",
+      "colors": [
+        "White",
+        "Beige",
+        "Silver"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/shimmer-white-room.webp"
+    },
+    {
+      "name": "Muslin Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/muslin/",
+      "light": "Sheer",
+      "colors": [
+        "Off White",
+        "Ivory",
+        "Beige",
+        "Light Grey"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/muslin-off-white-room.webp"
+    },
+    {
+      "name": "Sheer Stripe Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/sheer-stripe/",
+      "light": "Sheer",
+      "colors": [
+        "White",
+        "Beige",
+        "Khaki",
+        "Grey",
+        "White Grey"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/sheer-stripe-white-room.webp"
+    },
+    {
+      "name": "Ribbed Sheer Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/ribbed-sheer/",
+      "light": "Sheer",
+      "colors": [
+        "White",
+        "Beige",
+        "Coffee",
+        "Espresso"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/ribbed-sheer-white-room.webp"
+    },
+    {
+      "name": "Linen Gauze Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/linen-gauze/",
+      "light": "Sheer",
+      "colors": [
+        "Latte",
+        "Black"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/linen-gauze-latte-room.webp"
+    },
+    {
+      "name": "Flax Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/flax/",
+      "light": "Light filtering",
+      "colors": [
+        "Beige",
+        "Cream"
+      ],
+      "best_rooms": [
+        "bathroom",
+        "kitchen",
+        "living room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/flax-beige-room.webp"
+    },
+    {
+      "name": "Slate Slub Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/slate-slub/",
+      "light": "Light filtering",
+      "colors": [
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "bathroom",
+        "kitchen",
+        "living room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/slate-slub-light-grey-room.webp"
+    },
+    {
+      "name": "Haze Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/haze/",
+      "light": "Light filtering",
+      "colors": [
+        "Beige",
+        "Khaki",
+        "Grey"
+      ],
+      "best_rooms": [
+        "bathroom",
+        "kitchen",
+        "living room"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/haze-beige-room.webp"
+    },
+    {
+      "name": "Tweed Sheer Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/tweed-sheer/",
+      "light": "Sheer",
+      "colors": [
+        "Beige",
+        "Khaki",
+        "Grey",
+        "Light Grey"
+      ],
+      "best_rooms": [
+        "living room",
+        "dining room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/tweed-sheer-beige-room.webp"
     },
     {
       "name": "Clear View Roller",
       "type": "roller",
       "url": "https://helloshade.co/shades/roller/clear-view/",
-      "light": "Light filtering",
+      "light": "Solar screen",
       "colors": [
-        "White",
-        "Mist",
-        "Slate"
+        "Pure White",
+        "Sand",
+        "White Grey",
+        "Dark Grey"
       ],
       "best_rooms": [
-        "kitchen",
-        "bathroom",
-        "home office"
+        "home office",
+        "living room",
+        "sunroom"
       ],
       "from_price": 209,
       "price_36x60": 229,
       "price_36x60_with_lining": null,
       "price_is_estimate": false,
-      "image": "https://helloshade.co/images/p/clear-view-white-room.webp"
+      "image": "https://helloshade.co/images/p/clear-view-pure-white-room.webp"
+    },
+    {
+      "name": "Hexagon Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/hexagon-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/hexagon-screen-white-room.webp"
+    },
+    {
+      "name": "Fine Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/fine-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/fine-screen-white-room.webp"
+    },
+    {
+      "name": "Dense Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/dense-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "White Sand",
+        "White Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/dense-screen-white-room.webp"
+    },
+    {
+      "name": "Classic Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/classic-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "White Sand",
+        "White Grey",
+        "Grey Black",
+        "Black"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/classic-screen-white-room.webp"
+    },
+    {
+      "name": "Linen Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/linen-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "Khaki",
+        "Black"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/linen-screen-white-room.webp"
+    },
+    {
+      "name": "Dense Weave Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/dense-weave/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "White Sand",
+        "White Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/dense-weave-white-room.webp"
+    },
+    {
+      "name": "Geo Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/geo-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "Khaki",
+        "Light Grey",
+        "Dark Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/geo-screen-khaki-room.webp"
+    },
+    {
+      "name": "Crosshatch Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/crosshatch-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "Khaki",
+        "Light Grey",
+        "Black"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/crosshatch-screen-khaki-room.webp"
+    },
+    {
+      "name": "Palm Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/palm-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "Khaki",
+        "Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/palm-screen-khaki-room.webp"
+    },
+    {
+      "name": "Open Screen Roller",
+      "type": "roller",
+      "url": "https://helloshade.co/shades/roller/open-screen/",
+      "light": "Solar screen",
+      "colors": [
+        "White",
+        "Grey"
+      ],
+      "best_rooms": [
+        "home office",
+        "living room",
+        "sunroom"
+      ],
+      "from_price": 209,
+      "price_36x60": 229,
+      "price_36x60_with_lining": null,
+      "price_is_estimate": false,
+      "image": "https://helloshade.co/images/p/open-screen-white-room.webp"
     },
     {
       "name": "Twin Light Zebra",

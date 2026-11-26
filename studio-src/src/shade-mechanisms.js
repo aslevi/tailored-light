@@ -35,7 +35,8 @@ function axle(parent,name,r,length,mat,x=0,y=0,z=0){
 function textile(color,fabric,ownedTextures){
   const source=clothTexture(fabric),map=source.clone(),normal=normalFromHeight(source).clone();
   // Scanned woven tiles are 3 in (7.6 cm) square; UVs run one unit per 12 cm.
-  const k=/^w-/.test(fabric)?.12/.0762:1;map.repeat.set(k,k);normal.repeat.set(k,k);map.needsUpdate=normal.needsUpdate=true;
+  // Scanned tiles: 3 in (7.6 cm); large-repeat patterns 4.5 in (11.4 cm).
+  const k=/^rp-/.test(fabric)?.12/.1143:/^(w|r)-/.test(fabric)?.12/.0762:1;map.repeat.set(k,k);normal.repeat.set(k,k);map.needsUpdate=normal.needsUpdate=true;
   ownedTextures.add(map);ownedTextures.add(normal);
   const mat=new THREE.MeshPhysicalMaterial({color,map,normalMap:normal,normalScale:new THREE.Vector2(.40,.40),roughness:.93,
     sheen:.65,sheenColor:new THREE.Color('#e8dfcd'),sheenRoughness:.86,side:THREE.DoubleSide});

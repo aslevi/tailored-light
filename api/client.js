@@ -39,7 +39,7 @@
       },
       {
         id: 'demo-3', room: 'Bedroom', label: 'Over bed', style: 'Roller',
-        fabric: 'Deep Sleep', color: 'Oat', colorHex: '#D8CBB6', swatch: 'swatches/deep-sleep-oat.webp',
+        fabric: 'Canvas', color: 'Oat', colorHex: '#D8CBB6', swatch: 'swatches/deep-sleep-oat.webp',
         mount: 'Outside', control: 'Cordless', controlSide: null,
         widths: [42.5, null, null], heights: [64, null, null], depth: 2.5,
         orderWidth: 42.5, orderHeight: 64,

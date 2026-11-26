@@ -8,7 +8,7 @@ const p = (style, family, w, h, lining) => quote({ style, family, width: w, heig
 assert.equal(FROM.roller, 209); assert.equal(FROM.roman, 259); assert.equal(FROM.woven, 269); assert.equal(FROM.zebra, 239);
 assert.equal(LOWEST_FROM, 209);
 // Typical window, 36 x 60.
-assert.equal(p('roller', 'Daylight Weave', 36, 60), 229);
+assert.equal(p('roller', 'Canvas', 36, 60), 229);
 assert.equal(p('roman', 'Raw Linen', 36, 60), 329);   // 9.25 * 15 sq ft = 138.75 cost -> 319.13 -> 329
 assert.equal(p('roman', 'Grasscloth', 36, 60), 399);
 assert.equal(p('zebra', 'Twin Light', 36, 60), 259);

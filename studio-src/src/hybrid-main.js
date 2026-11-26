@@ -36,7 +36,7 @@ const hex=()=>col().hex;
 const foldsApply=()=>state.style==='roman'&&!fam().weave;
 // Room-darkening lining: Roman fabrics only, not the sheer, the blackout or the woven (same rule as flow/pricing.js).
 const liningOK=()=>state.style==='roman'&&!fam().weave&&!fam().blackout&&!/Sheer/.test(fam().name);
-function syncFamily(reset){const f=fam();state.family=f.name;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;state.fabric=f.weave?(SWATCH[f.name+'|'+state.colorName]?'w-'+SWATCH[f.name+'|'+state.colorName]:'reed'):/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
+function syncFamily(reset){const f=fam();state.family=f.name;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;const sw=SWATCH[f.name+'|'+state.colorName];state.fabric=f.weave?(sw?'w-'+sw:'reed'):(state.style==='roller'&&sw&&f.light)?(PATTERNED.has(f.name)?'rp-':'r-')+sw:/Stripe/.test(f.name)?'stripe':f.tex;if(!f.colors.some(c=>c.name===state.colorName))state.colorName=f.colors[0].name;
  if(reset||state.style!=='roman'||f.weave||f.blackout)state.opacity=f.blackout?'blackout':'filtering';
  if(!f.blackout&&!liningOK())state.opacity='filtering';}
 function renderOptions(){
@@ -67,13 +67,14 @@ function positionModel(){
  mechanism.root.position.set(0,0,0);mechanism.root.scale.setScalar(1);mechanism.root.rotation.set(0,0,0);
 }
 const wovenLoading=new Set();
+const PATTERNED=new Set(['Hexagon Screen','Geo Screen','Palm Screen']);
 function ensureWoven(kind){
- if(!/^w-/.test(kind)||hasTextureImage(kind)||wovenLoading.has(kind))return;
+ if(!/^(w|r|rp)-/.test(kind)||hasTextureImage(kind)||wovenLoading.has(kind))return;
  wovenLoading.add(kind);const i=new Image();
  i.onload=()=>{registerTextureImage(kind,i);wovenLoading.delete(kind);if(state.fabric===kind)rebuild();};
- i.onerror=()=>wovenLoading.delete(kind);i.src=site('textures/woven/'+kind.slice(2)+'.webp');
+ i.onerror=()=>wovenLoading.delete(kind);i.src=site((/^w-/.test(kind)?'textures/woven/':'textures/roller/')+kind.replace(/^[a-z]+-/,'')+'.webp');
 }
-const shadeColor=()=>/^w-/.test(state.fabric)&&hasTextureImage(state.fabric)?'#f3efe8':hex();
+const shadeColor=()=>/^(w|r|rp)-/.test(state.fabric)&&hasTextureImage(state.fabric)?'#f3efe8':hex();
 function rebuild(){
  if(!installation){refresh();return;}
  ensureWoven(state.fabric);
@@ -87,9 +88,10 @@ function lighting(){
  const wl=fam().weave?state.liner:null;
  const response=roomResponse({...state,opacity:wl==='dark'?'blackout':state.opacity,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  // No liner: you can see out through the weave. Any liner makes the shade opaque.
- response.clothOpacity=wl==='none'?.74:1;
+ const fl=fam().weave?null:fam().light,op=(fam().open||[]);
+ response.clothOpacity=wl==='none'?.74:fl==='sheer'?.8:fl==='screen'?(op.length?Math.max(.62,.9-.025*op[Math.floor(op.length/2)]):.8):1;
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):.3;
+ const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):f_.light==='sheer'?.55:f_.light==='screen'?.45:.3;
  const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
  roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:shadeBottomY},response);
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
@@ -114,7 +116,7 @@ function lighting(){
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
-   m.roughness=.98;m.sheen=.28;m.normalScale?.set(/^(reed|w-)/.test(state.fabric)?.9:state.fabric==='stripe'?.5:.36,/^(reed|w-)/.test(state.fabric)?.9:state.fabric==='stripe'?.5:.36);
+   m.roughness=.98;m.sheen=.28;m.normalScale?.set(/^(reed|w-)/.test(state.fabric)?.9:/^(r|rp)-/.test(state.fabric)?.55:state.fabric==='stripe'?.5:.36,/^(reed|w-)/.test(state.fabric)?.9:/^(r|rp)-/.test(state.fabric)?.55:state.fabric==='stripe'?.5:.36);
    const transparent=response.clothOpacity<1;
    if(m.transparent!==transparent){m.transparent=transparent;m.needsUpdate=true;}
    m.opacity=response.clothOpacity;m.depthWrite=!transparent;
@@ -174,26 +176,27 @@ function updatePrice(){const out=$('price-out');const z=sizeInfo();
 const chipOf=()=>state.style==='roman'&&fam().weave?'woven':state.style;
 // Woven: see-through by default; a light-filtering liner stops the view, a blackout liner stops the light.
 const LINER_LIGHT={none:'sheer',filter:'filtering',dark:'blackout'},LIGHT_LINER={sheer:'none',filtering:'filter',blackout:'dark'};
-const lightOf=()=>fam().weave?LINER_LIGHT[state.liner]||'sheer':fam().blackout?'blackout':'filtering';
+const famLight=x=>x.light||(x.blackout?'blackout':'filtering');
+const lightOf=()=>fam().weave?LINER_LIGHT[state.liner]||'sheer':famLight(fam());
 const linerName=()=>fam().weave?{none:'',filter:'light-filtering liner',dark:'blackout liner'}[state.liner]||'':'';
-const typeFams=(chip,light)=>{const style=chip==='woven'?'roman':chip;return CATALOG[style].families.filter(x=>(chip==='woven'?x.weave:!x.weave)&&(light==null||(light==='blackout')===!!x.blackout));};
+const typeFams=(chip,light)=>{const style=chip==='woven'?'roman':chip;return CATALOG[style].families.filter(x=>(chip==='woven'?x.weave:!x.weave)&&(light==null||famLight(x)===light));};
 const slugify=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const tileURL=(f,c)=>SWATCH[f+'|'+c]?site('swatches/'+SWATCH[f+'|'+c]+'.webp'):'';
 // Dana's pick for each room: type, light, fabric, color.
 const RECS={'living-room':{text:'a <b>Roman in Raw Linen</b> for living rooms',chip:'roman',f:'Raw Linen',c:'Flax'},
  mine:{text:'a <b>Roman in Raw Linen</b> for your room',chip:'roman',f:'Raw Linen',c:'Flax'},
- bedroom:{text:'a <b>blackout Roller</b> for bedrooms',chip:'roller',f:'Deep Sleep',c:'Oat'},
- nursery:{text:'a <b>blackout Roller</b> for nurseries',chip:'roller',f:'Deep Sleep',c:'Oat'},
+ bedroom:{text:'a <b>blackout Roller</b> for bedrooms',chip:'roller',f:'Canvas',c:'Alabaster'},
+ nursery:{text:'a <b>blackout Roller</b> for nurseries',chip:'roller',f:'Matte',c:'White'},
  kitchen:{text:'a <b>Woven</b> shade for kitchens',chip:'woven',f:'Grasscloth',c:'Warm Tan'},
- 'home-office':{text:'a <b>light-filtering Roller or Zebra</b> for home offices',chip:'roller',f:'Clear View',c:'White'},
- bathroom:{text:'a <b>Daylight Weave Roller</b> for bathrooms',chip:'roller',f:'Daylight Weave',c:'Oat'},
+ 'home-office':{text:'a <b>solar screen Roller</b> for home offices',chip:'roller',f:'Clear View',c:'Pure White'},
+ bathroom:{text:'a <b>light-filtering Roller</b> for bathrooms: light in, privacy all day',chip:'roller',f:'Drift',c:'Off White'},
  'dining-room':{text:'a <b>Roman</b> for dining rooms',chip:'roman',f:'Raw Linen',c:'Cream'}};
 function setLook(chip,family,color){const style=chip==='woven'?'roman':chip;state.style=style;state.family=family;state.colorName=color;syncFamily(true);renderOptions();rebuild();lighting();refresh();document.body.classList.add('designed');}
 function updatePick(){
  const f=fam(),c=col(),chip=chipOf(),light=lightOf();
  document.querySelectorAll('[data-chip]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chip===chip)));
- const hasBo=typeFams(chip,'blackout').length>0;
- const wv=chip==='woven';document.querySelectorAll('[data-light]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.light===light));if(b.dataset.light==='blackout')b.hidden=!(hasBo||wv);if(b.dataset.light==='sheer')b.hidden=!wv;b.textContent=wv?{sheer:'No liner',filtering:'Light filtering',blackout:'Blackout'}[b.dataset.light]:{sheer:'See-through',filtering:'Light filtering',blackout:'Blackout'}[b.dataset.light];});
+ const hasBo=typeFams(chip,'blackout').length>0,has=l=>typeFams(chip,l).length>0;
+ const wv=chip==='woven';document.querySelectorAll('[data-light]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.light===light));b.hidden=wv?b.dataset.light==='screen':!has(b.dataset.light);b.textContent=wv?{sheer:'No liner',filtering:'Light filtering',blackout:'Blackout'}[b.dataset.light]:{sheer:'Sheer',filtering:'Light filtering',screen:'Solar screen',blackout:'Blackout'}[b.dataset.light];});
  $('pick-fabric').textContent=f.name;$('pick-color').textContent=c.name;
  const row=$('swatch-row'),fams=typeFams(chip,wv?null:light),key=chip+'|'+(wv?'':light);
  if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>{const u=tileURL(x.name,cc.name);return `<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="background-color:${cc.hex}">${u?`<img src="${u}" alt="" loading="lazy" decoding="async">`:''}</button>`;}).join('')).join('');}

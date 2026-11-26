@@ -22,7 +22,7 @@ export function eveningWeight({tod,mood}={}){
  return mood==='evening'?1:0;
 }
 export function roomResponse({coverage=0,style='roman',fabric='linen',color='#d7c5a2',opacity='filtering',alignment=1,mood='afternoon',lamp=true,tod,lampFade}={}){
- coverage=clamp(coverage);alignment=clamp(alignment);const scanned=/^w-/.test(fabric);if(scanned)fabric='reed';
+ coverage=clamp(coverage);alignment=clamp(alignment);const scanned=/^w-/.test(fabric);if(scanned)fabric='reed';else if(/^(r|rp)-/.test(fabric))fabric='linen';
  const rgb=color.replace('#','').match(/../g).map(x=>parseInt(x,16)/255);
  const luma=.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
  // Diffuse light transmission is independent of image/view transmission.

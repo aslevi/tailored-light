@@ -11,14 +11,14 @@ const writePicks = list => { try { localStorage.setItem(KIT_KEY, JSON.stringify(
 
 /* ---------- Listing filters (light control, color family) ---------- */
 document.querySelectorAll('[data-listing]').forEach(list => {
-  const state = { light: '', colors: '' };
+  const state = { light: '', colors: '', pattern: '' };
   const cards = [...list.querySelectorAll('.pcard')];
   const count = list.querySelector('[data-count]');
   const empty = list.querySelector('[data-empty]');
   const apply = () => {
     let n = 0;
     for (const c of cards) {
-      const ok = (!state.light || c.dataset.light === state.light) && (!state.colors || c.dataset.colors.split(' ').includes(state.colors));
+      const ok = (!state.light || c.dataset.light === state.light) && (!state.colors || c.dataset.colors.split(' ').includes(state.colors)) && (!state.pattern || c.dataset.pattern === state.pattern);
       c.hidden = !ok; if (ok) n++;
     }
     count.textContent = `${n} shade${n === 1 ? '' : 's'}`;
@@ -28,7 +28,7 @@ document.querySelectorAll('[data-listing]').forEach(list => {
   list.addEventListener('click', e => {
     const b = e.target.closest('[data-filter]');
     if (b) { state[b.dataset.filter] = b.dataset.value; apply(); }
-    if (e.target.closest('[data-clear]')) { state.light = state.colors = ''; apply(); }
+    if (e.target.closest('[data-clear]')) { state.light = state.colors = state.pattern = ''; apply(); }
   });
 });
 
@@ -114,7 +114,7 @@ if (catEl) {
   const add = new URLSearchParams(location.search).get('add');
   let type = 'roman', light = 'filtering';
   if (add && valid(add)) {
-    const f = add.split('|')[0]; type = CAT[f].type; light = CAT[f].blackout ? 'blackout' : 'filtering';
+    const f = add.split('|')[0]; type = CAT[f].type; light = CAT[f].light || (CAT[f].blackout ? 'blackout' : 'filtering');
     if (!list.includes(add)) { if (list.length < SWATCH_KIT_MAX) { list.push(add); writePicks(list); } else if (full) full.hidden = false; }
   }
   const grid = document.querySelector('[data-fab-grid]');
@@ -122,16 +122,17 @@ if (catEl) {
   const kit = document.querySelector('[data-swatch-kit]');
   const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
   const tile = (f, c) => `<button type="button" class="stile" data-sample="${esc(f)}|${esc(c)}" aria-pressed="false" aria-label="${esc(f)} in ${esc(c)}"><span class="sw"><img src="${root}${CAT[f].colors[c].swatch}" alt="" width="240" height="240" loading="lazy"><i aria-hidden="true"></i></span><span class="nm">${esc(f)} · ${esc(c)}</span></button>`;
-  const fams = (t, l) => Object.keys(CAT).filter(f => CAT[f].type === t && (l == null || (l === 'blackout') === !!CAT[f].blackout));
+  const lightOf = f => CAT[f].light || (CAT[f].blackout ? 'blackout' : 'filtering');
+  const fams = (t, l) => Object.keys(CAT).filter(f => CAT[f].type === t && (l == null || lightOf(f) === l));
   const drawGrid = () => {
-    const hasBO = fams(type, 'blackout').length > 0;
-    if (!hasBO) light = 'filtering';
+    const has = l => fams(type, l).length > 0;
+    if (!has(light)) light = ['filtering', 'sheer', 'screen', 'blackout'].find(has) || 'filtering';
     document.querySelectorAll('[data-stype]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.stype === type)));
-    document.querySelectorAll('[data-slight]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.slight === light)); if (b.dataset.slight === 'blackout') b.hidden = !hasBO; });
+    document.querySelectorAll('[data-slight]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.slight === light)); b.hidden = !has(b.dataset.slight); });
     const keys = fams(type, light).flatMap(f => Object.keys(CAT[f].colors).map(c => [f, c]));
     grid.innerHTML = keys.map(([f, c]) => tile(f, c)).join('');
     const cnt = document.querySelector('[data-fab-count]');
-    if (cnt) cnt.textContent = `${keys.length} ${light === 'blackout' ? 'blackout ' : ''}${TYPE_LABEL[type]} fabrics`;
+    if (cnt) cnt.textContent = `${keys.length} ${({ blackout: 'blackout ', sheer: 'sheer ', screen: 'solar screen ' })[light] || ''}${TYPE_LABEL[type]} fabrics`;
     mark();
   };
   const mark = () => {
