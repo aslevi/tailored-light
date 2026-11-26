@@ -3,17 +3,18 @@
 export function prepareClothLighting(material,lightField){
  if(material.userData.diffuseCloth)return;
  material.userData.diffuseCloth=true;
+ if(!lightField.backlit)lightField.backlit={value:1};
  material.onBeforeCompile=shader=>{
   Object.assign(shader.uniforms,{
    clothDay:lightField.day,clothSun:lightField.sun,clothMood:lightField.mood,
-   clothClock:lightField.clock,clothBreeze:lightField.breeze,clothRegistration:lightField.registration
+   clothClock:lightField.clock,clothBreeze:lightField.breeze,clothRegistration:lightField.registration,clothBacklit:lightField.backlit
   });
   shader.vertexShader=shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 clothPosition;');
   shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nclothPosition = position;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>', `#include <common>
    varying vec3 clothPosition;
    uniform sampler2D clothDay,clothSun;
-   uniform float clothMood,clothClock,clothBreeze;
+   uniform float clothMood,clothClock,clothBreeze,clothBacklit;
    uniform mat3 clothRegistration;
    float leafOval(vec2 p,vec2 c,vec2 r){return 1.-smoothstep(.62,1.,length((p-c)/r));}
    vec3 outdoorSample(vec2 p){
@@ -65,10 +66,10 @@ export function prepareClothLighting(material,lightField){
    vec3 projected=clothRegistration*vec3(windowUV,1.);
    float outdoor=diffuseOutdoor(projected.xy/projected.z,1.8+thickness*9.);
    float sky = .85+.25*smoothstep(-1.3,0.,clothPosition.y);
-   float broadLight = sky*(.34+.95*outdoor);
+   float broadLight = sky*(.34+.95*mix(.8,outdoor,clothBacklit));
    totalEmissiveRadiance *= (0.65+0.35*edge)*(.55+.45*head)*pocket*broadLight*weave;
   `);
  };
- material.customProgramCacheKey=()=> 'frontal-room-diffuse-cloth-v4';
+ material.customProgramCacheKey=()=> 'frontal-room-diffuse-cloth-v5';
  material.needsUpdate=true;
 }

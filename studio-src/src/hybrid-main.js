@@ -74,24 +74,27 @@ function ensureWoven(kind){
  i.onload=()=>{registerTextureImage(kind,i);wovenLoading.delete(kind);if(state.fabric===kind)rebuild();};
  i.onerror=()=>wovenLoading.delete(kind);i.src=site((/^w-/.test(kind)?'textures/woven/':'textures/roller/')+kind.replace(/^[a-z]+-/,'')+'.webp');
 }
+// Valance comes in white, beige or grey: pick the closest to the fabric.
+const valanceFor=hx=>{const v=hx.slice(1).match(/../g).map(x=>parseInt(x,16)/255),L=.2126*v[0]+.7152*v[1]+.0722*v[2],warm=v[0]-v[2];return L>.78&&warm<.06?'#F1EFEA':warm>.035&&L>.35?'#D8CAB0':'#A3A4A2';};
+const valanceName=hx=>({'#F1EFEA':'White','#D8CAB0':'Beige','#A3A4A2':'Grey'})[valanceFor(hx)];
 const shadeColor=()=>/^(w|r|rp)-/.test(state.fabric)&&hasTextureImage(state.fabric)?'#f3efe8':hex();
 function rebuild(){
  if(!installation){refresh();return;}
  ensureWoven(state.fabric);
  if(mechanism){scene.remove(mechanism.root);mechanism.dispose();}
- mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),width:1.66*winK,height:1.30});
+ mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),valance:state.style==='roller'?valanceFor(hex()):null,width:1.66*winK,height:1.30});
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();lighting();
 }
 function lighting(){
  if(!mechanism)return;
  const even=state.mood==='evening',afternoon=state.mood==='afternoon',alignment=mechanism.state.bandAlignment??1;
  const wl=fam().weave?state.liner:null;
- const response=roomResponse({...state,opacity:wl==='dark'?'blackout':state.opacity,color:hex(),coverage:mechanism.state.actualDrop,alignment});
+ const response=roomResponse({...state,opacity:(wl==='dark'||fam().light==='blackout')?'blackout':state.opacity,color:hex(),coverage:mechanism.state.actualDrop,alignment});
  // No liner: you can see out through the weave. Any liner makes the shade opaque.
  const fl=fam().weave?null:fam().light,op=(fam().open||[]);
  response.clothOpacity=wl==='none'?.74:fl==='sheer'?.8:fl==='screen'?(op.length?Math.max(.62,.9-.025*op[Math.floor(op.length/2)]):.8):1;
  if(state.style==='zebra')$('alignment-value').textContent=alignment>.8?'Sheer':alignment<.2?'Privacy':'Partly open';
- const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):f_.light==='sheer'?.55:f_.light==='screen'?.45:.3;
+ const by=mechanism.state.bottomY??-1.3;const f_=fam(),clothTrans=f_.blackout||f_.light==='blackout'||wl==='dark'||(state.style==='roman'&&!f_.weave&&state.opacity==='blackout')?0:/Sheer/.test(f_.name)?.6:state.style==='zebra'?.15+.35*alignment:f_.weave?.4*(.3+.7*(()=>{const v=hex().slice(1).match(/../g).map(x=>parseInt(x,16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2];})())*(wl==='none'?.6:1):f_.light==='sheer'?.55:f_.light==='screen'?.45:.3;
  const shadeBottomY=OPEN.y0+(.07-by)/1.38*(OPEN.y1-OPEN.y0);
  roomPlate?.update({...state,tod:state.tod??.5,clothTrans,shadeBottom:shadeBottomY},response);
  {const tod=state.tod??.5,night=Math.min(1,Math.max(0,tod-1)),sun=(tod<1?1:Math.pow(Math.max(0,1-(tod-1)/.85),1.3))*(1-night);
@@ -112,7 +115,7 @@ function lighting(){
  key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=1.15;key.shadow.camera.bottom=-1.15;key.shadow.camera.near=.05;key.shadow.camera.far=15;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.0015;
  const mats=new Set();mechanism.root.traverse(o=>{if(o.material&&/textile|fabric|Sewn_hems/.test(o.material.name))mats.add(o.material);});
  for(const m of mats){
-  m.emissive.copy(m.color).lerp(new THREE.Color('#ffe9c6'),.24);m.emissiveMap=m.map;m.emissiveIntensity=response.backscatter;
+  if(installation.lightField.backlit)installation.lightField.backlit.value=(fam().light==='blackout'||state.liner==='dark')?0:1;m.emissive.copy(m.color).lerp(new THREE.Color('#ffe9c6'),.24);m.emissiveMap=m.map;m.emissiveIntensity=Math.max(response.backscatter,/^(r|rp)-/.test(state.fabric)?.30*(1-(response.evening||0)):0);
   if(m.name==='Sewn_hems'){m.emissiveIntensity*=.18;continue;}
   if(state.style!=='zebra'){
    prepareClothLighting(m,installation.lightField);
@@ -201,7 +204,7 @@ function updatePick(){
  const row=$('swatch-row'),fams=typeFams(chip,wv?null:light),key=chip+'|'+(wv?'':light);
  if(row.dataset.key!==key){row.dataset.key=key;row.innerHTML=fams.map(x=>x.colors.map(cc=>{const u=tileURL(x.name,cc.name);return `<button type="button" data-pick="${x.name}|${cc.name}" aria-label="${x.name} in ${cc.name}" title="${x.name} · ${cc.name}" style="background-color:${cc.hex}">${u?`<img src="${u}" alt="" loading="lazy" decoding="async">`:''}</button>`;}).join('')).join('');}
  row.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===f.name+'|'+c.name)));
- const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label,name=`${f.name} ${label} in ${c.name}`+(linerName()?`, ${linerName()}`:'');
+ const z=sizeInfo(),label=chip==='woven'?'Woven':CATALOG[state.style].label,name=`${f.name} ${label} in ${c.name}`+(linerName()?`, ${linerName()}`:'')+(state.style==='roller'?`, ${valanceName(c.hex).toLowerCase()} valance`:'');
  const from=SITE.fromPrice(state.style,f.name);
  $('cta-sub').textContent=name+(z.price?` · ${SITE.money(z.price)}${z.estimate?' est.':''}`:from?` · from ${SITE.money(from)}`:'');
  $('size-open').textContent=z.price?`${z.text.replace(' wide x ',' × ').replace(' high','')} · ${SITE.money(z.price)} · edit size`:'Add your window size';
@@ -303,7 +306,7 @@ async function start3D(){try{
  {const tex=clothTexture(state.fabric==='reed'?'reed':state.fabric);normalFromHeight(tex);}
  await yieldUI();
  // First build, split across tasks (rebuild() does the same steps in one go for later changes).
- ensureWoven(state.fabric);mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),width:1.66*winK,height:1.30});
+ ensureWoven(state.fabric);mechanism=createMechanism({style:state.style,fabric:state.fabric,fold:foldsApply()?state.fold:'flat',color:shadeColor(),valance:state.style==='roller'?valanceFor(hex()):null,width:1.66*winK,height:1.30});
  await yieldUI();
  mechanism.update({drop:actualDrop,openness:actualOpen});scene.add(mechanism.root);positionModel();
  await yieldUI();
@@ -319,7 +322,7 @@ document.addEventListener('click',e=>{
  const d=b.dataset;
  if(d.style){state.style=d.style;state.family=CATALOG[d.style].families[0].name;syncFamily(true);renderOptions();rebuild();}
  else if(d.family){const ch=d.family!==state.family;state.family=d.family;syncFamily(ch);renderOptions();rebuild();}
- else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed||fam().weave){rebuild();}else mechanism?.update({color:hex()});}
+ else if(d.pick){const [f,c]=d.pick.split('|');const changed=f!==state.family;state.family=f;state.colorName=c;syncFamily(changed);if(changed||fam().weave||state.style==='roller'){rebuild();}else mechanism?.update({color:hex()});}
  else if(d.fold){state.fold=d.fold;rebuild();}
  else if(d.mood)state.mood=d.mood;
  else if(d.opacity)state.opacity=d.opacity;

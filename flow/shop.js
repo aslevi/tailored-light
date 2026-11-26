@@ -101,6 +101,29 @@ if (dataEl) {
   });
   document.querySelectorAll('[data-size]').forEach(i => i.addEventListener('input', render));
   render();
+  /* Magnifier: hover (or touch and hold) the photo to see the fabric up close, from the full-resolution scan. */
+  {
+    const main = $('[data-main]'), box = main.parentElement;
+    const lens = document.createElement('div'); lens.className = 'loupe'; lens.setAttribute('aria-hidden', 'true'); box.appendChild(lens);
+    const hint = document.createElement('p'); hint.className = 'loupe-hint'; hint.textContent = matchMedia('(hover: hover)').matches ? 'Hover to see the weave up close' : 'Touch and hold to see the weave up close'; box.after(hint);
+    if (!document.getElementById('loupe-css')) { const css = document.createElement('style'); css.id = 'loupe-css'; css.textContent = '.gallery .main{position:relative;overflow:hidden;cursor:zoom-in}.loupe{position:absolute;width:220px;height:220px;border-radius:50%;pointer-events:none;opacity:0;transform:translate(-50%,-50%) scale(.85);transition:opacity .15s,transform .15s;box-shadow:0 0 0 3px #fff,0 10px 30px rgba(40,25,20,.35);background-repeat:no-repeat;background-color:#eee;z-index:3}.loupe.on{opacity:1;transform:translate(-50%,-50%) scale(1)}.loupe-hint{font-size:13px;color:#7A5F57;margin:6px 0 0}@media (max-width:640px){.loupe{width:170px;height:170px}}'; document.head.appendChild(css); }
+    const zoomSrc = () => root + (st.color.zoom || st.color.win);
+    let img = null, src = '';
+    const ensure = () => { const z = zoomSrc(); if (z !== src) { src = z; img = new Image(); img.src = z; lens.style.backgroundImage = `url("${z}")`; } };
+    const move = (x, y) => {
+      ensure(); const r = main.getBoundingClientRect(); const fx = Math.min(1, Math.max(0, (x - r.left) / r.width)), fy = Math.min(1, Math.max(0, (y - r.top) / r.height));
+      const k = .5, zw = (img.naturalWidth || 2400) * k, zh = (img.naturalHeight || 1800) * k, L = lens.offsetWidth;
+      lens.style.left = (x - r.left) + 'px'; lens.style.top = (y - r.top) + 'px';
+      lens.style.backgroundSize = `${zw}px ${zh}px`; lens.style.backgroundPosition = `${-(fx * zw - L / 2)}px ${-(fy * zh - L / 2)}px`;
+      lens.classList.add('on');
+    };
+    const off = () => lens.classList.remove('on');
+    box.addEventListener('mousemove', e => move(e.clientX, e.clientY)); box.addEventListener('mouseleave', off);
+    let hold = null;
+    box.addEventListener('touchstart', e => { const t = e.touches[0]; hold = setTimeout(() => move(t.clientX, t.clientY), 250); }, { passive: true });
+    box.addEventListener('touchmove', e => { if (lens.classList.contains('on')) { e.preventDefault(); const t = e.touches[0]; move(t.clientX, t.clientY); } else clearTimeout(hold); }, { passive: false });
+    box.addEventListener('touchend', () => { clearTimeout(hold); off(); });
+  }
 }
 
 /* ---------- Samples picks: Dana's picks, 1 Type, 2 Light, 3 Fabric, tray of up to 5 ---------- */

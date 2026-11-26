@@ -36,7 +36,8 @@ function textile(color,fabric,ownedTextures){
   const source=clothTexture(fabric),map=source.clone(),normal=normalFromHeight(source).clone();
   // Scanned woven tiles are 3 in (7.6 cm) square; UVs run one unit per 12 cm.
   // Scanned tiles: 3 in (7.6 cm); large-repeat patterns 4.5 in (11.4 cm).
-  const k=/^rp-/.test(fabric)?.12/.1143:/^(w|r)-/.test(fabric)?.12/.0762:1;map.repeat.set(k,k);normal.repeat.set(k,k);map.needsUpdate=normal.needsUpdate=true;
+  // Synthesized fabric tiles are 12 in square; large-repeat roller patterns 4.5 in.
+  const k=/^rp-/.test(fabric)?.12/.1143:/^(r|w)-/.test(fabric)?.12/.3048:1;map.repeat.set(k,k);normal.repeat.set(k,k);map.needsUpdate=normal.needsUpdate=true;
   ownedTextures.add(map);ownedTextures.add(normal);
   const mat=new THREE.MeshPhysicalMaterial({color,map,normalMap:normal,normalScale:new THREE.Vector2(.40,.40),roughness:.93,
     sheen:.65,sheenColor:new THREE.Color('#e8dfcd'),sheenRoughness:.86,side:THREE.DoubleSide});
@@ -84,7 +85,7 @@ function hardware(root,width,metal,cap){
   }
 }
 function validate01(value,label){if(!Number.isFinite(value))throw new TypeError(label+' must be finite.');return clamp(value,0,1);}
-export function createMechanism({style='roller',width=1.62,height=1.28,color='#d8c6a4',fabric='linen',fold='relaxed'}={}){
+export function createMechanism({style='roller',width=1.62,height=1.28,color='#d8c6a4',fabric='linen',fold='relaxed',valance=null}={}){
   if(!['roller','roman','zebra'].includes(style))throw new RangeError('Unknown shade style: '+style);
   if(!Number.isFinite(width)||!Number.isFinite(height)||width<=.15||height<=.20)throw new RangeError('Shade dimensions must be positive metres.');
   const root=new THREE.Group();root.name='ShadeMechanism_'+style;
@@ -94,6 +95,13 @@ export function createMechanism({style='roller',width=1.62,height=1.28,color='#d
   const cap=new THREE.MeshStandardMaterial({color:'#eee9df',roughness:.54});cap.name='Warm_white_hardware';
   const stitch=cloth.clone();stitch.name='Sewn_hems';stitch.color.multiplyScalar(.95);stitch.normalMap=null;
   hardware(root,width,metal,cap);
+  if(style==='roller'&&valance){
+    // Square fascia valance (white, beige or grey) hides the roll, matched to the fabric.
+    const vm=new THREE.MeshStandardMaterial({color:valance,roughness:.62});vm.name='Valance';textures.add({dispose:()=>vm.dispose()});
+    roundBox(root,'Valance_front',width+.06,.100,.008,vm,0,.020,.066);
+    roundBox(root,'Valance_top',width+.06,.008,.092,vm,0,.068,.024);
+    for(const side of[-1,1])roundBox(root,'Valance_end_'+side,.008,.100,.092,vm,side*(width/2+.03),.020,.024);
+  }
   const state={style,drop:1,openness:1,time:0,actualDrop:1,bottomY:-height,rolledLength:0,spoolRadius:.024,spoolAngle:0,bandAlignment:1};
   const nodes={},coreRadius=.024,thickness=style==='roman'?.0007:.00045;
   let updater,disposed=false;

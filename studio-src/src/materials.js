@@ -35,7 +35,7 @@ export function clothTexture(kind='linen') {
       if(kind==='reed')k=(r()-.5)*14+((y%21)<4?-62:(y%21)<8?-20:10)+Math.sin(x*.09+y*.7)*9+((x%85)<2?-40:0);
       const i=(y*s+x)*4;d[i]=Math.max(0,Math.min(255,233+k));d[i+1]=Math.max(0,Math.min(255,229+k));d[i+2]=Math.max(0,Math.min(255,220+k));d[i+3]=255;
     }ctx.putImageData(image,0,0);
-  },/^(w|r|rp)-/.test(kind)?1024:512);
+  },/^(r|w)-/.test(kind)?1536:/^rp-/.test(kind)?1024:512);
 }
 export function woodTexture(){return texture('oak-grain',(ctx,s)=>{
   if(sourceImages.oak){ctx.drawImage(sourceImages.oak,0,0,s,s);return;}
